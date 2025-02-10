@@ -12,6 +12,7 @@ ini_set('display_errors', 1);
     <link rel="stylesheet" href="../css/main.css">  
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Settings</title>
 </head>
 <body>
@@ -328,28 +329,61 @@ if ($result->num_rows > 0) {
         document.getElementById("passwordModal").style.display = "none";
     }
     </script>
-    <?php
-if (isset($_POST["change_password"])) {
-    $entered_current_password = $_POST["current_password"];
-    $new_password = $_POST["new_password"];
-    $confirm_password = $_POST["confirm_password"];
-    $current_password_hash = $_POST["current_password_hash"];
+   <?php
+if (isset($_POST['change_password'])) {
+    $current_password = $_POST['current_password'];
+    $new_password = $_POST['new_password'];
+    $confirm_password = $_POST['confirm_password'];
 
-    if (!password_verify($entered_current_password, $current_password_hash)) {
-        echo "<script>alert('Incorrect current password!');</script>";
-    } elseif ($new_password !== $confirm_password) {
-        echo "<script>alert('New password and confirm password do not match!');</script>";
-    } elseif (strlen($new_password) < 6) {
-        echo "<script>alert('Password must be at least 6 characters!');</script>";
-    } else {
-        $new_password_hashed = password_hash($new_password, PASSWORD_DEFAULT);
-        $update_query = $database->prepare("UPDATE employee SET emp_password = ? WHERE emp_id = ?");
-        $update_query->bind_param("si", $new_password_hashed, $user_id);
-        if ($update_query->execute()) {
-            echo "<script>alert('Password changed successfully!');</script>";
+    // Check if the current password is correct
+    if (password_verify($current_password, $current_password_hash)) {
+        if ($new_password === $confirm_password) {
+            // Encrypt the new password
+            $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
+            
+            // Update password in database
+            $update_query = $database->prepare("UPDATE employee SET emp_password = ? WHERE emp_id = ?");
+            $update_query->bind_param("si", $new_password_hash, $user_id);
+            if ($update_query->execute()) {
+                echo "<script>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Password changed successfully!',
+                        confirmButtonColor: '#28a745'
+                    }).then(() => {
+                        window.location.href = 'settings.php';
+                    });
+                </script>";
+            } else {
+                echo "<script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops!',
+                        text: 'Something went wrong. Try again.',
+                        confirmButtonColor: '#dc3545'
+                    });
+                </script>";
+            }
         } else {
-            echo "<script>alert('Error changing password!');</script>";
+            echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'New passwords do not match!',
+                    confirmButtonColor: '#dc3545'
+                });
+            </script>";
         }
+    } else {
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Incorrect current password!',
+                confirmButtonColor: '#dc3545'
+            });
+        </script>";
     }
 }
 ?>
