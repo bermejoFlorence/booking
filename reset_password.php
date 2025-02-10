@@ -20,7 +20,7 @@ if (isset($_GET['token'])) {
 
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
-        $email = $user['email']; 
+        $email = $user['email'];
         $usertype = $user['usertype']; // Kunin ang usertype (p = client, a = admin)
     } else {
         echo "
@@ -42,9 +42,32 @@ if (isset($_GET['token'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $new_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $email = $_POST['email']; 
-    $usertype = $_POST['usertype']; // Ipadala ang usertype sa form
+    $new_password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    $email = $_POST['email'];
+    $usertype = $_POST['usertype'];
+
+    // Server-side validation: Check if passwords match
+    if ($new_password !== $confirm_password) {
+        echo "
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password Mismatch!',
+                    text: 'New password and confirm password do not match.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.history.back();
+                });
+            });
+        </script>";
+        exit();
+    }
+
+    // Hash the new password
+    $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
 
     if ($usertype === 'p') {
         // Update password sa client table
@@ -52,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$update_client) {
             die("Prepare failed (client table): " . $database->error);
         }
-        $update_client->bind_param("ss", $new_password, $email);
+        $update_client->bind_param("ss", $hashed_password, $email);
         $update_client->execute();
     } elseif ($usertype === 'a') {
         // Update password sa employee table para sa admin
@@ -60,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$update_admin) {
             die("Prepare failed (employee table): " . $database->error);
         }
-        $update_admin->bind_param("ss", $new_password, $email);
+        $update_admin->bind_param("ss", $hashed_password, $email);
         $update_admin->execute();
     }
 
@@ -89,7 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -179,59 +201,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         /* === Responsive Styles === */
-        @media screen and (max-width: 1024px) {
-            .container {
-                width: 50%;
-            }
-        }
-
         @media screen and (max-width: 768px) {
             .container {
                 width: 70%;
-                padding: 1.5rem;
-            }
-
-            .header-text {
-                font-size: 1.5rem;
-            }
-
-            .sub-text {
-                font-size: 0.9rem;
-            }
-
-            label {
-                font-size: 0.9rem;
-            }
-
-            .btn {
-                font-size: 0.9rem;
             }
         }
 
         @media screen and (max-width: 480px) {
             .container {
                 width: 90%;
-                padding: 1.2rem;
-            }
-
-            .header-text {
-                font-size: 1.3rem;
-            }
-
-            .sub-text {
-                font-size: 0.85rem;
-            }
-
-            label {
-                font-size: 0.85rem;
-            }
-
-            .btn {
-                font-size: 0.85rem;
-                padding: 0.7rem;
             }
         }
     </style>
+
+    <script>
+        function validateForm(event) {
+            let password = document.getElementById("password").value;
+            let confirmPassword = document.getElementById("confirm_password").value;
+
+            if (password !== confirmPassword) {
+                event.preventDefault(); // Pigilan ang form submission
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password Mismatch!',
+                    text: 'New password and confirm password do not match.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -239,12 +237,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p class="header-text">Reset Password</p>
     <p class="sub-text">Enter your new password below</p>
 
-    <form action="" method="POST">
+    <form action="" method="POST" onsubmit="validateForm(event)">
         <input type="hidden" name="email" value="<?= htmlspecialchars($email) ?>">
         <input type="hidden" name="usertype" value="<?= htmlspecialchars($usertype) ?>">
 
         <label>Enter New Password:</label>
-        <input type="password" name="password" class="input-text" required>
+        <input type="password" id="password" name="password" class="input-text" required>
+
+        <label>Confirm Password:</label>
+        <input type="password" id="confirm_password" name="confirm_password" class="input-text" required>
 
         <button type="submit" class="btn">Change Password</button>
     </form>
@@ -254,4 +255,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
-
