@@ -1,12 +1,9 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-?>
 
-<?php
 include("connection.php");
 require __DIR__ . '/vendor/autoload.php';
-
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -29,7 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Save token sa database
         $update = $database->prepare("UPDATE webuser SET reset_token = ?, reset_expiry = ? WHERE email = ?");
         $update->bind_param("sss", $token, $expiry, $email);
-        $update->execute();
+        if (!$update->execute()) {
+            die("Error saving token: " . $database->error);
+        }
 
         // Setup PHPMailer
         $mail = new PHPMailer(true);
@@ -46,63 +45,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->addAddress($email);
             $mail->isHTML(true);
             $mail->Subject = 'Password Reset Request';
-            $baseURL = "https://exzphotography.com/booking"; // Palitan ito ng iyong aktwal na domain
-            $$mail->Body = "Click <a href='$baseURL/reset_password.php?token=" . urlencode($token) . "'>here</a> to reset your password.";
 
-            
+            // Gamitin ang `urlencode()` para maiwasan ang token corruption
+            $encoded_token = urlencode($token);
+            $reset_link = "http://localhost/book/reset_password.php?token=$encoded_token";
+
+            $mail->Body = "Click <a href='$reset_link'>here</a> to reset your password.";
 
             if ($mail->send()) {
-                echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
                 echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Email Sent!',
-                            text: 'Check your email for the reset link.',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = 'login.php';
-                            }
-                        });
-                    });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Email Sent!',
+                        text: 'Check your email for the reset link.',
+                        confirmButtonText: 'OK'
+                    }).then(() => { window.location.href = 'login.php'; });
                 </script>";
-                exit; // Para hindi na magpatuloy ang PHP script
+                exit;
             }
         } catch (Exception $e) {
-            echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-            echo "<script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops!',
-                        text: 'Email sending failed: " . addslashes($mail->ErrorInfo) . "',
-                        confirmButtonText: 'Try Again'
-                    });
-                });
-            </script>";
-            exit;
+            die("Error sending email: " . $mail->ErrorInfo);
         }
     } else {
-        echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
         echo "<script>
-        document.addEventListener('DOMContentLoaded', function() {
             Swal.fire({
                 icon: 'error',
                 title: 'Email Not Found!',
                 text: 'Please enter a registered email.',
                 confirmButtonText: 'Try Again'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'login.php';
-                }
-            });
-        });
-    </script>";
-    exit;
+            }).then(() => { window.location.href = 'login.php'; });
+        </script>";
+        exit;
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>
