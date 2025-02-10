@@ -1,90 +1,92 @@
 <?php
-include("connection.php");
+require 'connection.php'; // Ensure this file connects to the database session_start();
 
-if (isset($_GET['token'])) {
-    $token = $_GET['token'];
+if (!isset($_GET['token']) || empty($_GET['token'])) {
+    header("Location: forgot_password.php");
+    exit();
+}
 
-    // Check kung valid ang token sa webuser table
-    $stmt = $database->prepare("SELECT * FROM webuser WHERE reset_token = ? AND reset_expiry > NOW()");
-    if (!$stmt) {
-        die("Prepare failed: " . $database->error);
-    }
-    $stmt->bind_param("s", $token);
-    $stmt->execute();
-    $result = $stmt->get_result();
+$token = $_GET['token'];
 
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
-        $email = $user['email']; 
-        $usertype = $user['usertype']; // Kunin ang usertype (p = client, a = admin)
-    } else {
-        echo "
-        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid or Expired Token!',
-                    text: 'Please request a new password reset link.',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    window.location.href = 'forgot_password.php';
-                });
+$stmt = $database->prepare("SELECT email, usertype FROM webuser WHERE reset_token = ? AND reset_expiry > NOW() LIMIT 1");
+$stmt->bind_param("s", $token);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    echo "<script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid or Expired Token!',
+            text: 'The reset link has expired or is invalid.',
+            confirmButtonText: 'OK'
+        }).then(() => { window.location.href = 'forgot_password.php'; });
+    </script>";
+    exit();
+}
+
+$row = $result->fetch_assoc();
+$email = $row['email'];
+$usertype = $row['usertype'];
+$stmt->close();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    if ($password !== $confirm_password) {
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Passwords do not match!',
+                text: 'Please enter the same password in both fields.',
+                confirmButtonText: 'OK'
             });
         </script>";
         exit();
     }
-}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $new_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $email = $_POST['email']; 
-    $usertype = $_POST['usertype']; // Ipadala ang usertype sa form
-
-    if ($usertype === 'p') {
-        // Update password sa client table
-        $update_client = $database->prepare("UPDATE client SET c_password = ? WHERE c_email = ?");
-        if (!$update_client) {
-            die("Prepare failed (client table): " . $database->error);
-        }
-        $update_client->bind_param("ss", $new_password, $email);
-        $update_client->execute();
-    } elseif ($usertype === 'a') {
-        // Update password sa employee table para sa admin
-        $update_admin = $database->prepare("UPDATE employee SET emp_password = ? WHERE emp_email = ?");
-        if (!$update_admin) {
-            die("Prepare failed (employee table): " . $database->error);
-        }
-        $update_admin->bind_param("ss", $new_password, $email);
-        $update_admin->execute();
-    }
-
-    // I-clear ang reset token sa webuser table
-    $clear_token = $database->prepare("UPDATE webuser SET reset_token = NULL, reset_expiry = NULL WHERE email = ?");
-    if (!$clear_token) {
-        die("Prepare failed (webuser table): " . $database->error);
-    }
-    $clear_token->bind_param("s", $email);
-    $clear_token->execute();
-
-    echo "
-    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    if (strlen($password) < 8) {
+        echo "<script>
             Swal.fire({
-                icon: 'success',
-                title: 'Password Reset Successful!',
-                text: 'You can now log in with your new password.',
+                icon: 'error',
+                title: 'Password Too Short!',
+                text: 'Your password must be at least 8 characters long.',
                 confirmButtonText: 'OK'
-            }).then(() => {
-                window.location.href = 'login.php';
             });
-        });
+        </script>";
+        exit();
+    }
+
+    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+    
+    if ($usertype === 'client') {
+        $update_stmt = $database->prepare("UPDATE client SET password = ? WHERE email = ?");
+    } else {
+        $update_stmt = $database->prepare("UPDATE admin SET password = ? WHERE email = ?");
+    }
+    $update_stmt->bind_param("ss", $hashed_password, $email);
+    $update_stmt->execute();
+    $update_stmt->close();
+
+    // Clear the reset token
+    $clear_token_stmt = $database->prepare("UPDATE webuser SET reset_token = NULL, reset_expiry = NULL WHERE email = ?");
+    $clear_token_stmt->bind_param("s", $email);
+    $clear_token_stmt->execute();
+    $clear_token_stmt->close();
+    $database->close();
+
+    echo "<script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Password Reset Successfully!',
+            text: 'You can now log in with your new password.',
+            confirmButtonText: 'OK'
+        }).then(() => { window.location.href = 'login.php'; });
     </script>";
     exit();
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -240,6 +242,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <label>Enter New Password:</label>
         <input type="password" name="password" class="input-text" required>
+
+        <label>Confirm New Password:</label>
+        <input type="password" name="confirm_password" class="input-text" required>
 
         <button type="submit" class="btn">Change Password</button>
     </form>
