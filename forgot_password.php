@@ -46,7 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->addAddress($email);
             $mail->isHTML(true);
             $mail->Subject = 'Password Reset Request';
-            $mail->Body = "Click <a href='http://localhost/book/reset_password.php?token=$token'>here</a> to reset your password.";
+            $baseURL = "https://exzphotography.com/booking"; // Palitan ito ng iyong aktwal na domain
+            $mail->Body = "Click <a href='$baseURL/reset_password.php?token=$token'>here</a> to reset your password.";
+            
 
             if ($mail->send()) {
                 echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
