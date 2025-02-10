@@ -1,6 +1,9 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+?>
+
+<?php
 include("connection.php");
 
 if (isset($_GET['token'])) {
@@ -8,6 +11,9 @@ if (isset($_GET['token'])) {
 
     // Check kung valid ang token sa webuser table
     $stmt = $database->prepare("SELECT * FROM webuser WHERE reset_token = ? AND reset_expiry > NOW()");
+    if (!$stmt) {
+        die("Prepare failed: " . $database->error);
+    }
     $stmt->bind_param("s", $token);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -17,13 +23,19 @@ if (isset($_GET['token'])) {
         $email = $user['email']; 
         $usertype = $user['usertype']; // Kunin ang usertype (p = client, a = admin)
     } else {
-        echo "<script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid or Expired Token!',
-                text: 'Please request a new password reset link.',
-                confirmButtonText: 'OK'
-            }).then(() => { window.location.href = 'forgot_password.php'; });
+        echo "
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid or Expired Token!',
+                    text: 'Please request a new password reset link.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = 'forgot_password.php';
+                });
+            });
         </script>";
         exit();
     }
@@ -37,38 +49,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($usertype === 'p') {
         // Update password sa client table
         $update_client = $database->prepare("UPDATE client SET c_password = ? WHERE c_email = ?");
-        $update_client->bind_param("ss", $new_password, $email);
-        if (!$update_client->execute()) {
-            die("Error updating client password: " . $database->error);
+        if (!$update_client) {
+            die("Prepare failed (client table): " . $database->error);
         }
+        $update_client->bind_param("ss", $new_password, $email);
+        $update_client->execute();
     } elseif ($usertype === 'a') {
         // Update password sa employee table para sa admin
         $update_admin = $database->prepare("UPDATE employee SET emp_password = ? WHERE emp_email = ?");
-        $update_admin->bind_param("ss", $new_password, $email);
-        if (!$update_admin->execute()) {
-            die("Error updating admin password: " . $database->error);
+        if (!$update_admin) {
+            die("Prepare failed (employee table): " . $database->error);
         }
+        $update_admin->bind_param("ss", $new_password, $email);
+        $update_admin->execute();
     }
 
     // I-clear ang reset token sa webuser table
     $clear_token = $database->prepare("UPDATE webuser SET reset_token = NULL, reset_expiry = NULL WHERE email = ?");
-    $clear_token->bind_param("s", $email);
-    if (!$clear_token->execute()) {
-        die("Error clearing reset token: " . $database->error);
+    if (!$clear_token) {
+        die("Prepare failed (webuser table): " . $database->error);
     }
+    $clear_token->bind_param("s", $email);
+    $clear_token->execute();
 
-    echo "<script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Password Reset Successful!',
-            text: 'You can now log in with your new password.',
-            confirmButtonText: 'OK'
-        }).then(() => { window.location.href = 'login.php'; });
+    echo "
+    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Password Reset Successful!',
+                text: 'You can now log in with your new password.',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = 'login.php';
+            });
+        });
     </script>";
     exit();
 }
 ?>
-reset pas
 
 
 <!DOCTYPE html>
