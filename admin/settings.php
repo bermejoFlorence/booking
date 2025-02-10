@@ -227,12 +227,12 @@
                                     <div  class="dashboard-items setting-tabs"  style="padding:20px;margin:auto;width:95%;display: flex;">
                                         <div class="btn-icon-back dashboard-icons-setting" style="background-image: url('../img/icons/patients-hover.svg');"></div>
                                         <div>
-                                                <div class="h1-dashboard" style="color: #ff5050;">
-                                                    Delete Account
+                                                <div class="h1-dashboard" >
+                                                    Profile Settings
                                                     
                                                 </div><br>
                                                 <div class="h3-dashboard"  style="font-size: 15px;">
-                                                    Will Permanently Remove your Account
+                                                   Edit your profile details or your password.
                                                 </div>
                                         </div>
                                                 
