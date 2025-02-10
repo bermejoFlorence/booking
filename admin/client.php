@@ -91,6 +91,15 @@ $result = $database->query($sql);
         color: rgb(49, 49, 49);
         margin: 0;
     }
+    .header {
+    background-color: green;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    width: 100%;
+}
 
     .search-container {
     display: flex;
@@ -337,15 +346,22 @@ hr {
         padding: 6px 8px;
     }
 }
+@media screen and (max-width: 480px) {
+    .header {
+        font-size: 3px;
+        padding: 8px;
+    }
+}
 </style>
 
-
-    <div class="container">  
-        
+    
+<div class="header">
+        <h1>EXZPHOTOGRAPHY STUDIO</h1>
+    </div>
     <div class="hamburger" onclick="toggleMenu()">
-            ☰
-        </div>
-
+                ☰
+    </div>
+    <div class="container">  
         <div class="menu">
             <div class="close-btn" onclick="toggleMenu()">✖</div>
             

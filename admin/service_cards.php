@@ -84,6 +84,15 @@ if (!$service_query) {
     width: 100%;
     margin-top: 10px; /* Space sa taas ng search at reset button */
 }
+.header {
+    background-color: green;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    width: 100%;
+}
 
 .header-searchbar {
     flex: 1;
@@ -372,11 +381,23 @@ hr {
           padding: 8px;
       }
   }
+  @media screen and (max-width: 480px) {
+    .header {
+        font-size: 3px;
+        padding: 8px;
+    }
+}
 
 </style>
 
+  
+<div class="header">
+        <h1>EXZPHOTOGRAPHY STUDIO</h1>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+                ☰
+    </div>
     <div class="container">
-        <div class="hamburger" onclick="toggleMenu()">☰</div>
         <div class="menu">
             <div class="close-btn" onclick="toggleMenu()">✖</div>
             <table class="menu-container" border="0">

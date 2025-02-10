@@ -64,6 +64,23 @@
                 width: 30%; /* Even smaller width for large desktops */
             }
         }
+
+        .header {
+    background-color: green;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    width: 100%;
+}
+
+@media screen and (max-width: 480px) {
+    .header {
+        font-size: 3px;
+        padding: 8px;
+    }
+}
     </style>
     
     
@@ -103,12 +120,13 @@
         $user_email = "Unknown Email"; // Default na value kung walang nahanap na email
     }
     ?>
+        <div class="header">
+        <h1>EXZPHOTOGRAPHY STUDIO</h1>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+                ☰
+    </div>
     <div class="container">
-             <!-- Hamburger Icon -->
-             <div class="hamburger" onclick="toggleMenu()">
-            ☰
-        </div>
-
         <div class="menu">
             <div class="close-btn" onclick="toggleMenu()">✖</div>
             
