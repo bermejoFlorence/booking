@@ -118,7 +118,7 @@
         <a href="">
           <i class="fa fa-envelope" aria-hidden="true"></i>
           <span>
-            Email : florencebermejo@gmail.com
+            Email : rysha.andaya@cbsua.edu.ph
           </span>
         </a>
         <div>
@@ -146,7 +146,7 @@
     </div>
   </section>
   <!-- end info_section -->
-   
+
   <!-- jQery -->
   <script src="js/jquery-3.4.1.min.js"></script>
   <!-- bootstrap js -->
