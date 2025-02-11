@@ -1,6 +1,7 @@
+
 <?php
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 1); // displaying errors
 ?>
 <!DOCTYPE html>
 <html>
@@ -35,7 +36,7 @@ ini_set('display_errors', 1);
   <link href="webpage/css/responsive.css" rel="stylesheet" />
 
   <?php
-include 'connection.php'; // Siguraduhin na tama ang path ng database connection mo
+include 'connection.php'; // database connection
 
 $query = "SELECT f.comment, f.date_created, f.rating, c.c_fullname 
           FROM feedback f
@@ -139,7 +140,7 @@ $rating_map = [
     <!-- end slider section -->
   </div>
 
-  <!-- blog section -->
+  <!-- pictures section -->
 
   <section class="blog_section layout_padding">
     <div class="container">
@@ -197,22 +198,13 @@ $rating_map = [
       </div>
     </div>
   </section>
+  <!-- end picture section -->
 
-  <!-- end blog section -->
-
-  <!-- about section -->
-
-
-
-  <!-- end about section -->
-
-
-  <!-- client section -->
-
+  <!-- feedback section -->
   <section class="client_section layout_padding-bottom">
   <div class="container">
     <div class="heading_container">
-      <h2>Testimonial</h2>
+      <h2>Client's Feedback</h2>
     </div>
     <div id="carouselExample2Controls" class="carousel slide" data-ride="carousel">
       <div class="carousel-inner">
@@ -266,12 +258,11 @@ $rating_map = [
       </div>
     </div>
   </div>
-</section>
-  <!-- end client section -->
+  </section>
+  <!-- end feedback section -->
 
   <!-- info section -->
   <section class="info_section long_section">
-
     <div class="container">
       <div class="contact_nav">
         <a href="">
@@ -283,7 +274,7 @@ $rating_map = [
         <a href="">
           <i class="fa fa-envelope" aria-hidden="true"></i>
           <span>
-            Email : florencebermejo@gmail.com
+            Email : rysha.andaya@cbsua.edu.ph
           </span>
         </a>
         <div>
@@ -311,8 +302,6 @@ $rating_map = [
     </div>
   </section>
   <!-- end info_section -->
-
-
   <!-- jQery -->
   <script src="webpage/js/jquery-3.4.1.min.js"></script>
   <!-- bootstrap js -->
