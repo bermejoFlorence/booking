@@ -13,7 +13,7 @@
   <meta name="description" content="" />
   <meta name="author" content="" />
 
-  <title>Edgecut</title>
+  <title>Ezphotography / About</title>
 
 
   <!-- bootstrap core css -->
@@ -60,12 +60,12 @@
             </ul>
           </div>
           <div class="quote_btn-container">
-            <a href="login.php">
+            <a href="../login.php">
               <span class="btn btn-outline-primary">
                 Login
               </span>
             </a>
-            <a href="create-account.php">
+            <a href="../create-account.php">
               <span class="btn btn-primary">
                 Register
               </span>
@@ -78,7 +78,6 @@
   </div>
 
   <!-- about section -->
-
   <section class="about_section layout_padding long_section">
     <div class="container">
       <div class="row">
@@ -95,7 +94,7 @@
               </h2>
             </div>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti dolorem eum consequuntur ipsam repellat dolor soluta aliquid laborum, eius odit consectetur vel quasi in quidem, eveniet ab est corporis tempore.
+              Exzphotography owned by Mark Eco, located at Barangay Tara, Sipocot, Camarines Sur
             </p>
         
           </div>
@@ -103,13 +102,11 @@
       </div>
     </div>
   </section>
-
   <!-- end about section -->
 
 
   <!-- info section -->
   <section class="info_section long_section">
-
     <div class="container">
       <div class="contact_nav">
         <a href="">
@@ -149,11 +146,7 @@
     </div>
   </section>
   <!-- end info_section -->
-
-
-
-
-
+   
   <!-- jQery -->
   <script src="js/jquery-3.4.1.min.js"></script>
   <!-- bootstrap js -->
