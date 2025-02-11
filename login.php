@@ -145,6 +145,20 @@
                 padding: 0.7rem;
             }
         }
+
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: #007bff;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+
     </style>
 <?php
 session_start();
@@ -239,6 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>Don't have an account? <a href="create-account.php">Sign Up</a></p>
         <p>Forgot Password? <a href="forgot_password.php">Recover Account</a></p>
     </div>
+    <a href="index.php" class="back-btn">← Back to Home</a>
 </div>
 
 <!-- JavaScript for SweetAlert -->
