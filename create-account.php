@@ -132,21 +132,29 @@
             }
         }
 
-        .password-container {
+        .password-wrapper {
         position: relative;
         display: flex;
         align-items: center;
     }
-    .password-container input {
+
+    .password-wrapper .form-control {
         flex: 1;
-        padding-right: 30px; /* Para hindi matakpan ng icon ang text */
+        padding-right: 35px;
     }
-    .toggle-password {
+
+    .password-toggle {
         position: absolute;
         right: 10px;
         cursor: pointer;
-        font-size: 18px;
+        color: #888;
     }
+
+    .password-toggle:hover {
+        color: #007BFF;
+    }
+
+      
     </style>
 </head>
 <body>
@@ -255,7 +263,6 @@ if ($_POST) {
                 <input type="tel" name="tele" class="form-control" placeholder="ex: 09123456789" 
                     pattern="^09[0-9]{9}$" maxlength="11" required
                     oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                <small>Must be 11 digits, starting with 09</small>
             </div>
         </div>
 
@@ -264,23 +271,19 @@ if ($_POST) {
             <input type="text" name="address" class="form-control" placeholder="Address" required>
         </div>
 
+        
         <div class="form-group">
             <label for="newpassword">Create New Password:</label>
-            <div class="password-container">
                 <input type="password" name="newpassword" id="newpassword" class="form-control" placeholder="New Password" 
                     minlength="8" pattern=".{8,}" required>
-                <span class="toggle-password" onclick="togglePassword('newpassword')">👁</span>
-            </div>
-            <small>Must be at least 8 characters</small>
+                <i class="fas fa-eye password-toggle" onclick="togglePassword('newpassword', this)"></i>
         </div>
-
         <div class="form-group">
             <label for="cpassword">Confirm Password:</label>
-            <div class="password-container">
+            
                 <input type="password" name="cpassword" id="cpassword" class="form-control" placeholder="Confirm Password" 
                     minlength="8" pattern=".{8,}" required>
-                <span class="toggle-password" onclick="togglePassword('cpassword')">👁</span>
-            </div>
+                <i class="fas fa-eye password-toggle" onclick="togglePassword('cpassword', this)"></i>
         </div>
 
         <?php echo $error; ?>
@@ -295,15 +298,18 @@ if ($_POST) {
 </div>
 
 <script>
-        function togglePassword(fieldId) {
-        var passwordField = document.getElementById(fieldId);
-        if (passwordField.type === "password") {
-            passwordField.type = "text";
+    function togglePassword(fieldId, icon) {
+        let field = document.getElementById(fieldId);
+        if (field.type === "password") {
+            field.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
         } else {
-            passwordField.type = "password";
+            field.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
         }
     }
-
 </script>
 </body>
 
