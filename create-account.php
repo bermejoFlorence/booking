@@ -307,7 +307,7 @@ if ($_POST) {
         </div>
 
         <p class="sub-text">Already have an account? <a href="login.php">Login</a></p>
-        <a href="login.php" class="back-btn">← Back to Login</a>
+        <a href="index.php" class="back-btn">← Back to Home</a>
         
     </form>
 </div>
