@@ -131,6 +131,22 @@
                 min-width: 100%;
             }
         }
+
+        .password-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .password-container input {
+        flex: 1;
+        padding-right: 30px; /* Para hindi matakpan ng icon ang text */
+    }
+    .toggle-password {
+        position: absolute;
+        right: 10px;
+        cursor: pointer;
+        font-size: 18px;
+    }
     </style>
 </head>
 <body>
@@ -146,7 +162,7 @@ $_SESSION["date"] = $date;
 include("connection.php");
 
 $error = '';
-
+// saving to database
 if ($_POST) {
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
@@ -213,7 +229,7 @@ if ($_POST) {
 }
 ?>
 
-
+<!-- form for creating account -->
 <div class="container">
     <p class="header-text">Let’s Get Started</p>
 
@@ -236,7 +252,10 @@ if ($_POST) {
             </div>
             <div class="form-group-half">
                 <label for="tele">Mobile Number:</label>
-                <input type="tel" name="tele" class="form-control" placeholder="ex: 0912345678" pattern="[0]{1}[0-9]{9}">
+                <input type="tel" name="tele" class="form-control" placeholder="ex: 09123456789" 
+                    pattern="^09[0-9]{9}$" maxlength="11" required
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <small>Must be 11 digits, starting with 09</small>
             </div>
         </div>
 
@@ -247,12 +266,21 @@ if ($_POST) {
 
         <div class="form-group">
             <label for="newpassword">Create New Password:</label>
-            <input type="password" name="newpassword" class="form-control" placeholder="New Password" required>
+            <div class="password-container">
+                <input type="password" name="newpassword" id="newpassword" class="form-control" placeholder="New Password" 
+                    minlength="8" pattern=".{8,}" required>
+                <span class="toggle-password" onclick="togglePassword('newpassword')">👁</span>
+            </div>
+            <small>Must be at least 8 characters</small>
         </div>
 
         <div class="form-group">
             <label for="cpassword">Confirm Password:</label>
-            <input type="password" name="cpassword" class="form-control" placeholder="Confirm Password" required>
+            <div class="password-container">
+                <input type="password" name="cpassword" id="cpassword" class="form-control" placeholder="Confirm Password" 
+                    minlength="8" pattern=".{8,}" required>
+                <span class="toggle-password" onclick="togglePassword('cpassword')">👁</span>
+            </div>
         </div>
 
         <?php echo $error; ?>
@@ -265,6 +293,18 @@ if ($_POST) {
         <p class="sub-text">Already have an account? <a href="login.php">Login</a></p>
     </form>
 </div>
+
+<script>
+        function togglePassword(fieldId) {
+        var passwordField = document.getElementById(fieldId);
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+        } else {
+            passwordField.type = "password";
+        }
+    }
+
+</script>
 </body>
 
 </html>

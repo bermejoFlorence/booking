@@ -13,7 +13,7 @@
   <meta name="description" content="" />
   <meta name="author" content="" />
 
-  <title>Edgecut</title>
+  <title>EXZPHOTOGRAPHY / Contact US</title>
 
 
   <!-- bootstrap core css -->
@@ -37,7 +37,7 @@
   <div class="hero_area">
     <!-- header section strats -->
         <!-- header section strats -->
-        <header class="header_section long_section px-0">
+    <header class="header_section long_section px-0">
       <nav class="navbar navbar-expand-lg custom_nav-container ">
         <a class="navbar-brand" href="../index.php">
           <span style="color: orange; ">EXZPHOTOGRAPHY</span>
@@ -61,12 +61,12 @@
             </ul>
           </div>
           <div class="quote_btn-container">
-            <a href="login.php">
+            <a href="../login.php">
               <span class="btn btn-outline-primary">
                 Login
               </span>
             </a>
-            <a href="create-account.php">
+            <a href="../create-account.php">
               <span class="btn btn-primary">
                 Register
               </span>
