@@ -153,6 +153,7 @@
     .password-toggle:hover {
         color: #007BFF;
     }
+
     .back-btn {
             display: block;
             text-align: center;
@@ -300,13 +301,14 @@ if ($_POST) {
 
         <?php echo $error; ?>
 
-        < class="btn-container">
+        <div class="btn-container">
             <input type="reset" value="Reset" class="btn btn-secondary">
             <input type="submit" value="Sign Up" class="btn btn-primary">
         </div>
 
         <p class="sub-text">Already have an account? <a href="login.php">Login</a></p>
         <a href="login.php" class="back-btn">← Back to Login</a>
+        
     </form>
 </div>
 
