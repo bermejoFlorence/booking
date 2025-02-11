@@ -272,19 +272,19 @@ if ($_POST) {
         </div>
 
         
-        <div class="form-group">
-            <label for="newpassword">Create New Password:</label>
-                <input type="password" name="newpassword" id="newpassword" class="form-control" placeholder="New Password" 
-                    minlength="8" pattern=".{8,}" required>
-                <i class="fas fa-eye password-toggle" onclick="togglePassword('newpassword', this)"></i>
-        </div>
-        <div class="form-group">
-            <label for="cpassword">Confirm Password:</label>
-            
-                <input type="password" name="cpassword" id="cpassword" class="form-control" placeholder="Confirm Password" 
-                    minlength="8" pattern=".{8,}" required>
-                <i class="fas fa-eye password-toggle" onclick="togglePassword('cpassword', this)"></i>
-        </div>
+            <div class="form-group">
+                <label for="newpassword">Create New Password:</label>
+                    <input type="password" name="newpassword" id="newpassword" class="form-control" placeholder="New Password" 
+                        minlength="8" pattern=".{8,}" required>
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('newpassword', this)"></i>
+            </div>
+            <div class="form-group">
+                <label for="cpassword">Confirm Password:</label>
+                
+                    <input type="password" name="cpassword" id="cpassword" class="form-control" placeholder="Confirm Password" 
+                        minlength="8" pattern=".{8,}" required>
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('cpassword', this)"></i>
+            </div>
 
         <?php echo $error; ?>
 
@@ -298,7 +298,7 @@ if ($_POST) {
 </div>
 
 <script>
-    function togglePassword(fieldId, icon) {
+     function togglePassword(fieldId, icon) {
         let field = document.getElementById(fieldId);
         if (field.type === "password") {
             field.type = "text";
