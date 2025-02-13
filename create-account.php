@@ -173,9 +173,7 @@
 <body>
 <?php
 session_start();
-
 require __DIR__ . '/vendor/autoload.php';
-
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -189,7 +187,6 @@ $_SESSION["date"] = $date;
 
 include("connection.php");
 
-
 $error = '';
 if ($_POST) {
     $fname = $_POST['fname'];
@@ -201,19 +198,42 @@ if ($_POST) {
     $newpassword = $_POST['newpassword'];
     $cpassword = $_POST['cpassword'];
 
+    echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>'; // Load SweetAlert
+
     if ($newpassword == $cpassword) {
         $empCheckResult = $database->query("SELECT emp_id FROM employee WHERE emp_id = 1;");
         if ($empCheckResult->num_rows == 0) {
-            $error = '<div class="error-message">Error: emp_id 1 does not exist in the employee table.</div>';
+            echo '<script>
+                Swal.fire({
+                    title: "Error!",
+                    text: "emp_id 1 does not exist in the employee table.",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+            </script>';
         } else {
             $result = $database->query("SELECT * FROM client WHERE c_email='$email';");
 
             if ($result->num_rows == 1) {
-                $error = '<div class="error-message">Email already registered.</div>';
+                echo '<script>
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Email already registered.",
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                </script>';
             } else {
                 $webuserResult = $database->query("SELECT * FROM webuser WHERE email='$email';");
                 if ($webuserResult->num_rows == 1) {
-                    $error = '<div class="error-message">Email already registered.</div>';
+                    echo '<script>
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Email already registered.",
+                            icon: "error",
+                            confirmButtonText: "OK"
+                        });
+                    </script>';
                 } else {
                     $hashedPassword = password_hash($newpassword, PASSWORD_DEFAULT);
                     $verification_code = md5(uniqid(rand(), true));
@@ -226,18 +246,38 @@ if ($_POST) {
                     if ($database->query($queryClient) && $database->query($queryWebuser)) {
                         sendVerificationEmail($email, $verification_code);
                         echo '<script>
-                            alert("Account created! Please check your email for verification.");
-                            window.location.href = "login.php";
+                            Swal.fire({
+                                title: "Success!",
+                                text: "Account created! Please check your email for verification.",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            }).then(() => {
+                                window.location.href = "login.php";
+                            });
                         </script>';
                         exit();
                     } else {
-                        $error = '<div class="error-message">Error saving data: ' . $database->error . '</div>';
+                        echo '<script>
+                            Swal.fire({
+                                title: "Error!",
+                                text: "Error saving data: ' . $database->error . '",
+                                icon: "error",
+                                confirmButtonText: "OK"
+                            });
+                        </script>';
                     }
                 }
             }
         }
     } else {
-        $error = '<div class="error-message">Password Confirmation Error! Reconfirm Password.</div>';
+        echo '<script>
+            Swal.fire({
+                title: "Error!",
+                text: "Password Confirmation Error! Reconfirm Password.",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        </script>';
     }
 }
 
@@ -265,10 +305,18 @@ function sendVerificationEmail($email, $verification_code) {
 
         $mail->send();
     } catch (Exception $e) {
-        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        echo '<script>
+            Swal.fire({
+                title: "Error!",
+                text: "Message could not be sent. Mailer Error: ' . $mail->ErrorInfo . '",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        </script>';
     }
 }
 ?>
+
 
 <!-- form for creating account -->
 <div class="container">

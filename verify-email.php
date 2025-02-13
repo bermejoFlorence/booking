@@ -10,6 +10,8 @@ if (isset($_GET['code'])) {
     $query = "SELECT * FROM client WHERE verification_code='$verification_code' AND verified=0";
     $result = $database->query($query);
 
+    echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+
     if ($result->num_rows == 1) {
         $updateQuery = "UPDATE client SET verified=1 WHERE verification_code='$verification_code'";
         $database->query($updateQuery);
@@ -18,13 +20,25 @@ if (isset($_GET['code'])) {
         $database->query($updateWebuser);
 
         echo '<script>
-            alert("Email verified! You can now log in.");
-            window.location.href = "login.php";
+            Swal.fire({
+                title: "Success!",
+                text: "Email verified! You can now log in.",
+                icon: "success",
+                confirmButtonText: "OK"
+            }).then(() => {
+                window.location.href = "login.php";
+            });
         </script>';
     } else {
         echo '<script>
-            alert("Invalid or already verified.");
-            window.location.href = "login.php";
+            Swal.fire({
+                title: "Error!",
+                text: "Invalid or already verified.",
+                icon: "error",
+                confirmButtonText: "OK"
+            }).then(() => {
+                window.location.href = "login.php";
+            });
         </script>';
     }
 } else {
