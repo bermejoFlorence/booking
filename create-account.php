@@ -173,6 +173,14 @@
 <body>
 <?php
 session_start();
+
+require __DIR__ . '/vendor/autoload.php';
+
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+date_default_timezone_set('Asia/Manila');
 $_SESSION["user"] = "";
 $_SESSION["usertype"] = "";
 
@@ -182,8 +190,8 @@ $_SESSION["date"] = $date;
 
 include("connection.php");
 
+
 $error = '';
-// saving to database
 if ($_POST) {
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
@@ -194,51 +202,36 @@ if ($_POST) {
     $newpassword = $_POST['newpassword'];
     $cpassword = $_POST['cpassword'];
 
-    // Check if passwords match
     if ($newpassword == $cpassword) {
-        // Check if emp_id 1 exists in employee table
         $empCheckResult = $database->query("SELECT emp_id FROM employee WHERE emp_id = 1;");
-        if ($empCheckResult && $empCheckResult->num_rows == 0) {
+        if ($empCheckResult->num_rows == 0) {
             $error = '<div class="error-message">Error: emp_id 1 does not exist in the employee table.</div>';
         } else {
             $result = $database->query("SELECT * FROM client WHERE c_email='$email';");
 
-            if (!$result) {
-                $error = '<div class="error-message">Error checking email in client: ' . $database->error . '</div>';
-            } else if ($result->num_rows == 1) {
-                $error = '<div class="error-message">Already have an account for this Email address in client table.</div>';
+            if ($result->num_rows == 1) {
+                $error = '<div class="error-message">Email already registered.</div>';
             } else {
                 $webuserResult = $database->query("SELECT * FROM webuser WHERE email='$email';");
-
-                if (!$webuserResult) {
-                    $error = '<div class="error-message">Error checking email in webuser: ' . $database->error . '</div>';
-                } else if ($webuserResult->num_rows == 1) {
-                    $error = '<div class="error-message">Already have an account for this Email address in webuser table.</div>';
+                if ($webuserResult->num_rows == 1) {
+                    $error = '<div class="error-message">Email already registered.</div>';
                 } else {
-                    // Encrypt the password before saving it to the database
                     $hashedPassword = password_hash($newpassword, PASSWORD_DEFAULT);
+                    $verification_code = md5(uniqid(rand(), true));
 
-                    // Insert into client table with emp_id = 1
-                    $queryClient = "INSERT INTO client (c_fullname, c_email, c_contactnum, c_address, c_password, emp_id, date_created) 
-                                    VALUES ('$fullname', '$email', '$tele', '$address', '$hashedPassword', 1, NOW());";
+                    $queryClient = "INSERT INTO client (c_fullname, c_email, c_contactnum, c_address, c_password, emp_id, date_created, verification_code, verified) 
+                                    VALUES ('$fullname', '$email', '$tele', '$address', '$hashedPassword', 1, NOW(), '$verification_code', 0);";
 
-                    $queryWebuser = "INSERT INTO webuser (email, usertype) VALUES ('$email', 'p');";
+                    $queryWebuser = "INSERT INTO webuser (email, usertype, verified) VALUES ('$email', 'p', 0);";
 
                     if ($database->query($queryClient) && $database->query($queryWebuser)) {
-                        echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+                        sendVerificationEmail($email, $verification_code);
                         echo '<script>
-                            Swal.fire({
-                                title: "Success!",
-                                text: "Account created successfully. Please login.",
-                                icon: "success",
-                                confirmButtonText: "OK"
-                            }).then(() => {
-                                window.location.href = "login.php";
-                            });
+                            alert("Account created! Please check your email for verification.");
+                            window.location.href = "login.php";
                         </script>';
                         exit();
-                    }
-                     else {
+                    } else {
                         $error = '<div class="error-message">Error saving data: ' . $database->error . '</div>';
                     }
                 }
@@ -246,6 +239,34 @@ if ($_POST) {
         }
     } else {
         $error = '<div class="error-message">Password Confirmation Error! Reconfirm Password.</div>';
+    }
+}
+
+// Function to send verification email
+function sendVerificationEmail($email, $verification_code) {
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com'; 
+        $mail->SMTPAuth = true;
+        $mail->Username = 'rysha.andaya@cbsua.edu.ph';  
+        $mail->Password = 'cmuz wzak zmwq laxt';  
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587; 
+
+        $mail->setFrom('rysha.andaya@cbsua.edu.ph', 'Exzphotogprahy Studio');
+        $mail->addAddress($email);
+        $mail->isHTML(true);
+        $mail->Subject = "Email Verification";
+        $mail->Body = "
+            <h2>Verify Your Email</h2>
+            <p>Click the link below to verify your email:</p>
+            <a href='http://localhost/book/verify-email.php?code=$verification_code'>Verify Email</a>
+        ";
+
+        $mail->send();
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
 }
 ?>

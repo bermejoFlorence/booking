@@ -37,12 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com'; 
             $mail->SMTPAuth = true;
-            $mail->Username = 'florencebermejo09@gmail.com';
-            $mail->Password = 'jqkc hulz qqhv mfqo'; // Gumamit ng App Password
+            $mail->Username = 'rysha.andaya@cbsua.edu.ph';
+            $mail->Password = 'cmuz wzak zmwq laxt'; // Gumamit ng App Password
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
 
-            $mail->setFrom('your-email@gmail.com', 'Book Management');
+            $mail->setFrom('rysha.andaya@cbsua.edu.ph', 'Exzphotography Studio');
             $mail->addAddress($email);
             $mail->isHTML(true);
             $mail->Subject = 'Password Reset Request';
