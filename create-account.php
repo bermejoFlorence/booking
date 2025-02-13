@@ -180,7 +180,6 @@ require __DIR__ . '/vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-date_default_timezone_set('Asia/Manila');
 $_SESSION["user"] = "";
 $_SESSION["usertype"] = "";
 
@@ -261,7 +260,7 @@ function sendVerificationEmail($email, $verification_code) {
         $mail->Body = "
             <h2>Verify Your Email</h2>
             <p>Click the link below to verify your email:</p>
-            <a href='http://localhost/book/verify-email.php?code=$verification_code'>Verify Email</a>
+            <a href='http://exzphotography.com/verify-email.php?code=$verification_code'>Verify Email</a>
         ";
 
         $mail->send();
