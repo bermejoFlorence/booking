@@ -13,6 +13,9 @@
 <!-- FullCalendar JS -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales-all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
 
         
     <title>Dashboard</title>
@@ -106,6 +109,27 @@ $resultInProcess = $queryInProcess->get_result();
 $rowInProcess = $resultInProcess->fetch_assoc();
 $inProcessCount = $rowInProcess['total_in_process'];
 
+$queryFeedback = $database->prepare("SELECT rating FROM feedback");
+$queryFeedback->execute();
+$resultFeedback = $queryFeedback->get_result();
+
+// Initialize counters
+$goodCount = 0;
+$neutralCount = 0;
+$badCount = 0;
+
+while ($rowFeedback = $resultFeedback->fetch_assoc()) {
+    $rating = $rowFeedback['rating'];
+    
+    if ($rating === 'Very Satisfied' || $rating === 'Satisfied') {
+        $goodCount++;
+    } elseif ($rating === 'Neutral') {
+        $neutralCount++;
+    } elseif ($rating === 'Dissatisfied' || $rating === 'Very Dissatisfied') {
+        $badCount++;
+    }
+}
+
 ?>
     <style>
 
@@ -114,7 +138,7 @@ $inProcessCount = $rowInProcess['total_in_process'];
     overflow: hidden;
     text-overflow: ellipsis;
     display: block;
-    max-width: 150px; /* Adjust to fit within the sidebar */
+    max-width: 125px; /* Adjust to fit within the sidebar */
 }
         .dash-body {
     margin: 30px auto; /* Adds top margin and centers horizontally */
@@ -189,12 +213,6 @@ $inProcessCount = $rowInProcess['total_in_process'];
     margin-left: 20px; /* Add spacing between icon and content */
 }
 
-.hamburger {
-    display: none;
-    cursor: pointer;
-    font-size: 24px;
-    margin-left: 15px;
-}
 
 /* Responsive Design */
 @media screen and (max-width: 768px) {
@@ -215,9 +233,7 @@ $inProcessCount = $rowInProcess['total_in_process'];
     .h3-dashboard {
         font-size: 14px; /* Adjust font size for smaller screens */
     }
-    .hamburger {
-        display: block;
-    }
+
 }
 
 
@@ -308,6 +324,30 @@ $inProcessCount = $rowInProcess['total_in_process'];
         padding: 8px;
     }
 }
+
+.chart-wrapper {
+    width: 90%;
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+    padding: 15px;
+}
+
+.chart-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
     </style>
 
     <div class="header">
@@ -349,7 +389,7 @@ $inProcessCount = $rowInProcess['total_in_process'];
                 </tr>
                 <tr class="menu-row">
                     <td class="menu-btn menu-icon-appoinment">
-                        <a href="bookings.php" class="non-style-link-menu"><div><p class="menu-text">My Bookings</p></a></div>
+                        <a href="bookings.php" class="non-style-link-menu"><div><p class="menu-text">Bookings</p></a></div>
                     </td>
                 </tr>
 
@@ -412,9 +452,18 @@ $inProcessCount = $rowInProcess['total_in_process'];
         </div>
 
         <div class="calendar-container">
-    <h2 style="text-align: center; font-size: 24px; margin-bottom: 20px; color: #28a745;">APPROVED SCHEDULE</h2>
-    <div id="calendar"></div>
-</div>
+            <h2 style="text-align: center; font-size: 24px; margin-bottom: 20px; color: #28a745;">APPROVED SCHEDULE</h2>
+            <div id="calendar"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <h3 class="chart-title">User Feedback Overview</h3>
+            <div class="chart-container">
+                <canvas id="feedbackChart"></canvas>
+            </div>
+        </div>
+
+        
         </table>
         </div>
     </div>
@@ -439,6 +488,43 @@ $inProcessCount = $rowInProcess['total_in_process'];
 
         calendar.render();
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    var ctx = document.getElementById('feedbackChart').getContext('2d');
+
+    var feedbackChart = new Chart(ctx, {
+        type: 'bar', 
+        data: {
+            labels: ['Good', 'Neutral', 'Bad'],
+            datasets: [{
+                label: 'Feedback Ratings',
+                data: [<?php echo $goodCount; ?>, <?php echo $neutralCount; ?>, <?php echo $badCount; ?>],
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                borderColor: ['#218838', '#d39e00', '#c82333'],
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    enabled: true
+                }
+            }
+        }
+    });
+});
     </script>
 </body>
 </html>
