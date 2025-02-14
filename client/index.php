@@ -66,7 +66,7 @@ $services = $database->query("SELECT * FROM services ORDER BY date_created DESC"
     position: relative; /* Siguraduhin na may relative positioning ito */
 }
 
-.header {
+    .header {
     background-color: green;
     color: white;
     text-align: center;
@@ -162,7 +162,7 @@ $services = $database->query("SELECT * FROM services ORDER BY date_created DESC"
             </table>
         </div>
 
-        <div class="dash-body" style="margin-top: 15px">
+        <div class="dash-body">
 
         <div class="carousel">
                 <div class="carousel-slides">
