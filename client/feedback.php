@@ -59,7 +59,7 @@ if ($userrow && $userrow->num_rows > 0) {
     position: relative; /* Siguraduhin na may relative positioning ito */
 }
 
-    .header {
+.header {
     background-color: green;
     color: white;
     text-align: center;
@@ -67,6 +67,12 @@ if ($userrow && $userrow->num_rows > 0) {
     font-size: 10px;
     font-weight: bold;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Para laging nasa ibabaw */
+
 }
 
 @media screen and (max-width: 768px) {
@@ -85,13 +91,13 @@ if ($userrow && $userrow->num_rows > 0) {
 
 .feedback-body {
             font-family: 'Poppins', sans-serif;
-            background: #f7f7f7;
             display: flex;
             justify-content: center;
             align-items: center;
             padding-top: 50px; /* Add space above the form */
             padding-bottom: 50px; /* Add space above the form */
             margin: 0;
+            margin-top: 20px;
         }
 
         .feedback-container {
