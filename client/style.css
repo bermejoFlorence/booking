@@ -10,7 +10,6 @@
 }
 
 
-
 .menu {
     width: 250px;
     transition: transform 0.3s ease-in-out;
@@ -66,6 +65,9 @@
     width: 100%;
     margin: 0 auto;
     text-align: center;
+    margin-top: 50px; /* I-adjust ayon sa taas ng header */
+    margin-left: 250px; /* I-adjust ayon sa lapad ng sidebar */
+
 }
 
 
@@ -292,10 +294,11 @@
     }
 
     .dash-body {
-        margin-top: 20px;
         margin-left: 0;
         margin-right: 15px;
         max-width: calc(100% - 15px); /* Ensures content doesn't overflow */
+        margin-top: 80px; /* I-adjust ito depende sa taas ng header */
+        padding-top: 20px; /* Para may space pa lalo */
     }
 
     .profile-title {
