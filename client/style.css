@@ -10,10 +10,17 @@
 }
 
 
+
 .menu {
     width: 250px;
     transition: transform 0.3s ease-in-out;
     margin-top: 10px;
+    position: fixed;
+    top: 50px; /* I-adjust ito depende sa taas ng header mo */
+    left: 0;
+    height: 100vh; /* Para masakop ang buong taas ng screen */
+    overflow-y: auto; /* Para ma-scroll kung mahaba */
+    z-index: 999; /* Mas mababa sa header */
 }
 
 .menu-container {
@@ -71,6 +78,15 @@
     position: absolute;
     top: 15px; /* Ilalagay sa top */
     left: 15px; /* Ilalagay sa left */
+     position: fixed; /* Gawing fixed para laging visible */
+    top: 10px; 
+    left: 10px; /* Adjust kung saan mo gustong lumabas */
+    z-index: 1100; /* Mas mataas kaysa sidebar at header */
+    cursor: pointer;
+    font-size: 24px;
+    background: white; /* Para di mawala sa background */
+    padding: 10px;
+    border-radius: 5px;
 }
 .menu .close-btn {
     display: none;
@@ -92,17 +108,20 @@
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
+    margin-top: 20px;
 }
 
 .carousel-slides {
     display: flex;
     transition: transform 0.5s ease-in-out;
+    margin-top: 20px;
 }
 
 .carousel-slide {
     flex: 0 0 100%;
     display: flex;
     justify-content: center;
+    margin-top: 20px;
 }
 
 .carousel-slide img {

@@ -66,7 +66,7 @@ $services = $database->query("SELECT * FROM services ORDER BY date_created DESC"
     position: relative; /* Siguraduhin na may relative positioning ito */
 }
 
-    .header {
+.header {
     background-color: green;
     color: white;
     text-align: center;
@@ -74,6 +74,11 @@ $services = $database->query("SELECT * FROM services ORDER BY date_created DESC"
     font-size: 10px;
     font-weight: bold;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; 
 }
 
 @media screen and (max-width: 768px) {
