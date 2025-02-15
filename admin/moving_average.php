@@ -89,12 +89,13 @@ for ($i = 0; $i < 12; $i++) {
 ?>
 
     <style>
-        .dash-body {
+    .dash-body {
     margin: 30px auto; /* Adds top margin and centers horizontally */
     padding: 0 20px; /* Adds inner padding */
-        width: 90%; /* Set width to allow centering with auto margin */
-        max-width: 1200px; /* Optional: Limit the width for large screens */
-}
+    width: 90%; /* Set width to allow centering with auto margin */
+    margin-top: 80px; /* I-adjust ayon sa taas ng header */
+    margin-left: 250px; /* I-adjust ayon sa lapad ng sidebar */
+    }
         .dashboard-container {
     display: flex;
     justify-content: space-between; /* Distribute items evenly */
