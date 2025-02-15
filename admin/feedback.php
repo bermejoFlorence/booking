@@ -80,18 +80,35 @@ $result = $database->query($sql);
 ?>
 
    <style>
-    .dash-body {
-        margin: 30px auto; /* Center content */
-        padding: 0 20px;
-    }
-
-    .header-section {
+      .dash-body {
+            margin: 30px auto; /* Adds top margin and centers horizontally */
+    padding: 0 20px; /* Adds inner padding */
+    width: 90%; /* Set width to allow centering with auto margin */
+    margin-top: 80px; /* I-adjust ayon sa taas ng header */
+    margin-left: 250px; /* I-adjust ayon sa lapad ng sidebar */
+}
+.header-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px; /* Space sa pagitan ng header at table */
     flex-wrap: wrap;
-    margin-top: 30px; /* Space sa taas ng header */
+    margin-top: 7%; /* Space sa taas ng header */
+}
+    .header {
+    background-color: green;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Para laging nasa ibabaw */
+
 }
 
     .heading-main12 {
