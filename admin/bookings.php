@@ -16,7 +16,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales-all.min.js"></script>
 
         
-    <title>Dashboard</title>
+    <title>Booking</title>
 </head>
 <body>
 <?php
@@ -93,9 +93,13 @@ $result = $database->query($sql);?>
 
    <style>
     .dash-body {
-        margin: 30px auto; /* Center content */
-        padding: 0 20px;
-    }
+            margin: 30px auto; /* Adds top margin and centers horizontally */
+    padding: 0 20px; /* Adds inner padding */
+    width: 90%; /* Set width to allow centering with auto margin */
+    max-width: 1200px; /* Optional: Limit the width for large screens */
+    margin-top: 80px; /* I-adjust ayon sa taas ng header */
+    margin-left: 250px; /* I-adjust ayon sa lapad ng sidebar */
+}
 
     .header-section {
     display: flex;
@@ -103,7 +107,7 @@ $result = $database->query($sql);?>
     align-items: center;
     margin-bottom: 30px; /* Space sa pagitan ng header at table */
     flex-wrap: wrap;
-    margin-top: 30px; /* Space sa taas ng header */
+    margin-top: 7%; /* Space sa taas ng header */
 }
 
     .heading-main12 {
@@ -375,6 +379,12 @@ hr {
     font-size: 10px;
     font-weight: bold;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Para laging nasa ibabaw */
+
 }
 
 
