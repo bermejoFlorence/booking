@@ -92,8 +92,8 @@ for ($i = 0; $i < 12; $i++) {
         .dash-body {
     margin: 30px auto; /* Adds top margin and centers horizontally */
     padding: 0 20px; /* Adds inner padding */
-    width: 90%; /* Set width to allow centering with auto margin */
-    max-width: 1200px; /* Optional: Limit the width for large screens */
+        width: 90%; /* Set width to allow centering with auto margin */
+        max-width: 1200px; /* Optional: Limit the width for large screens */
 }
         .dashboard-container {
     display: flex;
@@ -197,6 +197,7 @@ canvas { max-width: 100%; height: 400px; }
     .dash-body {
         width: 100%; /* Full width to center dashboard items */
         height: auto; /* Remove fixed height */
+        margin: auto;
     }
 
     .dashboard-container {
@@ -243,6 +244,12 @@ canvas { max-width: 100%; height: 400px; }
     font-size: 10px;
     font-weight: bold;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Para laging nasa ibabaw */
+
 }
     </style>
 

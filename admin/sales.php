@@ -104,6 +104,8 @@ for ($i = 1; $i <= 12; $i++) {
     padding: 0 20px; /* Adds inner padding */
     width: 90%; /* Set width to allow centering with auto margin */
     max-width: 1200px; /* Optional: Limit the width for large screens */
+    margin-top: 80px; /* I-adjust ayon sa taas ng header */
+    margin-left: 250px; /* I-adjust ayon sa lapad ng sidebar */
 }
         .dashboard-container {
     display: flex;
@@ -255,6 +257,12 @@ canvas { max-width: 100%; height: 400px; }
     font-size: 10px;
     font-weight: bold;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Para laging nasa ibabaw */
+
 }
     </style>
 
