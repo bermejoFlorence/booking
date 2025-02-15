@@ -7,6 +7,13 @@
     width: 250px;
     transition: transform 0.3s ease-in-out;
     margin-top: 10px; /* Added margin from the top */
+    position: fixed;
+    top: 50px; /* I-adjust ito depende sa taas ng header mo */
+    left: 0;
+    height: 100vh; /* Para masakop ang buong taas ng screen */
+    overflow-y: auto; /* Para ma-scroll kung mahaba */
+    z-index: 999; /* Mas mababa sa header */
+
 }
 .menu-container {
     width: 100%;
@@ -50,7 +57,18 @@
     display: none;
     cursor: pointer;
     font-size: 24px;
-    margin-left: 15px;
+    position: absolute;
+    top: 15px; /* Ilalagay sa top */
+    left: 15px; /* Ilalagay sa left */
+     position: fixed; /* Gawing fixed para laging visible */
+    top: 10px; 
+    left: 10px; /* Adjust kung saan mo gustong lumabas */
+    z-index: 1100; /* Mas mataas kaysa sidebar at header */
+    cursor: pointer;
+    font-size: 24px;
+    background: white; /* Para di mawala sa background */
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .menu .close-btn {

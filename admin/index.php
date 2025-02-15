@@ -154,6 +154,7 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
     padding: 20px;
     max-width: 1200px;
     flex-wrap: nowrap; /* Prevent stacking */
+    margin-top: 4%;
 }
 
 .dashboard-items {
@@ -189,6 +190,12 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
     font-size: 10px;
     font-weight: bold;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Para laging nasa ibabaw */
+
 }
 .h1-dashboard {
     font-size: 36px;
