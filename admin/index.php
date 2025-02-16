@@ -326,6 +326,16 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
         font-size: 5px;
         padding: 10px;
     }
+    .dashboard-flex {
+        flex-direction: column; /* Gawing column para mag-stack */
+        align-items: center; /* I-center ang content */
+    }
+
+    .calendar-container,
+    .chart-wrapper {
+        max-width: 100%; /* Full width para di masikip */
+       margin:auto;
+    }
 }
 
 @media screen and (max-width: 480px) {
@@ -357,6 +367,22 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
     padding: 10px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+.dashboard-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap; /* Para mag-stack sa maliit na screen */
+}
+
+/* Default size (Large Screens) */
+.calendar-container,
+.chart-wrapper {
+    flex: 1;
+    max-width: 50%; /* Hinati ang space (50% bawat isa) */
 }
     </style>
 
@@ -461,19 +487,19 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
             </a>
         </div>
 
-        <div class="calendar-container">
-            <h2 style="text-align: center; font-size: 24px; margin-bottom: 20px; color: #28a745;">APPROVED SCHEDULE</h2>
-            <div id="calendar"></div>
-        </div>
-
-        <div class="chart-wrapper">
-            <h3 class="chart-title">User Feedback Overview</h3>
-            <div class="chart-container">
-                <canvas id="feedbackChart"></canvas>
+        <div class="dashboard-flex">
+            <div class="calendar-container">
+                <h2 style="text-align: center; font-size: 24px; margin-bottom: 20px; color: #28a745;">APPROVED SCHEDULE</h2>
+                <div id="calendar"></div>
             </div>
-        </div>
 
-        
+            <div class="chart-wrapper">
+                <h3 class="chart-title">User Feedback Overview</h3>
+                <div class="chart-container">
+                    <canvas id="feedbackChart"></canvas>
+                </div>
+            </div>
+        </div>    
         </table>
         </div>
     </div>
