@@ -214,6 +214,12 @@ if ($result->num_rows > 0) {
     font-size: 10px;
     font-weight: bold;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Para laging nasa ibabaw */
+
 }
 
 @media screen and (max-width: 480px) {
