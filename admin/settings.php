@@ -46,11 +46,12 @@
         }
 
         .dashboard-items {
-            margin: 30px auto; /* Adds top margin and centers horizontally */
-    padding: 0 20px; /* Adds inner padding */
-    width: 90%; /* Set width to allow centering with auto margin */
-    margin-top: 80px; /* I-adjust ayon sa taas ng header */
-    margin-left: 250px; /* I-adjust ayon sa lapad ng sidebar */
+            padding: 20px;
+            margin: 10px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%; /* Default for smaller screens */
         }
         @media (min-width: 768px) {
             .dashboard-items {
@@ -72,11 +73,14 @@
     font-size: 10px;
     font-weight: bold;
     width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000; /* Para laging nasa ibabaw */
+}
+
+.settings-body {
+    margin: 30px auto; /* Adds top margin and centers horizontally */
+    padding: 0 20px; /* Adds inner padding */
+    width: 90%; /* Set width to allow centering with auto margin */
+    margin-top: 30%; /* I-adjust ayon sa taas ng header */
+    margin-left: 15%; /* I-adjust ayon sa lapad ng sidebar */
 }
 
 @media screen and (max-width: 480px) {
@@ -179,7 +183,7 @@
                 </tr>
             </table>
         </div>
-        <div class="dash-body" style="margin-top: 15px">
+        <div class="settings-body" style="margin-top: 15px">
         <div class="settings-title">S E T T I N G S</div>
             <table border="0" width="100%" style=" border-spacing: 0;margin:0;padding:0;" >
                 <tr>
