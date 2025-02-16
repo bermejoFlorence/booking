@@ -11,6 +11,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- FullCalendar CSS -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales-all.min.js"></script>
 
         
     <title>Dashboard</title>
@@ -54,11 +57,15 @@ if (!$service_query) {
 }
 ?>
 
+
    <style>
-    .dash-body {
-        margin: 30px auto; /* Center content */
-        padding: 0 20px;
-    }
+         .dash-body {
+    margin: 30px auto; /* Adds top margin and centers horizontally */
+    padding: 0 20px; /* Adds inner padding */
+    width: 90%; /* Set width to allow centering with auto margin */
+    margin-top: 80px; /* I-adjust ayon sa taas ng header */
+    margin-left: 250px; /* I-adjust ayon sa lapad ng sidebar */
+}
 
     .header-section {
     display: flex;
@@ -66,7 +73,7 @@ if (!$service_query) {
     align-items: center;
     margin-bottom: 30px; /* Space sa pagitan ng header at table */
     flex-wrap: wrap;
-    margin-top: 30px; /* Space sa taas ng header */
+    margin-top: 7%; /* Space sa taas ng header */
 }
 
     .heading-main12 {
@@ -83,15 +90,6 @@ if (!$service_query) {
     justify-content: flex-end;
     width: 100%;
     margin-top: 10px; /* Space sa taas ng search at reset button */
-}
-.header {
-    background-color: green;
-    color: white;
-    text-align: center;
-    padding: 5px;
-    font-size: 10px;
-    font-weight: bold;
-    width: 100%;
 }
 
 .header-searchbar {
@@ -149,22 +147,6 @@ if (!$service_query) {
         background-color: #f2f2f2;
     }
     
-   
-
-/* Close Button */
-.close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #888;
-}
-.close:hover {
-    color: #333;
-}
-
 
 .section h3 {
     font-size: 18px;
@@ -266,6 +248,10 @@ hr {
         padding: 8px 12px;
         font-size: 14px;
     }
+    .header {
+        font-size: 5px;
+        padding: 10px;
+    }
 }
 
 @media screen and (max-width: 480px) {
@@ -291,112 +277,37 @@ hr {
         font-size: 12px;
         padding: 6px 8px;
     }
-}
-
-#editModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-  }
-
-  #modalContent {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      width: 400px;
-      max-width: 90%; /* Ensures modal adapts to smaller screens */
-      position: relative;
-      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-  }
-
-  #modalContent h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 1.5rem;
-  }
-
-  #editForm {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-  }
-
-  #editForm label {
-      font-size: 0.9rem;
-      font-weight: bold;
-  }
-
-  #editForm input[type="text"],
-  #editForm textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 1rem;
-  }
-
-  #editForm button {
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      color: white;
-      text-align: center;
-  }
-
-  #editForm button[type="submit"] {
-      background-color: rgb(39, 134, 211);
-  }
-
-  #editForm button[type="button"] {
-      background-color: #dc3545;
-  }
-
-  /* Responsive Modal for Mobile Screens */
-  @media (max-width: 600px) {
-      #modalContent {
-          padding: 20px;
-          width: 90%;
-      }
-
-      #editForm {
-          gap: 8px;
-      }
-
-      #editForm input[type="text"],
-      #editForm textarea {
-          font-size: 0.9rem;
-      }
-
-      #editForm button {
-          font-size: 0.9rem;
-          padding: 8px;
-      }
-  }
-  @media screen and (max-width: 480px) {
-    .header {
+      .header {
         font-size: 3px;
         padding: 8px;
     }
 }
 
+
+.header {
+    background-color: green;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Para laging nasa ibabaw */
+
+}
 </style>
 
-  
 <div class="header">
         <h1>EXZPHOTOGRAPHY STUDIO</h1>
     </div>
     <div class="hamburger" onclick="toggleMenu()">
                 ☰
     </div>
+
     <div class="container">
         <div class="menu">
             <div class="close-btn" onclick="toggleMenu()">✖</div>
@@ -421,14 +332,29 @@ hr {
                         </table>
                     </td>
                 </tr>
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-dashbord" >
-                        <a href="index.php" class="non-style-link-menu"><div><p class="menu-text">Dashboard</p></a></div></a>
+                <tr class="menu-row">
+                    <td class="menu-btn menu-icon-home">
+                        <a href="index.php" class="non-style-link-menu">
+                            <div><p class="menu-text">Home</p></div>
+                        </a>
                     </td>
                 </tr>
+                
                 <tr class="menu-row">
                     <td class="menu-btn menu-icon-appoinment">
-                        <a href="bookings.php" class="non-style-link-menu"><div><p class="menu-text">My Bookings</p></a></div>
+                        <a href="bookings.php" class="non-style-link-menu"><div><p class="menu-text">Bookings</p></a></div>
+                    </td>
+                </tr>
+
+                <tr class="menu-row">
+                    <td class="menu-btn menu-icon-message">
+                        <a href="report.php" class="non-style-link-menu"><div><p class="menu-text">Reports</p></a></div>
+                    </td>
+                </tr>
+                
+                <tr class="menu-row">
+                    <td class="menu-btn menu-icon-feedback menu-active menu-icon-feedback-active">
+                        <a href="feedback.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">Feedback</p></a></div>
                     </td>
                 </tr>
 
@@ -438,9 +364,11 @@ hr {
                     </td>
                 </tr>
 
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-settings menu-active menu-icon-settings-active">
-                        <a href="settings.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">Settings</p></a></div>
+                <tr class="menu-row">
+                    <td class="menu-btn menu-icon-settings">
+                        <a href="settings.php" class="non-style-link-menu">
+                            <div><p class="menu-text">Settings</p></div>
+                        </a>
                     </td>
                 </tr>
             </table>
@@ -448,12 +376,10 @@ hr {
         
         <div class="dash-body" style="margin-top: 15px;">
         
-    <div class="header-section">
-        <p class="heading-main12" style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px;">SERVICES DETAILS</p>
-
-    </div>
-
-    <div class="table-container">
+        <div class="header-section">
+    <p class="heading-main12" style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px;">SERVICE DETAILS</p>
+</div>
+<div class="table-container">
         <div class="table-responsive">
         <table class="sub-table" style="width: 100%; border-collapse: collapse; text-align: center;">
 
@@ -532,7 +458,6 @@ hr {
         
         </div>
     </div>
-   
 </div>
 
     </div>
