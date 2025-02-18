@@ -374,8 +374,8 @@ hr {
                 </tr>
                 
                 <tr class="menu-row">
-                    <td class="menu-btn menu-icon-feedback menu-active menu-icon-feedback-active">
-                        <a href="feedback.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">Feedback</p></a></div>
+                    <td class="menu-btn menu-icon-feedback" >
+                        <a href="feedback.php" class="non-style-link-menu"><div><p class="menu-text">Feedback</p></a></div>
                     </td>
                 </tr>
 
@@ -386,8 +386,8 @@ hr {
                 </tr>
 
                 <tr class="menu-row">
-                    <td class="menu-btn menu-icon-settings">
-                        <a href="settings.php" class="non-style-link-menu">
+                    <td class="menu-btn menu-icon-settings menu-active menu-icon-feedback-active">
+                        <a href="settings.php" class="non-style-link-menu non-style-link-menu-active">
                             <div><p class="menu-text">Settings</p></div>
                         </a>
                     </td>

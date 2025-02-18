@@ -171,6 +171,18 @@
                 </tr>
 
                 <tr class="menu-row">
+                    <td class="menu-btn menu-icon-message">
+                        <a href="report.php" class="non-style-link-menu"><div><p class="menu-text">Reports</p></a></div>
+                    </td>
+                </tr>
+
+                <tr class="menu-row">
+                    <td class="menu-btn menu-icon-feedback">
+                        <a href="feedback.php" class="non-style-link-menu"><div><p class="menu-text">Feedback</p></a></div>
+                    </td>
+                </tr>
+
+                <tr class="menu-row">
                     <td class="menu-btn menu-icon-sales">
                         <a href="moving_average.php" class="non-style-link-menu"><div><p class="menu-text">Sales</p></a></div>
                     </td>
