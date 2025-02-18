@@ -54,7 +54,8 @@ $bookingData = $database->query("
         p.reference_no
     FROM booking AS b
     LEFT JOIN payment AS p ON b.booking_id = p.booking_id
-    WHERE b.client_id = '$userid'
+    WHERE b.client_id = '$userid' AND b.is_deleted = 0
+    ORDER BY b.booking_id DESC
 ");
 
 ?>
