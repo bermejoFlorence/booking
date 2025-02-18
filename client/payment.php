@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +12,7 @@
     <title>Payment</title>
 
     <?php
+    echo "<script>console.log('Received booking_id: " . $booking_id . "');</script>";
 session_start();
 
 if (isset($_SESSION["user"])) {
@@ -57,6 +59,8 @@ if (isset($_GET['booking_id'])) {
         $package = $booking['package'];
         $price = $booking['price'];
 
+        echo "<script>console.log('Package: " . $package . " | Price: " . $price . "');</script>";
+
         // Generate a random 10-digit transaction number
         $transactionNumber = random_int(1000000000, 9999999999);
     } else {
@@ -98,8 +102,6 @@ if (isset($_GET['booking_id'])) {
             text-align: center;
         }
 
-       
-
 
     .form-container {
         max-width: 600px; /* Slightly larger form */
@@ -110,9 +112,8 @@ if (isset($_GET['booking_id'])) {
         padding: 25px 35px;
         margin-left:auto;
         margin-right: auto;
-        margin-top: auto;
         margin-bottom: auto;
-   
+        margin-top: 80px;
     }
 
         .form-container h2 {
@@ -202,7 +203,14 @@ if (isset($_GET['booking_id'])) {
 
             .details-container {
                 font-size: 15px;
-            }
+            } 
+             .form-container {
+ 
+        margin-left:auto;
+        margin-right: auto;
+        margin-bottom: auto;
+        margin-top: 80px;
+    }
         }
 
 
@@ -211,6 +219,7 @@ if (isset($_GET['booking_id'])) {
         font-size: 3px;
         padding: 8px;
     }
+    
 }
 
 .header {
@@ -221,7 +230,14 @@ if (isset($_GET['booking_id'])) {
     font-size: 10px;
     font-weight: bold;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Para laging nasa ibabaw */
 }
+
+
 </style>
 
 <div class="header">
@@ -304,7 +320,7 @@ if (isset($_GET['booking_id'])) {
         <label for="amt_payment">Amount to Pay</label>
         <div style="display: flex; align-items: center;">
          
-            <input type="number" name="amt_payment" id="amt_payment" value="<?php echo htmlspecialchars($price); ?>" required>
+            <input type="text" name="amt_payment" id="amt_payment" value="<?php echo htmlspecialchars($price); ?>" readonly>
         </div>
     </div>
 
@@ -326,7 +342,8 @@ if (isset($_GET['booking_id'])) {
         </div>
         <div class="form-group">
             <label for="reference_no">Reference Number</label>
-            <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number">
+            <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number" maxlength="13" pattern="\d{13}" required>
+            <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
         </div>
     </div>
 
@@ -355,7 +372,20 @@ if (isset($_GET['booking_id'])) {
         gcashFields.classList.add('hidden');
     }
 }
+document.getElementById("reference_no").addEventListener("input", function (event) {
+    let input = event.target;
+    let errorMessage = document.getElementById("error-message");
 
+    // Remove non-numeric characters
+    input.value = input.value.replace(/\D/g, '');
+
+    // Show error message if not exactly 13 digits
+    if (input.value.length !== 13) {
+        errorMessage.style.display = "block";
+    } else {
+        errorMessage.style.display = "none";
+    }
+});
     </script>
 
 </body>
