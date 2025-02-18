@@ -72,25 +72,21 @@ $result = $database->query($sql);
 ?>
 
    <style>
-    .dash-body {
-        margin: 30px auto; /* Center content */
-        padding: 0 20px;
-    }
-
-    .header-section {
+      .dash-body {
+            margin: 30px auto; /* Adds top margin and centers horizontally */
+    padding: 0 20px; /* Adds inner padding */
+    width: 90%; /* Set width to allow centering with auto margin */
+    margin-top: 80px; /* I-adjust ayon sa taas ng header */
+    margin-left: 250px; /* I-adjust ayon sa lapad ng sidebar */
+}
+.header-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px; /* Space sa pagitan ng header at table */
     flex-wrap: wrap;
-    margin-top: 30px; /* Space sa taas ng header */
+    margin-top: 7%; /* Space sa taas ng header */
 }
-
-    .heading-main12 {
-        font-size: 20px;
-        color: rgb(49, 49, 49);
-        margin: 0;
-    }
     .header {
     background-color: green;
     color: white;
@@ -99,7 +95,19 @@ $result = $database->query($sql);
     font-size: 10px;
     font-weight: bold;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Para laging nasa ibabaw */
+
 }
+
+    .heading-main12 {
+        font-size: 20px;
+        color: rgb(49, 49, 49);
+        margin: 0;
+    }
 
     .search-container {
     display: flex;
@@ -120,6 +128,8 @@ $result = $database->query($sql);
     border-radius: 5px;
     margin-top: 10px; /* Space sa taas ng search input */
 }
+
+
 .login-btn {
     padding: 10px 15px;
     border: none;
@@ -164,61 +174,6 @@ $result = $database->query($sql);
         background-color: #f2f2f2;
     }
     
-        
-/* Modal Overlay */
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Modal Popup */
-.popup {
-    background: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    width: 600px; /* Medium size */
-    max-width: 90%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease-in-out;
-    position: relative;
-}
-
-/* Modal Header */
-.modal-header h2 {
-    margin: 0;
-    font-size: 24px;
-    color: #333;
-    text-align: center;
-    border-bottom: 2px solid #f4f4f4;
-    padding-bottom: 10px;
-}
-
-/* Close Button */
-.close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #888;
-}
-.close:hover {
-    color: #333;
-}
-
-/* Modal Content */
-.modal-content {
-    margin-top: 20px;
-}
 
 .section h3 {
     font-size: 18px;
@@ -320,6 +275,10 @@ hr {
         padding: 8px 12px;
         font-size: 14px;
     }
+    .header {
+        font-size: 5px;
+        padding: 10px;
+    }
 }
 
 @media screen and (max-width: 480px) {
@@ -345,32 +304,40 @@ hr {
         font-size: 12px;
         padding: 6px 8px;
     }
-}
-@media screen and (max-width: 480px) {
-    .header {
+      .header {
         font-size: 3px;
         padding: 8px;
     }
 }
+
+
+.header {
+    background-color: green;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    width: 100%;
+}
 </style>
 
-    
 <div class="header">
         <h1>EXZPHOTOGRAPHY STUDIO</h1>
     </div>
     <div class="hamburger" onclick="toggleMenu()">
                 ☰
     </div>
-    <div class="container">  
+
+    <div class="container">
         <div class="menu">
             <div class="close-btn" onclick="toggleMenu()">✖</div>
-            
             <table class="menu-container" border="0">
                 <tr>
                     <td style="padding:10px" colspan="2">
                         <table border="0" class="profile-container">
                             <tr>
-                                <td width="30%" style="padding-left:20px" >
+                                <td width="30%" style="padding-left:20px">
                                     <img src="../img/user.png" alt="User Image">
                                 </td>
                                 <td style="padding:0px;margin:0px;">
@@ -380,20 +347,35 @@ hr {
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <a href="../logout.php" ><input type="button" value="Log out" class="logout-btn btn-primary-soft btn"></a>
+                                    <a href="../logout.php"><input type="button" value="Log out" class="logout-btn btn-primary-soft btn"></a>
                                 </td>
                             </tr>
-                    </table>
-                    </td>
-                </tr>
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-dashbord" >
-                        <a href="index.php" class="non-style-link-menu"><div><p class="menu-text">Dashboard</p></a></div></a>
+                        </table>
                     </td>
                 </tr>
                 <tr class="menu-row">
+                    <td class="menu-btn menu-icon-home">
+                        <a href="index.php" class="non-style-link-menu">
+                            <div><p class="menu-text">Home</p></div>
+                        </a>
+                    </td>
+                </tr>
+                
+                <tr class="menu-row">
                     <td class="menu-btn menu-icon-appoinment">
                         <a href="bookings.php" class="non-style-link-menu"><div><p class="menu-text">My Bookings</p></a></div>
+                    </td>
+                </tr>
+
+                <tr class="menu-row">
+                    <td class="menu-btn menu-icon-message">
+                        <a href="report.php" class="non-style-link-menu"><div><p class="menu-text">Reports</p></a></div>
+                    </td>
+                </tr>
+                
+                <tr class="menu-row">
+                    <td class="menu-btn menu-icon-feedback menu-active menu-icon-feedback-active">
+                        <a href="feedback.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">Feedback</p></a></div>
                     </td>
                 </tr>
 
@@ -403,107 +385,110 @@ hr {
                     </td>
                 </tr>
 
-                <tr class="menu-row" >
-                    <td class="menu-btn menu-icon-settings menu-active menu-icon-settings-active">
-                        <a href="settings.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">Settings</p></a></div>
+                <tr class="menu-row">
+                    <td class="menu-btn menu-icon-settings">
+                        <a href="settings.php" class="non-style-link-menu">
+                            <div><p class="menu-text">Settings</p></div>
+                        </a>
                     </td>
                 </tr>
             </table>
         </div>
+        
         <div class="dash-body" style="margin-top: 15px;">
         
-    <div class="header-section">
-        <p class="heading-main12" style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px;">LIST OF CLIENT</p>
-        <form action="" method="post" class="header-search">
-            <div class="search-container">
-                <input type="search" name="search" class="input-text header-searchbar" 
-                    placeholder="Type Client Name" 
-                    value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>" />
-                <button type="submit" class="login-btn btn-primary btn">Search</button>
-                <a href="client.php" class="login-btn btn-secondary btn">Reset</a>
-            </div>
-        </form>
-    </div>
-
-    <?php
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
-        $search = $database->real_escape_string($_POST['search']);
-        $sql = "SELECT client_id, emp_id, c_fullname, c_email, c_contactnum, c_address, date_created 
-                FROM client 
-                WHERE c_fullname LIKE '%$search%' 
-                ORDER BY date_created DESC";
+        <div class="header-section">
+            <p class="heading-main12" style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px;">LIST OF CLIENT</p>
+            <form action="" method="post" class="header-search">
+                <div class="search-container">
+                    <input type="search" name="search" class="input-text header-searchbar" 
+                        placeholder="Type Client Name" 
+                        value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>" />
+                    <button type="submit" class="login-btn btn-primary btn">Search</button>
+                    <a href="client.php" class="login-btn btn-secondary btn">Reset</a>
+                </div>
+            </form>
+        </div>
     
-        $result = $database->query($sql);
-    
-        if ($result->num_rows > 0) {
-            echo "<p>Search results for '<strong>$search</strong>':</p>";
-        } else {
-            echo "<p>No results found for '<strong>$search</strong>'.</p>";
+        <?php
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
+            $search = $database->real_escape_string($_POST['search']);
+            $sql = "SELECT client_id, emp_id, c_fullname, c_email, c_contactnum, c_address, date_created 
+                    FROM client 
+                    WHERE c_fullname LIKE '%$search%' 
+                    ORDER BY date_created DESC";
+        
+            $result = $database->query($sql);
+        
+            if ($result->num_rows > 0) {
+                echo "<p>Search results for '<strong>$search</strong>':</p>";
+            } else {
+                echo "<p>No results found for '<strong>$search</strong>'.</p>";
+            }
         }
-    }
+        
+        ?>
     
-    ?>
-
-    <div class="table-container">
-        <div class="table-responsive">
-        <table class="sub-table" style="width: 100%; border-collapse: collapse; text-align: center;">
-
-            <thead>
-                <tr>
-                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">#</th>
-                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Full Name</th>
-                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Email Address</th>
-                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Contact Number</th>
-                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Address</th>
-                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Date Created</th>
-
-                </tr>
-            </thead>
-
-            <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    $count = 1;
-                    while ($row = $result->fetch_assoc()) {
-                        $formatted_date = date("F j, Y", strtotime($row['date_created'])); // Convert date format
-                        echo "<tr>";
-                        echo "<td>{$count}</td>";
-                        echo "<td>{$row['c_fullname']}</td>";
-                        echo "<td>{$row['c_email']}</td>";
-                        echo "<td>{$row['c_contactnum']}</td>";
-                        echo "<td>{$row['c_address']}</td>";
-                        echo "<td>{$formatted_date}</td>"; // Display formatted date
-                        echo "</tr>";
-                        $count++;
+        <div class="table-container">
+            <div class="table-responsive">
+            <table class="sub-table" style="width: 100%; border-collapse: collapse; text-align: center;">
+    
+                <thead>
+                    <tr>
+                        <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">#</th>
+                        <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Full Name</th>
+                        <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Email Address</th>
+                        <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Contact Number</th>
+                        <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Address</th>
+                        <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Date Created</th>
+    
+                    </tr>
+                </thead>
+    
+                <tbody>
+                    <?php
+                    if ($result->num_rows > 0) {
+                        $count = 1;
+                        while ($row = $result->fetch_assoc()) {
+                            $formatted_date = date("F j, Y", strtotime($row['date_created'])); // Convert date format
+                            echo "<tr>";
+                            echo "<td>{$count}</td>";
+                            echo "<td>{$row['c_fullname']}</td>";
+                            echo "<td>{$row['c_email']}</td>";
+                            echo "<td>{$row['c_contactnum']}</td>";
+                            echo "<td>{$row['c_address']}</td>";
+                            echo "<td>{$formatted_date}</td>"; // Display formatted date
+                            echo "</tr>";
+                            $count++;
+                        }
+                    } else {
+                        echo "<tr><td colspan='6'>No records available.</td></tr>";
                     }
-                } else {
-                    echo "<tr><td colspan='6'>No records available.</td></tr>";
-                }
-                ?>
-                </tbody>
-        </table>
-
-        <div style="text-align: center; margin-top: 20px;">
-    <?php if ($current_page > 1): ?>
-        <a href="?page=<?php echo $current_page - 1; ?>" style="margin-right: 10px;">&laquo; Previous</a>
-    <?php endif; ?>
-
-    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-        <a href="?page=<?php echo $i; ?>" style="margin: 0 5px; <?php echo ($i == $current_page) ? 'font-weight: bold; color: blue;' : ''; ?>">
-            <?php echo $i; ?>
-        </a>
-    <?php endfor; ?>
-
-    <?php if ($current_page < $total_pages): ?>
-        <a href="?page=<?php echo $current_page + 1; ?>" style="margin-left: 10px;">Next &raquo;</a>
-    <?php endif; ?>
+                    ?>
+                    </tbody>
+            </table>
+    
+            <div style="text-align: center; margin-top: 20px;">
+        <?php if ($current_page > 1): ?>
+            <a href="?page=<?php echo $current_page - 1; ?>" style="margin-right: 10px;">&laquo; Previous</a>
+        <?php endif; ?>
+    
+        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+            <a href="?page=<?php echo $i; ?>" style="margin: 0 5px; <?php echo ($i == $current_page) ? 'font-weight: bold; color: blue;' : ''; ?>">
+                <?php echo $i; ?>
+            </a>
+        <?php endfor; ?>
+    
+        <?php if ($current_page < $total_pages): ?>
+            <a href="?page=<?php echo $current_page + 1; ?>" style="margin-left: 10px;">Next &raquo;</a>
+        <?php endif; ?>
+            </div>
+    
+    
+            </div>
         </div>
-
-
-        </div>
+       
     </div>
-   
-</div>
 
     </div>
     <script>
@@ -512,19 +497,107 @@ hr {
             menu.classList.toggle('open');
         }
 
-        function openEditModal(service) {
-    document.getElementById('editServiceId').value = service.service_id;
-    document.getElementById('editName').value = service.name;
-    document.getElementById('editDetail1').value = service.detail_1;
-    document.getElementById('editDetail2').value = service.detail_2;
-    document.getElementById('editDetail3').value = service.detail_3;
-    document.getElementById('editDetail4').value = service.detail_4;
-    document.getElementById('editDetail5').value = service.detail_5;
-    document.getElementById('editModal').style.display = 'flex';
+       function openModal(action, bookingId) {
+    const modal = document.getElementById('confirmationModal');
+    const modalContent = document.getElementById('modalContent');
+    const modalMessage = document.getElementById('modalMessage');
+    const confirmBtn = document.getElementById('confirmBtn');
+
+    // Set the modal message and button style based on action
+    if (action === 'accept') {
+        modalMessage.textContent = 'Are you sure you want to accept this booking?';
+        confirmBtn.style.backgroundColor = '#007bff';
+        confirmBtn.onclick = function () {
+            // Call the function to update the booking status
+            updateBookingStatus(bookingId, 'approved');
+            closeModal();
+        };
+    } else if (action === 'reject') {
+        modalMessage.textContent = 'Are you sure you want to reject this booking?';
+        confirmBtn.style.backgroundColor = '#007bff';
+        confirmBtn.onclick = function () {
+            updateBookingStatus(bookingId, 'rejected');
+            closeModal();
+        };
+    }
+
+    // Show the modal with animation
+    modal.style.display = 'flex';
+    setTimeout(() => {
+        modalContent.style.transform = 'scale(1)';
+    }, 10); // Trigger the animation after displaying the modal
 }
-function closeEditModal() {
-    document.getElementById('editModal').style.display = 'none';
+
+function closeConfirmationModal() {
+    const modal = document.getElementById('confirmationModal');
+    const modalContent = document.getElementById('modalContent');
+
+    // Hide the modal with animation
+    modalContent.style.transform = 'scale(0)';
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
 }
+
+
+function updateBookingStatus(bookingId, status) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'update_booking_status.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            const responseMessage = xhr.responseText.trim();
+
+            Swal.fire({
+                title: 'Success!',
+                text: responseMessage, // Gumamit ng response mula sa PHP
+                icon: status === 'approved' ? 'success' : 'warning', // Icon depende sa status
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.reload(); // Mag-reload ng page pagkatapos mag-click ng "OK"
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred. Please try again.',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        }
+    };
+    xhr.send(`booking_id=${bookingId}&status=${status}`);
+}
+
+function printBooking(bookingId, receiptNo, transacNum, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress) {
+    var modal = document.getElementById("viewReceiptModal");
+
+    // Ipakita ang modal
+    modal.style.display = "block";
+
+    // Update modal contents gamit ang tamang data
+    document.getElementById("modal-receipt-num").innerText = receiptNo;
+    document.getElementById("modal-transac-num").innerText = transacNum;
+    document.getElementById("modal-amt-payment").innerText = "₱" + amtPayment + ".00";
+    document.getElementById("modal-payment-status").innerText = paymentStatus;
+    document.getElementById("modal-reference-no").innerText = referenceNo;
+    
+    document.getElementById("modal-package").innerText = packageName;
+    document.getElementById("modal-price").innerText = "₱" + price + ".00";
+    document.getElementById("modal-event").innerText = event;
+    document.getElementById("modal-event-date").innerText = eventDate;
+    document.getElementById("modal-event-address").innerText = eventAddress;
+}
+
+function closeModal() {
+    document.getElementById("viewReceiptModal").style.display = "none";
+}
+
+
+
     </script>
 </body>
 </html>
