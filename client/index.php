@@ -56,7 +56,86 @@ if ($userrow && $userrow->num_rows > 0) {
 $services = $database->query("SELECT * FROM services ORDER BY date_created DESC");
 ?>
 
+<?php
+
+//query sa pag kuha ng feedback
+$query = "SELECT f.comment, f.date_created, f.rating, c.c_fullname 
+          FROM feedback f
+          JOIN client c ON f.client_id = c.client_id
+          ORDER BY f.date_created DESC"; // Sorting by latest feedback
+
+$result = mysqli_query($database, $query);
+
+// Mapping ng rating text sa numerical value
+$rating_map = [
+    "Very Dissatisfied" => 1,
+    "Dissatisfied" => 2,
+    "Neutral" => 3,
+    "Satisfied" => 4,
+    "Very Satisfied" => 5
+];
+?>
+
 <style>
+
+.slider_section .detail-box {
+  color: #000000;
+}
+
+.slider_section .detail-box h1 {
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 0;
+}
+
+.slider_section .detail-box p {
+  margin: 25px 0;
+}
+
+.slider_section .detail-box .btn-box {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin: 0 -5px;
+}
+
+.slider_section .detail-box .btn-box a {
+  margin: 5px;
+  text-align: center;
+  width: 165px;
+}
+
+.slider_section .detail-box .btn-box .btn1 {
+  display: inline-block;
+  padding: 10px 15px;
+  background-color: #0d00ff;
+  color: #ffffff;
+  border-radius: 0;
+  border: 1px solid #0004ff;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+}
+
+.slider_section .detail-box .btn-box .btn1:hover {
+  background-color: transparent;
+  color: #0033ff;
+}
+
+.slider_section .detail-box .btn-box .btn2 {
+  display: inline-block;
+  padding: 10px 15px;
+  background-color: #6bb7be;
+  color: #ffffff;
+  border-radius: 0;
+  border: 1px solid #6bb7be;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+}
+
+.slider_section .detail-box .btn-box .btn2:hover {
+  background-color: transparent;
+  color: #6bb7be;
+}
 .center-container {
     display: flex;
     justify-content: center;
@@ -100,6 +179,148 @@ $services = $database->query("SELECT * FROM services ORDER BY date_created DESC"
             opacity: 0.6; /* Para mukhang disabled */
             pointer-events: none; /* Hindi ma-click */
         }
+        .feedback-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.feedback-carousel {
+    position: relative;
+    max-width: 450px; /* Mas maliit ang box */
+    margin: auto;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #fff;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.feedback-slides {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.feedback-slide {
+    min-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 15px;
+}
+
+.feedback-content {
+    text-align: left;
+    width: 100%;
+}
+
+.feedback-rating {
+    font-style: italic;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.feedback-stars {
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 5px;
+}
+
+.feedback-star {
+    color: gold;
+}
+
+.feedback-star.empty {
+    color: #ccc;
+}
+
+/* Para sa Name at Comment */
+.feedback-client {
+    font-weight: bold;
+    font-size: 18px;
+    color: #4a90e2;
+    margin-top: 8px;
+}
+
+.feedback-comment {
+    font-size: 14px;
+    color: #000;
+    margin-top: 5px;
+}
+
+/* Navigation Buttons (Nasa Labas ng Box) */
+.feedback-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.feedback-btn {
+    background-color: #5c9ea8;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 8px;
+}
+
+.feedback-btn:hover {
+    background-color: #468489;
+}
+
+/* ✅ RESPONSIVE DESIGN */
+@media screen and (max-width: 768px) {
+    .feedback-carousel {
+        max-width: 350px; /* Mas maliit sa tablets */
+        padding: 10px;
+    }
+
+    .feedback-slide {
+        padding: 10px;
+    }
+
+    .feedback-client {
+        font-size: 16px;
+    }
+
+    .feedback-comment {
+        font-size: 13px;
+    }
+
+    .feedback-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .feedback-carousel {
+        max-width: 300px; /* Mas maliit sa mobile */
+    }
+
+    .feedback-client {
+        font-size: 14px;
+    }
+
+    .feedback-comment {
+        font-size: 12px;
+    }
+
+    .feedback-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+    }
+}
+
 
 </style>
 <div class="header">
@@ -255,7 +476,46 @@ $services = $database->query("SELECT * FROM services ORDER BY date_created DESC"
                 </div>
             </div>
         </div>
+        <div class="feedback-container">
+    <div class="feedback-carousel">
+        <div class="feedback-slides">
+            <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                <div class="feedback-slide">
+                    <div class="feedback-content">
+                        <p class="feedback-rating"><strong>RATING:</strong> 
+                            <?php 
+                            // Kunin ang numerical rating mula sa database text
+                            $rating_text = $row['rating'];
+                            $rating = isset($rating_map[$rating_text]) ? $rating_map[$rating_text] : 0;
+                            
+                            // Mag-display ng stars ayon sa rating
+                            for ($i = 1; $i <= 5; $i++) {
+                                if ($i <= $rating) {
+                                    echo '<span class="feedback-star">&#9733;</span>'; // Filled star (Gold)
+                                } else {
+                                    echo '<span class="feedback-star empty">&#9733;</span>'; // Empty star (Gray)
+                                }
+                            }
+                            ?>
+                        </p>
+                        <p class="feedback-client"><?php echo htmlspecialchars($row['c_fullname']); ?></p>
+                        <p class="feedback-comment"><?php echo htmlspecialchars($row['comment']); ?></p>
+                    </div>
+                </div>
+            <?php endwhile; ?>
+        </div>
     </div>
+
+    <!-- Navigation Arrows (Nasa Labas ng Box) -->
+    <div class="feedback-controls">
+        <button class="feedback-btn" onclick="prevFeedback()">&#8592;</button>
+        <button class="feedback-btn" onclick="nextFeedback()">&#8594;</button>
+    </div>
+</div>
+
+       
+    </div>
+
     <script>
         function toggleMenu() {
             const menu = document.querySelector('.menu');
@@ -326,6 +586,24 @@ availButtons.forEach(button => {
 function closeModal() {
     document.getElementById('popup1').style.display = 'none';
 }
+let feedbackIndex = 0;
+const feedbackSlides = document.querySelectorAll(".feedback-slide");
+
+function showFeedback(n) {
+    feedbackIndex = (n + feedbackSlides.length) % feedbackSlides.length;
+    document.querySelector(".feedback-slides").style.transform = `translateX(-${feedbackIndex * 100}%)`;
+}
+
+function nextFeedback() {
+    showFeedback(feedbackIndex + 1);
+}
+
+function prevFeedback() {
+    showFeedback(feedbackIndex - 1);
+}
+
+
+setInterval(nextFeedback, 5000); // Auto-slide every 5 seconds
 
 
 // Optional: Handle form submission
