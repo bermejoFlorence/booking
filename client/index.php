@@ -253,6 +253,7 @@ $rating_map = [
     display: flex;
     justify-content: center;
     margin-top: 10px;
+    padding-bottom: 10px;
 }
 
 .feedback-btn {
@@ -661,8 +662,8 @@ $(document).ready(function () {
                             confirmButtonColor: "#3085d6",
                             confirmButtonText: "OK"
                         }).then(() => {
-                            location.reload(); // Reload page after clicking OK
-                        });
+            window.location.href = "bookings.php"; // Redirect sa booking.php
+        });
                     } else {
                         Swal.fire({
                             title: "Error!",
