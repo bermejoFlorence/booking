@@ -184,7 +184,6 @@
             </table>
         </div>
         <div class="settings-body" style="margin-top: 15px">
-        <div class="settings-title">S E T T I N G S</div>
             <table border="0" width="100%" style=" border-spacing: 0;margin:0;padding:0;" >
                 <tr>
                     <td colspan="4">
