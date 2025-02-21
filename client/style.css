@@ -20,6 +20,7 @@
     height: 100vh; /* Para masakop ang buong taas ng screen */
     overflow-y: auto; /* Para ma-scroll kung mahaba */
     z-index: 999; /* Mas mababa sa header */
+    background-color: var(--menubg);
 }
 
 .menu-container {
@@ -86,9 +87,10 @@
     z-index: 1100; /* Mas mataas kaysa sidebar at header */
     cursor: pointer;
     font-size: 24px;
-    background: white; /* Para di mawala sa background */
     padding: 10px;
     border-radius: 5px;
+    background-color: var(--menubg);
+    color: white;
 }
 .menu .close-btn {
     display: none;
@@ -441,7 +443,7 @@ input, select {
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: #46B1C9;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -451,7 +453,7 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color:  #46B1C9;
 }
 
 /* Add margin-bottom to "Address" and "Event" input fields */
