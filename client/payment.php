@@ -165,7 +165,7 @@ if (isset($_GET['booking_id'])) {
             display: block;
             width: 100%;
             padding: 12px;
-            background-color: #007bff;
+            background-color: #46B1C9;
             color: white;
             border: none;
             border-radius: 5px;
@@ -176,7 +176,7 @@ if (isset($_GET['booking_id'])) {
         }
 
         .btn-primary:hover {
-            background-color: #0056b3;
+            background-color:#4da0e0;
         }
 
         .hidden {
@@ -221,23 +221,6 @@ if (isset($_GET['booking_id'])) {
     }
     
 }
-
-.header {
-    background-color: green;
-    color: white;
-    text-align: center;
-    padding: 5px;
-    font-size: 10px;
-    font-weight: bold;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000; /* Para laging nasa ibabaw */
-}
-
-
 </style>
 
 <div class="header">

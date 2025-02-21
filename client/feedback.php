@@ -49,7 +49,6 @@ if ($userrow && $userrow->num_rows > 0) {
 </head>
 <body>
 <style>
-       @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         .center-container {
     display: flex;
     justify-content: center;
@@ -148,7 +147,7 @@ h2 {
 }
 
 button {
-    background: green;
+    background: #46B1C9;
     color: white;
     border: none;
     padding: 15px 30px; /* Bigger button size */
@@ -159,9 +158,8 @@ button {
 }
 
         button:hover {
-            background: darkgreen;
+            background: #4da0e0;
         }
-
         @media screen and (max-width: 480px) {
             h2 {
                 font-size: 20px;
