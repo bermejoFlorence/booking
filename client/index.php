@@ -463,6 +463,7 @@ $rating_map = [
             </div>
         </div>
         <div class="feedback-container">
+        <div class="services-title" style="padding-bottom: 10px">CLIENT'S FEEDBACK</div>
     <div class="feedback-carousel">
         <div class="feedback-slides">
             <?php while ($row = mysqli_fetch_assoc($result)) : ?>
