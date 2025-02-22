@@ -45,6 +45,7 @@ if ($userrow && $userrow->num_rows > 0) {
     exit();
 }
 
+
 ?>
 </head>
 <body>
@@ -152,6 +153,19 @@ button {
                 font-size: 30px;
             }
         }
+        .btn {
+    padding: 10px 20px;
+    margin-top: 20px;
+    background:#46B1C9; ;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+.btn:hover {
+    background: #4da0e0 ;
+}
 
     </style>
 
