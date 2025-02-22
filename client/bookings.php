@@ -840,8 +840,14 @@ function printInvoice(receiptNo, transactionNum, amountPayment, paymentStatus, p
 
 function showConfirmationModal(action, bookingId) {
     let modal = document.getElementById("confirmationModal");
+    let modalContent = document.getElementById("modalContent");
     let modalMessage = document.getElementById("modalMessage");
     let confirmBtn = document.getElementById("confirmBtn");
+
+    modal.style.display = "flex"; // Ipakita ang modal
+    setTimeout(() => {
+        modalContent.style.transform = "scale(1)"; // Zoom-in effect
+    }, 50);
 
     if (action === 'checkout') {
         modalMessage.textContent = 'Are you sure you want to proceed with checkout?';
@@ -853,12 +859,9 @@ function showConfirmationModal(action, bookingId) {
         modalMessage.textContent = 'Are you sure you want to cancel this booking?';
         confirmBtn.style.backgroundColor = '#007bff';
         confirmBtn.onclick = function () {
-            // Gumamit ng AJAX para i-update ang database
             fetch('cancel_booking.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'booking_id=' + bookingId
             })
             .then(response => response.text())
@@ -870,7 +873,7 @@ function showConfirmationModal(action, bookingId) {
                         text: 'The booking has been successfully cancelled!',
                         confirmButtonColor: '#007bff',
                     }).then(() => {
-                        location.reload(); // Refresh page para makita ang updated status
+                        location.reload();
                     });
                 } else {
                     Swal.fire({
@@ -892,48 +895,48 @@ function showConfirmationModal(action, bookingId) {
             });
         };
     } else if (action === 'delete') {
-    modalMessage.textContent = 'Are you sure you want to delete this booking?';
-    confirmBtn.style.backgroundColor = '#007bff';
-    confirmBtn.onclick = function () {
-        fetch('delete_booking.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'booking_id=' + bookingId
-        })
-        .then(response => response.text())
-        .then(data => {
-            if (data.trim() === 'success') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Booking Deleted',
-                    text: 'Your booking has been removed!',
-                    confirmButtonColor: '#007bff',
-                }).then(() => {
-                    location.reload(); // Reload the page after success
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Error removing booking. Please try again.',
-                    confirmButtonColor: '#dc3545',
-                });
-            }
-        });
+        modalMessage.textContent = 'Are you sure you want to delete this booking?';
+        confirmBtn.style.backgroundColor = '#007bff';
+        confirmBtn.onclick = function () {
+            fetch('delete_booking.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'booking_id=' + bookingId
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.trim() === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Booking Deleted',
+                        text: 'Your booking has been removed!',
+                        confirmButtonColor: '#007bff',
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error removing booking. Please try again.',
+                        confirmButtonColor: '#dc3545',
+                    });
+                }
+            });
 
-        closeConfirmationModal();
-    };
-}
-
-
-    modal.style.display = "flex";
-    document.getElementById("modalContent").style.transform = "scale(1)";
+            closeConfirmationModal();
+        };
+    }
 }
 
 function closeConfirmationModal() {
     let modal = document.getElementById("confirmationModal");
-    modal.style.display = "none";
-    document.getElementById("modalContent").style.transform = "scale(0)";
+    let modalContent = document.getElementById("modalContent");
+
+    modalContent.style.transform = "scale(0)"; // Zoom-out effect
+    setTimeout(() => {
+        modal.style.display = "none"; // Itago ang modal pagkatapos ng 300ms
+    }, 300);
 }
 
 function showLogoutModal() {
