@@ -504,12 +504,12 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
 
         <div class="dashboard-flex">
             <div class="calendar-container">
-                <h2 style="text-align: center; font-size: 24px; margin-bottom: 20px; color: #28a745;">APPROVED SCHEDULE</h2>
+                <h2 style="text-align: center; font-size: 24px; margin-bottom: 20px; color: #4a4e69;">APPROVED SCHEDULE</h2>
                 <div id="calendar"></div>
             </div>
 
             <div class="chart-wrapper">
-                <h3 class="chart-title">User Feedback Overview</h3>
+                <h3 class="chart-title" style="color: #4a4e69;">User Feedback Overview</h3>
                 <div class="chart-container">
                     <canvas id="feedbackChart"></canvas>
                 </div>
