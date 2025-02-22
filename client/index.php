@@ -349,13 +349,20 @@ $rating_map = [
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <a href="../logout.php"><input type="button" value="Log out" class="logout-btn btn-primary-soft btn"></a>
+                                    <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
                                 </td>
                             </tr>
                     </table>
-                    </td>
-                </tr>
-
+                        <!-- Logout Confirmation Modal -->
+                    <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
+                                <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
+                                    <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
+                                    <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
+                                    <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
                 <tr class="menu-row">
                     <td class="menu-btn menu-icon-appointment menu-active menu-icon-home-active">
                         <a href="index.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">Home</p></a></div></a>
@@ -685,6 +692,28 @@ $(document).ready(function () {
             });
         });
     });
+    
+function showLogoutModal() {
+        let modal = document.getElementById("logoutModal");
+        let modalContent = document.getElementById("logoutModalContent");
+        modal.style.display = "flex";
+        setTimeout(() => {
+            modalContent.style.transform = "scale(1)";
+        }, 50);
+    }
+
+    function closeLogoutModal() {
+        let modalContent = document.getElementById("logoutModalContent");
+        modalContent.style.transform = "scale(0)";
+        setTimeout(() => {
+            document.getElementById("logoutModal").style.display = "none";
+        }, 300);
+    }
+
+    function logoutUser() {
+        window.location.href = "../logout.php"; // Redirect to logout page
+    }
+
     </script>
 </body>
 </html>
