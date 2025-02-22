@@ -86,6 +86,7 @@ if ($result->num_rows > 0) {
 }
 .dash-body{
     margin-top: 40%;
+    padding-top: 10px;
 }
 
 .dashboard-items {

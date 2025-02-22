@@ -81,7 +81,7 @@ while ($rowEvent = $resultEvents->fetch_assoc()) {
     $bookedDates[] = [
         'title' => $rowEvent['event'], // Display the event name from the database
         'start' => $rowEvent['date_event'],
-        'color' => 'green' // Make the date green
+        'color' => '#4da0e0' // Make the date green
     ];
 }
 
