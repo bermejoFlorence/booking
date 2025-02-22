@@ -221,6 +221,19 @@ if (isset($_GET['booking_id'])) {
     }
     
 }
+.btn {
+    padding: 10px 20px;
+    margin-top: 20px;
+    background:#46B1C9; ;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+.btn:hover {
+    background: #4da0e0 ;
+}
 </style>
 
 <div class="header">
