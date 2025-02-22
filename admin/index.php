@@ -230,23 +230,40 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
 
 }
 
-
-
-        .calendar-container {
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 10px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+.calendar-container {
+    flex: 1;
+    max-width: 40%; /* Bawasan ang lapad ng calendar */
+    height: 100px;
+    
 }
 
 #calendar {
-    width: 100%;
-    height: calc(100vh - 200px); /* Adjust height to fit the screen, subtracting space for header/footer */
-    overflow: hidden; /* Prevent scrollbar */
+    border: 20px  #4a4e69;/* Itim na border */
+    border-radius: 10px; /* Para medyo rounded ang kanto */
+    padding: 20px;
+
 }
+.fc-button {
+    background-color:#4da0e0 !important; /* Blue background */
+    color: white !important; /* White text */
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 5px 10px !important;
+}
+
+.fc-button:hover {
+    background-color: #0056b3 !important; /* Darker blue on hover */
+}
+
+.fc-prev-button, .fc-next-button {
+    background-color:#46B1C9 !important; /* Dark gray background */
+    color: white !important; /* White text */
+}
+
+.fc-prev-button:hover, .fc-next-button:hover {
+    background-color:#46B1C9 !important; /* Darker gray on hover */
+}
+
 
 @media screen and (max-width: 768px) {
     .calendar-container {
@@ -368,6 +385,19 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
 .chart-wrapper {
     flex: 1;
     max-width: 50%; /* Hinati ang space (50% bawat isa) */
+}
+.btn {
+    padding: 10px 20px;
+    margin-top: 20px;
+    background:#46B1C9; ;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+.btn:hover {
+    background: #4da0e0 ;
 }
     </style>
 
