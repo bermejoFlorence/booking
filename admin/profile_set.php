@@ -84,6 +84,9 @@ if ($result->num_rows > 0) {
         font-size: 1.2rem;
     }
 }
+.dash-body{
+    margin-top:30%;
+}
 
 .dashboard-items {
     padding: 20px;
