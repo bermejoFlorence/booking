@@ -294,17 +294,6 @@ hr {
         padding: 8px;
     }
 }
-
-
-.header {
-    background-color: green;
-    color: white;
-    text-align: center;
-    padding: 5px;
-    font-size: 10px;
-    font-weight: bold;
-    width: 100%;
-}
 </style>
 
 <div class="header">

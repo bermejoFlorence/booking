@@ -204,24 +204,6 @@ if ($result->num_rows > 0) {
     color: #777;
     font-weight: normal;
 }
-
-
-.header {
-    background-color: green;
-    color: white;
-    text-align: center;
-    padding: 5px;
-    font-size: 10px;
-    font-weight: bold;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000; /* Para laging nasa ibabaw */
-
-}
-
 @media screen and (max-width: 480px) {
     .header {
         font-size: 3px;
