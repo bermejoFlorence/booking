@@ -87,21 +87,6 @@ $result = $database->query($sql);
     flex-wrap: wrap;
     margin-top: 7%; /* Space sa taas ng header */
 }
-    .header {
-    background-color: green;
-    color: white;
-    text-align: center;
-    padding: 5px;
-    font-size: 10px;
-    font-weight: bold;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000; /* Para laging nasa ibabaw */
-
-}
 
     .heading-main12 {
         font-size: 20px;

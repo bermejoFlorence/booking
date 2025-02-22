@@ -3,17 +3,18 @@
     flex-direction: row;
     width: 100%;
 }
+
 .menu {
     width: 250px;
     transition: transform 0.3s ease-in-out;
-    margin-top: 10px; /* Added margin from the top */
+    margin-top: 10px;
     position: fixed;
     top: 50px; /* I-adjust ito depende sa taas ng header mo */
     left: 0;
     height: 100vh; /* Para masakop ang buong taas ng screen */
     overflow-y: auto; /* Para ma-scroll kung mahaba */
     z-index: 999; /* Mas mababa sa header */
-
+    background-color: var(--menubg);
 }
 .menu-container {
     width: 100%;
@@ -66,9 +67,10 @@
     z-index: 1100; /* Mas mataas kaysa sidebar at header */
     cursor: pointer;
     font-size: 24px;
-    background: white; /* Para di mawala sa background */
     padding: 10px;
     border-radius: 5px;
+    background-color: var(--menubg);
+    color: white;
 }
 
 .menu .close-btn {

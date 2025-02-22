@@ -183,21 +183,7 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
     justify-content: center; /* Vertically center-align content */
     text-align: left; /* Align text to the left */
 }
-.header {
-    background-color: green;
-    color: white;
-    text-align: center;
-    padding: 5px;
-    font-size: 10px;
-    font-weight: bold;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000; /* Para laging nasa ibabaw */
 
-}
 .h1-dashboard {
     font-size: 36px;
     font-weight: bold;
