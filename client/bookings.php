@@ -554,7 +554,7 @@ hr {
                                         $statusClass = 'background-color: red; color: white;';
                                     }
                                     elseif ($row['stat'] === 'cancelled') {
-                                        $statusClass = 'background-color: red; color: white;';
+                                        $statusClass = 'background-color: #8B0000; color: white;';
                                     }
 
                                     // Display the status with background color
@@ -598,6 +598,9 @@ hr {
                                         )\">";
                                         echo "<img src='../img/icons/printer.png' alt='Print Icon' width='20' style='cursor: pointer;'>";
                                         echo "</span>";
+                                    } elseif ($row['stat'] === 'cancelled') {
+                                        // Delete button
+                                        echo "<button class='delete-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('delete', '" . htmlspecialchars($row['booking_id']) . "')\">Delete</button>";
                                     }
                                     echo "</td>";
 
@@ -880,7 +883,40 @@ function showConfirmationModal(action, bookingId) {
                 });
             });
         };
-    }
+    } else if (action === 'delete') {
+    modalMessage.textContent = 'Are you sure you want to delete this booking?';
+    confirmBtn.style.backgroundColor = '#007bff';
+    confirmBtn.onclick = function () {
+        fetch('delete_booking.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'booking_id=' + bookingId
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data.trim() === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Booking Deleted',
+                    text: 'Your booking has been removed!',
+                    confirmButtonColor: '#007bff',
+                }).then(() => {
+                    location.reload(); // Reload the page after success
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error removing booking. Please try again.',
+                    confirmButtonColor: '#dc3545',
+                });
+            }
+        });
+
+        closeConfirmationModal();
+    };
+}
+
 
     modal.style.display = "flex";
     document.getElementById("modalContent").style.transform = "scale(1)";
