@@ -14,7 +14,7 @@
     height: 100vh; /* Para masakop ang buong taas ng screen */
     overflow-y: auto; /* Para ma-scroll kung mahaba */
     z-index: 999; /* Mas mababa sa header */
-    background-color: var(--menubg);
+    background-color:   #b7e2ec; /* Moonstone - Primary Accent (CTA Buttons) */
 }
 .menu-container {
     width: 100%;

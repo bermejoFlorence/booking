@@ -296,9 +296,9 @@ input[type=search]:focus {
   font-size: 16px;
 }
 .menu-active{
-  color: var(--primarycolor);
+  color:  #b7e2ec; /* Moonstone - Primary Accent (CTA Buttons) */
   border-right: 7px solid var(--primarycolor);
-  background-color: var(--menubg);
+  background-color:  #b7e2ec; /* Moonstone - Primary Accent (CTA Buttons) */
 }
 .menu-btn:hover{
   background-color: var(--btnice);
