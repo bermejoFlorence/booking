@@ -2,8 +2,8 @@
 @import url("../fonts/octin_sports_rg.ttf");
 body {
   font-family: "Poppins", sans-serif;
-  color: #0c0c0c;
-  background-color: #ffffff;
+  color: #4a4e69;
+  background-color: #faf6f3;
   overflow-x: hidden;
 }
 
@@ -105,7 +105,7 @@ a:focus {
 
 a:hover,
 a:focus {
-  color: initial;
+  color: #4da0e0;;
 }
 
 .btn,
@@ -268,17 +268,16 @@ a:focus {
 .slider_section .detail-box .btn-box .btn1 {
   display: inline-block;
   padding: 10px 15px;
-  background-color: #0d00ff;
+  background-color: #46B1C9;;
   color: #ffffff;
   border-radius: 0;
-  border: 1px solid #0004ff;
   -webkit-transition: all .2s;
   transition: all .2s;
 }
 
 .slider_section .detail-box .btn-box .btn1:hover {
   background-color: transparent;
-  color: #0033ff;
+  color: #4da0e0;;
 }
 
 .slider_section .detail-box .btn-box .btn2 {
@@ -294,7 +293,7 @@ a:focus {
 
 .slider_section .detail-box .btn-box .btn2:hover {
   background-color: transparent;
-  color: #6bb7be;
+  color: #4da0e0;;
 }
 
 .slider_section .img-box img {
@@ -361,7 +360,7 @@ a:focus {
 
 .about_section .detail-box a:hover {
   background-color: transparent;
-  color: #6bb7be;
+  color: #4da0e0;;
 }
 
 .blog_section .heading_container {
@@ -417,7 +416,7 @@ a:focus {
 
 .blog_section .box .detail-box a:hover {
   background-color: transparent;
-  color: #6bb7be;
+  color: #4da0e0;;
 }
 
 .client_section .heading_container {
@@ -506,7 +505,7 @@ a:focus {
 
 .client_section .carousel-control-prev:hover,
 .client_section .carousel-control-next:hover {
-  background-color: #000000;
+  background-color: #4da0e0;;
 }
 
 .client_section .carousel-control-next {
@@ -575,7 +574,7 @@ a:focus {
 
 .contact_section .form_container button:hover {
   background-color: transparent;
-  color: #6bb7be;
+  color: #4da0e0;;
 }
 
 .contact_section .map_container {
@@ -602,8 +601,8 @@ a:focus {
 }
 
 .info_section {
-  background-color: #191e1f;
-  color: #ffffff;
+  background-color:  #4da0e0;
+  color: #4a4e69;
   padding-top: 45px;
   padding-bottom: 45px;
 }
@@ -642,7 +641,7 @@ a:focus {
 }
 
 .info_section .contact_nav a:hover {
-  color: #f89646;
+  color: #000000;;
 }
 
 .info_section .info_top {
@@ -670,7 +669,7 @@ a:focus {
 }
 
 .info_section .info_links .info_links_menu a:hover, .info_section .info_links .info_links_menu a.active {
-  color: #f89646;
+  color: #4da0e0;;
 }
 
 .info_section .info_post .post_box {
@@ -741,7 +740,7 @@ a:focus {
 
 .info_section .info_form button:hover {
   background-color: transparent;
-  color: #6bb7be;
+  color: #4da0e0;;
 }
 
 .info_section .info_form .social_box {
@@ -765,15 +764,15 @@ a:focus {
   border-radius: 5px;
   width: 45px;
   height: 45px;
-  border: 1px solid #6bb7be;
-  color: #6bb7be;
+  border: 1px solid #ffffff;
+  color: #ffffff;
   font-size: 18px;
   margin-right: 10px;
 }
 
 .info_section .info_form .social_box a:hover {
-  color: #f89646;
-  border-color: #f89646;
+  color: #000000;;
+  border-color: #000000;;
 }
 
 /* footer section*/
