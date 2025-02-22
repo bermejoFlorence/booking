@@ -843,7 +843,7 @@ function showConfirmationModal(action, bookingId) {
         };
     } else if (action === 'cancel') {
         modalMessage.textContent = 'Are you sure you want to cancel this booking?';
-        confirmBtn.style.backgroundColor = '#dc3545';
+        confirmBtn.style.backgroundColor = '#007bff';
         confirmBtn.onclick = function () {
             // Gumamit ng AJAX para i-update ang database
             fetch('cancel_booking.php', {
