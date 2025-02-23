@@ -238,13 +238,13 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
 }
 
 #calendar {
-    border: 20px  #4a4e69;/* Itim na border */
+    border: 20pxrgb(50, 52, 60);/* Itim na border */
     border-radius: 10px; /* Para medyo rounded ang kanto */
     padding: 20px;
 
 }
 .fc-button {
-    background-color:#4da0e0 !important; /* Blue background */
+    background-color:#46B1C9 !important; /* Blue background */
     color: white !important; /* White text */
     border: none !important;
     border-radius: 5px !important;
