@@ -552,17 +552,17 @@ hr {
                                     $statusClass = '';
                                     $statusText = htmlspecialchars($row['stat']);
                                     if ($row['stat'] === 'pending') {
-                                        $statusClass = 'background-color: orange; color: white;';
+                                        $statusClass = 'background-color: rgb(241, 137, 80);; color: white;';
                                     } elseif ($row['stat'] === 'processing') {
-                                        $statusClass = 'background-color: blue; color: white;';
+                                        $statusClass = 'background-color: #46B1C9; color: white;';
                                     } elseif ($row['stat'] === 'approved') {
-                                        $statusClass = 'background-color: green; color: white;';
+                                        $statusClass = 'background-color: rgb(77, 224, 126); color: white;';
                                     }
                                     elseif ($row['stat'] === 'rejected') {
                                         $statusClass = 'background-color: red; color: white;';
                                     }
                                     elseif ($row['stat'] === 'cancelled') {
-                                        $statusClass = 'background-color: #8B0000; color: white;';
+                                        $statusClass = 'background-color: #rgb(235, 63, 63); color: white;';
                                         
                                     }
 
@@ -575,7 +575,7 @@ hr {
                                     echo "<td class='col-action' style='text-align: center; vertical-align: middle;'>";
                                     if ($row['stat'] === 'pending') {
                                         // Checkout button
-                                        echo "<button class='checkout-btn' style='padding: 5px 10px; border: none; background-color: #007bff; color: white; border-radius: 3px; cursor: pointer; margin-right: 5px;' onclick=\"showConfirmationModal('checkout', '" . htmlspecialchars($row['booking_id']) . "')\">Checkout</button>";
+                                        echo "<button class='checkout-btn' style='padding: 5px 10px; border: none; background-color: #46B1C9; color: white; border-radius: 3px; cursor: pointer; margin-right: 5px;' onclick=\"showConfirmationModal('checkout', '" . htmlspecialchars($row['booking_id']) . "')\">Checkout</button>";
                                     
                                         // Cancel button
                                         echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
