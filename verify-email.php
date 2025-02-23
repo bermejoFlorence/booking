@@ -42,7 +42,7 @@ if (isset($_GET['code'])) {
                     icon: "success",
                     confirmButtonText: "OK"
                 }).then(() => {
-                    window.location.href = "https://exzphotograpy.com/login.php";
+                    window.location.href = "https://exzphotography.com/login.php";
                 });
             }, 500); // Adding slight delay to ensure script execution
         </script>';
@@ -58,13 +58,13 @@ if (isset($_GET['code'])) {
                     icon: "error",
                     confirmButtonText: "OK"
                 }).then(() => {
-                    window.location.href = "https://exzphotograpy.com/login.php";
+                    window.location.href = "https://exzphotography.com/login.php";
                 });
             }, 500);
         </script>';
     }
 } else {
-    header("Location: https://exzphotograpy.com/login.php");
+    header("Location: https://exzphotography.com/login.php");
     exit();
 }
 ?>
