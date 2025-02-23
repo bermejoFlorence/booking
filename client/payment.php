@@ -297,11 +297,14 @@ if (isset($_GET['booking_id'])) {
                     </td>
                 </tr>
 
-                <tr class="menu-row">
+
+
+                <!-- <tr class="menu-row" >
                     <td class="menu-btn menu-icon-settings">
-                        <a href="profile_set.php" class="non-style-link-menu"><div><p class="menu-text">Profile Settings</p></a></div>
+                        <a href="settings.php" class="non-style-link-menu"><div><p class="menu-text">Settings</p></a></div>
                     </td>
-                </tr>
+                </tr> -->
+            </table>
         </div>
         <div class="dash-body" style="margin-top: 15px">
     <table border="0" width="100%" style="border-spacing: 0; margin: 0; padding: 0; margin-top: 25px;">
