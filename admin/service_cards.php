@@ -50,11 +50,21 @@ if ($result->num_rows > 0) {
 // Set timezone to Philippine Time
 date_default_timezone_set('Asia/Manila');
 
-$service_query = $database->query("SELECT service_id, name, details, price, date_created FROM services");
+$studio_query = $database->query("SELECT service_id, name, details, price, date_created FROM services WHERE category = 'In Studio'");
 
-if (!$service_query) {
+// Fetch New Born Photoshoot Services
+$newborn_query = $database->query("SELECT service_id, name, details, price, date_created FROM services WHERE category = 'New Born Photoshoot'");
+
+$wedding_query = $database->query("SELECT service_id, name, details, price, date_created FROM services WHERE category = 'Wedding'");
+
+
+$other_wedding_query = $database->query("SELECT service_id, name, details, price, date_created FROM services WHERE category = 'Other Wedding Services'");
+
+
+if (!$studio_query || !$newborn_query) {
     die("Query Failed: " . $database->error); // Debugging output
 }
+
 ?>
 
 
@@ -295,6 +305,7 @@ hr {
 .btn:hover {
     background: #4da0e0 ;
 }
+
 </style>
 
 <div class="header">
@@ -324,17 +335,16 @@ hr {
                                 <td colspan="2">
                                     <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
                                 </td>
-                            </tr>        
-
+                            </tr>
                         </table>
-                         <!-- Logout Confirmation Modal -->
-                         <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
-                            <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
-                                <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
-                                <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
-                                <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
-                            </div>
-                        </div>
+                        
+                            <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
+                                <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
+                                    <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
+                                    <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
+                                    <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
+                                </div>
+                            </div>    
 
                     </td>
                 </tr>
@@ -388,8 +398,12 @@ hr {
 <div class="table-container">
         <div class="table-responsive">
         <table class="sub-table" style="width: 100%; border-collapse: collapse; text-align: center;">
-
             <thead>
+            <tr>
+            <th colspan="6" style="font-size: 18px; font-weight: bold; padding: 15px; background-color: #f2f2f2; text-align: center;">
+                IN STUDIO SERVICES
+            </th>
+        </tr>
                 <tr>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">#</th>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Name</th>
@@ -403,7 +417,7 @@ hr {
             <tbody>
     <?php 
     $counter = 1;
-    while ($row = $service_query->fetch_assoc()) : 
+    while ($row = $studio_query->fetch_assoc()) : 
         // Hatiin ang details mula sa database
         $detailsArray = explode('|', htmlspecialchars($row['details']));
     ?>
@@ -429,12 +443,150 @@ hr {
     </tr>
     <?php endwhile; ?>
 </tbody>
+        </table>
 
+        
+        </div>
+</div>
+   <!-- New Born Photoshoot Services -->
+   <table class="sub-table" style="width: 100%; border-collapse: collapse; text-align: center; margin-top: 20px;">
+        <thead>
+            <tr>
+                <th colspan="6" style="font-size: 18px; font-weight: bold; padding: 15px; background-color: #f2f2f2; text-align: center;">
+                    NEW BORN PHOTOSHOOT SERVICES
+                </th>
+            </tr>
+            <tr>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">#</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Name</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Details</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Price</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Last Update</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            $counter = 1;
+            while ($row = $newborn_query->fetch_assoc()) : 
+                $detailsArray = explode('|', htmlspecialchars($row['details']));
+            ?>
+            <tr>
+                <td><?php echo $counter++; ?></td>
+                <td><?php echo htmlspecialchars($row['name']); ?></td>
+                <td><?php echo implode('<br>', $detailsArray); ?></td>
+                <td>P <?php echo htmlspecialchars($row['price']); ?>.00</td>
+                <td><?php echo date("F j, Y", strtotime($row['date_created'])); ?></td>
+                <td style="text-align: center;">
+                <button onclick="openEditModal(
+                <?php echo $row['service_id']; ?>,
+                '<?php echo addslashes(htmlspecialchars($row['name'])); ?>',
+                '<?php echo addslashes(implode('|', $detailsArray)); ?>',
+                '<?php echo htmlspecialchars($row['price']); ?>'
+            )" 
+            style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                Edit
+            </button>
+                </td>
+            </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+
+      <!-- Wedding Photoshoot Services -->
+   <table class="sub-table" style="width: 100%; border-collapse: collapse; text-align: center; margin-top: 20px;">
+        <thead>
+            <tr>
+                <th colspan="6" style="font-size: 18px; font-weight: bold; padding: 15px; background-color: #f2f2f2; text-align: center;">
+                    WEDDING PHOTOSHOOT SERVICES
+                </th>
+            </tr>
+            <tr>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">#</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Name</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Details</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Price</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Last Update</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            $counter = 1;
+            while ($row = $wedding_query->fetch_assoc()) : 
+                $detailsArray = explode('|', htmlspecialchars($row['details']));
+            ?>
+            <tr>
+                <td><?php echo $counter++; ?></td>
+                <td><?php echo htmlspecialchars($row['name']); ?></td>
+                <td><?php echo implode('<br>', $detailsArray); ?></td>
+                <td>P <?php echo htmlspecialchars($row['price']); ?>.00</td>
+                <td><?php echo date("F j, Y", strtotime($row['date_created'])); ?></td>
+                <td style="text-align: center;">
+                <button onclick="openEditModal(
+                <?php echo $row['service_id']; ?>,
+                '<?php echo addslashes(htmlspecialchars($row['name'])); ?>',
+                '<?php echo addslashes(implode('|', $detailsArray)); ?>',
+                '<?php echo htmlspecialchars($row['price']); ?>'
+            )" 
+            style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                Edit
+            </button>
+                </td>
+            </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+
+        <!-- Other Wedding Photoshoot Services -->
+   <table class="sub-table" style="width: 100%; border-collapse: collapse; text-align: center; margin-top: 20px;">
+        <thead>
+            <tr>
+                <th colspan="6" style="font-size: 18px; font-weight: bold; padding: 15px; background-color: #f2f2f2; text-align: center;">
+                    OITHER WEDDING PHOTOSHOOT SERVICES
+                </th>
+            </tr>
+            <tr>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">#</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Name</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Price</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Last Update</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            $counter = 1;
+            while ($row = $other_wedding_query->fetch_assoc()) : 
+                $detailsArray = explode('|', htmlspecialchars($row['details']));
+            ?>
+            <tr>
+                <td><?php echo $counter++; ?></td>
+                <td><?php echo htmlspecialchars($row['name']); ?></td>
+                <td>P <?php echo htmlspecialchars($row['price']); ?>.00</td>
+                <td><?php echo date("F j, Y", strtotime($row['date_created'])); ?></td>
+                <td style="text-align: center;">
+                <button onclick="openEditModal(
+                <?php echo $row['service_id']; ?>,
+                '<?php echo addslashes(htmlspecialchars($row['name'])); ?>',
+                '<?php echo addslashes(implode('|', $detailsArray)); ?>',
+                '<?php echo htmlspecialchars($row['price']); ?>'
+            )" 
+            style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                Edit
+            </button>
+                </td>
+            </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
 <!-- Edit Modal -->
 <div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000;">
     <div id="modalContent" style="background: white; padding: 30px; border-radius: 12px; width: 400px; position: relative;">
         <h2 style="text-align: center; margin-bottom: 20px;">Edit Service</h2>
         <form id="editForm" method="POST" action="update_service.php">
+            <input type="hidden" id="category" name="category">
+
             <input type="hidden" id="editServiceId" name="service_id">
             
             <label for="service_name">Service Name:</label>
@@ -459,11 +611,6 @@ hr {
 </div>
 
 
-        </table>
-
-        
-        </div>
-    </div>
 </div>
 
     </div>
@@ -491,18 +638,24 @@ hr {
 function closeEditModal() {
     document.getElementById('editModal').style.display = 'none';
 }
-
 function openEditModal(serviceId, serviceName, serviceDetails, price) {
     document.getElementById('editServiceId').value = serviceId;
     document.getElementById('service_name').value = serviceName;
     document.getElementById('price').value = price;
 
-    // Split service details and populate each input
+    const detailsContainer = document.getElementById('serviceDetailsContainer');
+    detailsContainer.innerHTML = ''; // Clear existing inputs
+
     const detailsArray = serviceDetails.split('|');
-    for (let i = 0; i < 5; i++) {
-        const detailInput = document.getElementById(`detail${i + 1}`);
-        detailInput.value = detailsArray[i] || ''; // Default to empty if no value
-    }
+    detailsArray.forEach((detail, index) => {
+        let input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'service_details[]';
+        input.value = detail;
+        input.placeholder = `Detail ${index + 1}`;
+        input.style = 'width: 100%; padding: 8px; margin-bottom: 5px;';
+        detailsContainer.appendChild(input);
+    });
 
     document.getElementById('editModal').style.display = 'flex';
 }
@@ -551,6 +704,7 @@ document.getElementById("editForm").addEventListener("submit", function (e) {
         console.error('Error:', error);
     });
 });
+
 function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
         let modalContent = document.getElementById("logoutModalContent");
@@ -571,7 +725,6 @@ function showLogoutModal() {
     function logoutUser() {
         window.location.href = "../logout.php"; // Redirect to logout page
     }
-
 
     </script>
 </body>
