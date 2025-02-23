@@ -565,7 +565,7 @@ hr {
             // **Condition para sa Status ng Booking**
             if ($row['stat'] == 'approved') {
                 echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
-                        <button style='background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>
+                        <button style='background-color: rgb(77, 224, 126); color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>
                         <button style='background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
                             onclick=\"printBooking(
                                 '{$row['booking_id']}', 
