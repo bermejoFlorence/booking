@@ -136,7 +136,7 @@
     <a href="">
       <i class="fa fa-envelope" aria-hidden="true"></i>
       <span>
-        Email : florencebermejo@gmail.com
+        Email : rysha.andaya@cbsua.edu.ph
       </span>
     </a>
     <div>
