@@ -58,6 +58,7 @@ $bookingData = $database->query("
     ORDER BY b.booking_id DESC
 ");
 
+
 ?>
 </head>
 <body>
@@ -457,10 +458,11 @@ hr {
                                 <td colspan="2">
                                     <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
                                 </td>
-                            </tr>  
+                            </tr>
+
                     </table>
                      <!-- Logout Confirmation Modal -->
-                     <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
+                        <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
                             <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
                                 <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
                                 <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
@@ -563,6 +565,7 @@ hr {
                                     }
                                     elseif ($row['stat'] === 'cancelled') {
                                         $statusClass = 'background-color: #8B0000; color: white;';
+                                        
                                     }
 
                                     // Display the status with background color
@@ -582,7 +585,24 @@ hr {
                                     }
                                      elseif ($row['stat'] === 'processing') {
                                         echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer;' 
+                                                onclick=\"viewDetails(
+                                                    '" . htmlspecialchars($row['booking_id']) . "', 
+                                                    '" . htmlspecialchars($row['package']) . "',
+                                                    '" . htmlspecialchars($row['price']) . "',
+                                                    '" . htmlspecialchars($row['event']) . "',
+                                                    '" . htmlspecialchars($row['date_event']) . "',
+                                                    '" . htmlspecialchars($row['address_event']) . "',
+                                                    '" . htmlspecialchars($row['transac_num']) . "',
+                                                    '" . htmlspecialchars($row['amt_payment']) . "',
+                                                    '" . htmlspecialchars($row['payment_status']) . "',
+                                                    '" . htmlspecialchars($row['reference_no']) . "'
+                                                )\">View Details</button>";
+
+                                    
+                                    } elseif ($row['stat'] === 'approved') {
+                                        echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer; margin-right: 5px;' 
                                         onclick=\"viewDetails(
+                                            '" . htmlspecialchars($row['booking_id']) . "', 
                                             '" . htmlspecialchars($row['package']) . "',
                                             '" . htmlspecialchars($row['price']) . "',
                                             '" . htmlspecialchars($row['event']) . "',
@@ -593,8 +613,7 @@ hr {
                                             '" . htmlspecialchars($row['payment_status']) . "',
                                             '" . htmlspecialchars($row['reference_no']) . "'
                                         )\">View Details</button>";
-                                    
-                                    } elseif ($row['stat'] === 'approved') {
+                                        
                                         echo "<span class='print-btn' onclick=\"printInvoice(
                                             '" . htmlspecialchars($row['receipt_no']) . "',
                                             '" . htmlspecialchars($row['transac_num']) . "',
@@ -644,6 +663,11 @@ hr {
                                             <span>Reference Number:</span> 
                                             <span id="modal-reference-no"></span>
                                         </div>
+                                        <div class="info-row" id="balance-row" style="display: none;">
+                                            <span>Balance:</span> 
+                                            <span id="modal-balance"></span>
+                                        </div>
+
                                     </div>
                                     <hr>
                                     <div class="section">
@@ -668,6 +692,11 @@ hr {
                                             <span>Event Address:</span> 
                                             <span id="modal-event-address"></span>
                                         </div>
+                                        <!-- Update Payment Button (Initially Hidden) -->
+                                            <button id="update-payment-btn" style="display: none; margin-top: 10px;" onclick="updatePayment()">
+                                                Update Payment
+                                            </button>
+
                                     </div>
                                 </div>
                             </div>
@@ -699,39 +728,115 @@ hr {
             menu.classList.toggle('open');
         }
 
-        function viewDetails(package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo) {
-    // Set booking details
-    document.getElementById('modal-package').textContent = package;
-    document.getElementById('modal-price').textContent = price;
-    document.getElementById('modal-event').textContent = event;
-    document.getElementById('modal-event-date').textContent = eventDate;
-    document.getElementById('modal-event-address').textContent = eventAddress;
-
-    // Set payment details
-    document.getElementById('modal-transac-num').textContent = transacNum || 'N/A';
-    document.getElementById('modal-amt-payment').textContent = amtPayment || 'N/A';
+        updatePaymentBtn.onclick = function() {
+    console.log("Update Payment button clicked!"); // Debugging step
+    console.log("Booking ID before redirect:", bookingId); // Siguraduhin may value
     
-    // Modify payment status based on database value
-    if (paymentStatus === 'Fully Paid') {
-        document.getElementById('modal-payment-status').textContent = 'Gcash';
-        // Show reference number for Gcash payments
-        document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
-    } else if (paymentStatus === 'No Payment') {
-        document.getElementById('modal-payment-status').textContent = 'Walk-In';
-        // Hide reference number for Walk-In payments
-        document.getElementById('modal-reference-no').textContent = 'N/A';  // Clear the reference number
+    if (bookingId) {
+        let redirectURL = `update_payment.php?booking_id=${bookingId}`;
+        console.log("Redirecting to:", redirectURL); // I-check ang final URL
+        window.location.href = redirectURL;
     } else {
-        document.getElementById('modal-payment-status').textContent = paymentStatus || 'N/A';
-        document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A'; // Default behavior for other statuses
+        alert("Error: No Booking ID found!");
     }
+};
 
-    // Show the modal
-    document.getElementById('viewDetailsModal').style.display = 'block';
-}
 
 function closeModal() {
     // Hide the modal
     document.getElementById('viewDetailsModal').style.display = 'none';
+}
+
+
+function showConfirmationModal(action, bookingId) {
+    let modal = document.getElementById("confirmationModal");
+    let modalContent = document.getElementById("modalContent");
+    let modalMessage = document.getElementById("modalMessage");
+    let confirmBtn = document.getElementById("confirmBtn");
+
+    modal.style.display = "flex"; // Ipakita ang modal
+    setTimeout(() => {
+        modalContent.style.transform = "scale(1)"; // Zoom-in effect
+    }, 50);
+
+    if (action === 'checkout') {
+        modalMessage.textContent = 'Are you sure you want to proceed with checkout?';
+        confirmBtn.style.backgroundColor = '#007bff';
+        confirmBtn.onclick = function () {
+            window.location.href = 'payment.php?booking_id=' + bookingId;
+        };
+    } else if (action === 'cancel') {
+        modalMessage.textContent = 'Are you sure you want to cancel this booking?';
+        confirmBtn.style.backgroundColor = '#007bff';
+        confirmBtn.onclick = function () {
+            fetch('cancel_booking.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'booking_id=' + bookingId
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.trim() === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Booking Cancelled',
+                        text: 'The booking has been successfully cancelled!',
+                        confirmButtonColor: '#007bff',
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error cancelling booking. Please try again.',
+                        confirmButtonColor: '#dc3545',
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred. Please try again later.',
+                    confirmButtonColor: '#dc3545',
+                });
+            });
+        };
+    } else if (action === 'delete') {
+        modalMessage.textContent = 'Are you sure you want to delete this booking?';
+        confirmBtn.style.backgroundColor = '#007bff';
+        confirmBtn.onclick = function () {
+            fetch('delete_booking.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'booking_id=' + bookingId
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.trim() === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Booking Deleted',
+                        text: 'Your booking has been removed!',
+                        confirmButtonColor: '#007bff',
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error removing booking. Please try again.',
+                        confirmButtonColor: '#dc3545',
+                    });
+                }
+            });
+
+            closeConfirmationModal();
+        };
+    }
 }
 
 function printInvoice(receiptNo, transactionNum, amountPayment, paymentStatus, packageName, price, eventName) {
@@ -837,97 +942,63 @@ function printInvoice(receiptNo, transactionNum, amountPayment, paymentStatus, p
 }
 
 }
+function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo) {
+    // Set booking details in modal
+    document.getElementById('modal-package').textContent = package;
+    document.getElementById('modal-price').textContent = price;
+    document.getElementById('modal-event').textContent = event;
+    document.getElementById('modal-event-date').textContent = eventDate;
+    document.getElementById('modal-event-address').textContent = eventAddress;
 
-function showConfirmationModal(action, bookingId) {
-    let modal = document.getElementById("confirmationModal");
-    let modalContent = document.getElementById("modalContent");
-    let modalMessage = document.getElementById("modalMessage");
-    let confirmBtn = document.getElementById("confirmBtn");
+    // Set transaction details
+    document.getElementById('modal-transac-num').textContent = transacNum || 'N/A';
+    document.getElementById('modal-amt-payment').textContent = `₱${amtPayment}`;
 
-    modal.style.display = "flex"; // Ipakita ang modal
-    setTimeout(() => {
-        modalContent.style.transform = "scale(1)"; // Zoom-in effect
-    }, 50);
+    // Compute balance
+    let balanceElement = document.getElementById('modal-balance');
+    let updateButton = document.getElementById('update-payment-btn'); // Get button element
 
-    if (action === 'checkout') {
-        modalMessage.textContent = 'Are you sure you want to proceed with checkout?';
-        confirmBtn.style.backgroundColor = '#007bff';
-        confirmBtn.onclick = function () {
-            window.location.href = 'payment.php?booking_id=' + bookingId;
-        };
-    } else if (action === 'cancel') {
-        modalMessage.textContent = 'Are you sure you want to cancel this booking?';
-        confirmBtn.style.backgroundColor = '#007bff';
-        confirmBtn.onclick = function () {
-            fetch('cancel_booking.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'booking_id=' + bookingId
-            })
-            .then(response => response.text())
-            .then(data => {
-                if (data.trim() === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Booking Cancelled',
-                        text: 'The booking has been successfully cancelled!',
-                        confirmButtonColor: '#007bff',
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error cancelling booking. Please try again.',
-                        confirmButtonColor: '#dc3545',
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An unexpected error occurred. Please try again later.',
-                    confirmButtonColor: '#dc3545',
-                });
-            });
-        };
-    } else if (action === 'delete') {
-        modalMessage.textContent = 'Are you sure you want to delete this booking?';
-        confirmBtn.style.backgroundColor = '#007bff';
-        confirmBtn.onclick = function () {
-            fetch('delete_booking.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'booking_id=' + bookingId
-            })
-            .then(response => response.text())
-            .then(data => {
-                if (data.trim() === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Booking Deleted',
-                        text: 'Your booking has been removed!',
-                        confirmButtonColor: '#007bff',
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error removing booking. Please try again.',
-                        confirmButtonColor: '#dc3545',
-                    });
-                }
-            });
+    let cleanedPrice = parseFloat(price.replace(/,/g, '')) || 0;
+    let cleanedAmtPayment = parseFloat(amtPayment) || 0;
+    let balance = cleanedPrice - cleanedAmtPayment;
 
-            closeConfirmationModal();
-        };
+    if (paymentStatus.trim() === 'Partial Paid') {
+        balanceElement.textContent = `₱${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        balanceElement.parentElement.style.display = 'flex'; 
+        updateButton.style.display = 'block'; 
+    } else {
+        balanceElement.parentElement.style.display = 'none'; 
+        updateButton.style.display = 'none'; 
     }
+
+    // Modify payment status display
+    if (paymentStatus.trim() === 'Fully Paid') {
+        document.getElementById('modal-payment-status').textContent = 'Gcash';
+        document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
+    } else if (paymentStatus.trim() === 'No Payment') {
+        document.getElementById('modal-payment-status').textContent = 'Walk-In';
+        document.getElementById('modal-reference-no').textContent = 'N/A';
+    } else {
+        document.getElementById('modal-payment-status').textContent = paymentStatus || 'N/A';
+        document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
+    }
+
+    // Update button function with bookingId, transactionNumber, package, and balance
+    updateButton.onclick = function () {
+        updatePayment(bookingId, transacNum, package, balance);
+    };
+
+    // Show the modal
+    document.getElementById('viewDetailsModal').style.display = 'block';
 }
+
+// Function to redirect to update_payment.php with parameters
+function updatePayment(bookingId, transacNum, package, balance) {
+    window.location.href = `update_payment.php?booking_id=${bookingId}&transac_num=${transacNum}&package=${encodeURIComponent(package)}&balance=${balance}`;
+}
+
+
+
 
 function closeConfirmationModal() {
     let modal = document.getElementById("confirmationModal");
@@ -959,7 +1030,6 @@ function showLogoutModal() {
     function logoutUser() {
         window.location.href = "../logout.php"; // Redirect to logout page
     }
-
 
 </script>
 

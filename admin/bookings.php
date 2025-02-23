@@ -16,7 +16,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales-all.min.js"></script>
 
         
-    <title>Booking</title>
+    <title>Dashboard</title>
 </head>
 <body>
 <?php
@@ -75,8 +75,8 @@ $sql = "SELECT
             p.receipt_no,
             p.transac_num,
             p.amt_payment,
-            p.payment_status as mode_of_payment,
-            p.reference_no
+            p.payment_status as payment_status,
+            p.reference_no as reference_no
         FROM 
             booking b 
         LEFT JOIN 
@@ -92,8 +92,8 @@ $sql = "SELECT
 $result = $database->query($sql);?>
 
    <style>
-    .dash-body {
-            margin: 30px auto; /* Adds top margin and centers horizontally */
+           .dash-body {
+    margin: 30px auto; /* Adds top margin and centers horizontally */
     padding: 0 20px; /* Adds inner padding */
     width: 90%; /* Set width to allow centering with auto margin */
     margin-top: 80px; /* I-adjust ayon sa taas ng header */
@@ -107,6 +107,7 @@ $result = $database->query($sql);?>
     margin-bottom: 30px; /* Space sa pagitan ng header at table */
     flex-wrap: wrap;
     margin-top: 7%; /* Space sa taas ng header */
+    
 }
 
     .heading-main12 {
@@ -341,7 +342,19 @@ hr {
         padding: 10px;
     }
 }
-
+.btn {
+    padding: 10px 20px;
+    margin-top: 20px;
+    background:#46B1C9; ;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+.btn:hover {
+    background: #4da0e0 ;
+}
 @media screen and (max-width: 480px) {
     .dash-body {
         margin: 5px auto;
@@ -371,18 +384,17 @@ hr {
     }
 }
 .btn {
-    padding: 10px 20px;
-    margin-top: 20px;
-    background:#46B1C9; ;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
+   
+   background:#46B1C9; ;
+   color: #fff;
+   text-decoration: none;
+   border-radius: 5px;
+   cursor: pointer;
+   border: none;
 }
 .btn:hover {
-    background: #4da0e0 ;
-}
+   background: #4da0e0 ;
+} 
 </style>
 <div class="header">
         <h1>EXZPHOTOGRAPHY STUDIO</h1>
@@ -411,16 +423,15 @@ hr {
                                 <td colspan="2">
                                     <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
                                 </td>
-                            </tr> 
+                            </tr>   
                         </table>
-                        <!-- Logout Confirmation Modal -->
                         <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
-                            <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
-                                <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
-                                <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
-                                <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
-                            </div>
-                        </div>
+                                <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
+                                    <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
+                                    <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
+                                    <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
+                                </div>
+                            </div> 
                     </td>
                 </tr>
                 <tr class="menu-row">
@@ -433,7 +444,7 @@ hr {
                 
                 <tr class="menu-row">
                     <td class="menu-btn menu-icon-appoinment menu-active menu-icon-appointment-active">
-                        <a href="bookings.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">My Bookings</p></a></div>
+                        <a href="bookings.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">Bookings</p></a></div>
                     </td>
                 </tr>
 
@@ -530,69 +541,69 @@ hr {
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Full Name</th>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Date of Event</th>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Event</th>
-                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Address of Event</th>
-                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Mode of Payment</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Payment Status</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Reference No.</th>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Amount</th>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Action</th>
                 </tr>
             </thead>
 
             <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    $counter = $offset + 1; // Start the numbering from the correct offset
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$counter}</td>";
-                        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['full_name']}</td>";
-                        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['date_event']}</td>";
-                        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['event']}</td>";
-                        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['address_event']}</td>";
-                        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['mode_of_payment']}</td>";
-                        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₱{$row['amt_payment']}.00</td>";
+    <?php
+    if ($result->num_rows > 0) {
+        $counter = $offset + 1; // Start the numbering from the correct offset
+        while ($row = $result->fetch_assoc()) {
+            echo "<tr>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$counter}</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['full_name']}</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['date_event']}</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['event']}</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['payment_status']}</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['reference_no']}</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₱{$row['amt_payment']}.00</td>";
 
-                        // Handle `stat` column
-                        if ($row['stat'] == 'approved') {
-                            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
-                                    <button style='background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>
-                                    <button style='background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
-                                        onclick=\"printBooking(
-                                            '{$row['booking_id']}', 
-                                            '{$row['receipt_no']}', 
-                                            '{$row['transac_num']}', 
-                                            '{$row['amt_payment']}', 
-                                            '{$row['mode_of_payment']}', 
-                                            '{$row['reference_no']}', 
-                                            '{$row['package']}', 
-                                            '{$row['price']}', 
-                                            '{$row['event']}', 
-                                            '{$row['date_event']}', 
-                                            '{$row['address_event']}'
-                                        )\">
-                                        View Receipt
-                                    </button>
-                                </td>";
-                        } elseif ($row['stat'] == 'rejected') {
-                            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
-                                    <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Rejected</button>
-                                </td>";
-                        } else {
-                            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
-                                    <button style='background-color: rgb(98, 54, 246); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
-                                        onclick=\"openModal('accept', {$row['booking_id']});\">Accept</button>
-                                    <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
-                                        onclick=\"openModal('reject', {$row['booking_id']});\">Reject</button>
-                                </td>";
-                        }
+            // **Condition para sa Status ng Booking**
+            if ($row['stat'] == 'approved') {
+                echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
+                        <button style='background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>
+                        <button style='background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                            onclick=\"printBooking(
+                                '{$row['booking_id']}', 
+                                '{$row['receipt_no']}', 
+                                '{$row['transac_num']}', 
+                                '{$row['amt_payment']}',  
+                                '{$row['reference_no']}', 
+                                '{$row['package']}', 
+                                '{$row['price']}', 
+                                '{$row['event']}', 
+                                '{$row['date_event']}', 
+                                '{$row['address_event']}'
+                            )\">
+                            View Receipt
+                        </button>
+                    </td>";
+            } elseif ($row['stat'] == 'rejected') {
+                echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
+                        <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Rejected</button>
+                    </td>";
+            } else {
+                echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
+                        <button style='background-color: rgb(98, 54, 246); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                            onclick=\"openModal('accept', {$row['booking_id']});\">Accept</button>
+                        <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                            onclick=\"openModal('reject', {$row['booking_id']});\">Reject</button>
+                    </td>";
+            }
 
-                        echo "</tr>";
-                        $counter++;
-                    }
-                } else {
-                    echo "<tr><td colspan='8' style='padding: 10px; text-align: center;'>No bookings available.</td></tr>";
-                }
-                ?>
-            </tbody>
+            echo "</tr>";
+            $counter++;
+        }
+    } else {
+        echo "<tr><td colspan='8' style='padding: 10px; text-align: center;'>No bookings available.</td></tr>";
+    }
+    ?>
+</tbody>
+
 
                 <div id="confirmationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
                 <div id="modalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
@@ -789,6 +800,7 @@ function closeModal() {
     document.getElementById("viewReceiptModal").style.display = "none";
 }
 
+
 function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
         let modalContent = document.getElementById("logoutModalContent");
@@ -809,8 +821,6 @@ function showLogoutModal() {
     function logoutUser() {
         window.location.href = "../logout.php"; // Redirect to logout page
     }
-
-
 
     </script>
 </body>
