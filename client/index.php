@@ -52,8 +52,16 @@ if ($userrow && $userrow->num_rows > 0) {
     header("location: ../login.php");
     exit();
 }
+$in_studio_services = $database->query("SELECT * FROM services WHERE category = 'In Studio' ORDER BY date_created DESC");
 
-$services = $database->query("SELECT * FROM services ORDER BY date_created DESC");
+// Kunin ang "New Born Photoshoot" services
+$new_born_services = $database->query("SELECT * FROM services WHERE category = 'New Born Photoshoot' ORDER BY date_created DESC");
+
+// Kunin ang "New Born Photoshoot" services
+$wedding_services = $database->query("SELECT * FROM services WHERE category = 'Wedding' ORDER BY date_created DESC");
+
+$other_wedding_services = $database->query("SELECT * FROM services WHERE category = 'Other Wedding Services' ORDER BY date_created DESC");
+
 ?>
 
 <?php
@@ -144,6 +152,7 @@ $rating_map = [
     width: 100%;
     position: relative; /* Siguraduhin na may relative positioning ito */
 }
+
 
 @media screen and (max-width: 768px) {
     .header {
@@ -307,8 +316,7 @@ $rating_map = [
     }
 }
 .btn {
-    padding: 10px 20px;
-    margin-top: 20px;
+   
     background:#46B1C9; ;
     color: #fff;
     text-decoration: none;
@@ -351,18 +359,19 @@ $rating_map = [
                                 <td colspan="2">
                                     <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
                                 </td>
-                            </tr>
+                            </tr> 
                     </table>
                         <!-- Logout Confirmation Modal -->
-                    <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
+                        <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
                                 <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
                                     <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
                                     <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
                                     <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
                                 </div>
                             </div>
-                        </td>
-                    </tr>
+                    </td>
+                </tr>
+
                 <tr class="menu-row">
                     <td class="menu-btn menu-icon-appointment menu-active menu-icon-home-active">
                         <a href="index.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">Home</p></a></div></a>
@@ -402,32 +411,119 @@ $rating_map = [
                 <div class="carousel-dots"></div>
             </div>
 
-            <div class="services-title" style="padding-bottom: 10px">S E R V I C E S</div>
-            
+            <div class="services-title" style="padding-bottom: 20px; padding-top: 20px;">SERVICE OFFERED</div>
+            <!-- In studio service cards -->
+            <div class="services-title" style="padding-bottom: 10px">IN STUDIO PHOTOSHOOT</div>
             <div class="services-cards">
-    <?php while ($service = $services->fetch_assoc()): ?>
-        <div class="service-card">
-            <h3 class="service-title"><?= htmlspecialchars($service['name']) ?></h3>
-            
-            <?php 
-                $detailsArray = explode("|", $service['details']); 
-                foreach ($detailsArray as $detail): 
-            ?>
-                <p class="service-details"><?= htmlspecialchars($detail) ?></p>
-            <?php endforeach; ?>
 
-            <p class="service-price">₱<?= number_format($service['price'], 2) ?></p>
-            <button class="avail-btn" 
-                data-bs-toggle="modal" 
-                data-bs-target="#availModal"
-                data-service-name="<?= htmlspecialchars($service['name']) ?>"
-                data-service-details="<?= htmlspecialchars($service['details']) ?>"
-                data-service-price="₱<?= number_format($service['price'], 2) ?>">
-                Avail
-            </button>
+                <?php while ($service = $in_studio_services->fetch_assoc()): ?>
+                    <div class="service-card">
+                        <h3 class="service-title"><?= htmlspecialchars($service['name']) ?></h3>
+
+                        <?php 
+                            $detailsArray = explode("|", $service['details']); 
+                            foreach ($detailsArray as $detail): 
+                        ?>
+                            <p class="service-details"><?= htmlspecialchars($detail) ?></p>
+                        <?php endforeach; ?>
+
+                        <p class="service-price">₱<?= number_format($service['price'], 2) ?></p>
+                        <button class="avail-btn" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#availModal"
+                            data-service-name="<?= htmlspecialchars($service['name']) ?>"
+                            data-service-details="<?= htmlspecialchars($service['details']) ?>"
+                            data-service-price="₱<?= number_format($service['price'], 2) ?>">
+                            Avail
+                        </button>
+                    </div>
+                <?php endwhile; ?>
+            </div>
+              <!-- New Born service cards -->
+        <div class="services-title" style="padding-bottom: 10px">NEW BORN PHOTOSHOOT</div>
+        <div class="services-cards">
+
+<?php while ($service = $new_born_services->fetch_assoc()): ?>
+    <div class="service-card">
+        <h3 class="service-title"><?= htmlspecialchars($service['name']) ?></h3>
+
+        <?php 
+            $detailsArray = explode("|", $service['details']); 
+            foreach ($detailsArray as $detail): 
+        ?>
+            <p class="service-details"><?= htmlspecialchars($detail) ?></p>
+        <?php endforeach; ?>
+
+        <p class="service-price">₱<?= number_format($service['price'], 2) ?></p>
+        <button class="avail-btn" 
+            data-bs-toggle="modal" 
+            data-bs-target="#availModal"
+            data-service-name="<?= htmlspecialchars($service['name']) ?>"
+            data-service-details="<?= htmlspecialchars($service['details']) ?>"
+            data-service-price="₱<?= number_format($service['price'], 2) ?>">
+            Avail
+        </button>
+    </div>
+<?php endwhile; ?>
         </div>
-    <?php endwhile; ?>
-            <div id="popup1" class="overlay">
+        
+          <!-- Wedding service cards -->
+        <div class="services-title" style="padding-bottom: 10px">WEDDING PHOTOSHOOT</div>
+                <div class="services-cards">
+
+        <?php while ($service = $wedding_services->fetch_assoc()): ?>
+            <div class="service-card">
+                <h3 class="service-title"><?= htmlspecialchars($service['name']) ?></h3>
+
+                <?php 
+                    $detailsArray = explode("|", $service['details']); 
+                    foreach ($detailsArray as $detail): 
+                ?>
+                    <p class="service-details"><?= htmlspecialchars($detail) ?></p>
+                <?php endforeach; ?>
+
+                <p class="service-price">₱<?= number_format($service['price'], 2) ?></p>
+                <button class="avail-btn" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#availModal"
+                    data-service-name="<?= htmlspecialchars($service['name']) ?>"
+                    data-service-details="<?= htmlspecialchars($service['details']) ?>"
+                    data-service-price="₱<?= number_format($service['price'], 2) ?>">
+                    Avail
+                </button>
+            </div>
+        <?php endwhile; ?>
+        </div>
+
+            <!-- Other wedding service cards -->
+            <div class="services-title" style="padding-bottom: 10px">OTHER WEDDING PHOTOSHOOT
+            </div>
+                <div class="services-cards">
+
+        <?php while ($service = $other_wedding_services->fetch_assoc()): ?>
+            <div class="service-card">
+                <h3 class="service-title"><?= htmlspecialchars($service['name']) ?></h3>
+
+                <?php 
+                    $detailsArray = explode("|", $service['details']); 
+                    foreach ($detailsArray as $detail): 
+                ?>
+                    <p class="service-details"><?= htmlspecialchars($detail) ?></p>
+                <?php endforeach; ?>
+
+                <p class="service-price">₱<?= number_format($service['price'], 2) ?></p>
+                <button class="avail-btn" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#availModal"
+                    data-service-name="<?= htmlspecialchars($service['name']) ?>"
+                    data-service-details="<?= htmlspecialchars($service['details']) ?>"
+                    data-service-price="₱<?= number_format($service['price'], 2) ?>">
+                    Avail
+                </button>
+            </div>
+        <?php endwhile; ?>
+        </div>
+        <div id="popup1" class="overlay">
                 <div class="popup">
                     <span class="close" onclick="closeModal();">&times;</span>
                     <center>
@@ -455,7 +551,9 @@ $rating_map = [
                             </div>
                             <div class="form-row">
                             <div class="form-group">
+
                                     <label for="event">Event:</label>
+                                    <input type="hidden" id="hidden-event" name="event">
                                     <select id="event" name="event" required>
                                         <option value="Wedding">Wedding</option>
                                         <option value="Debut Party">Debut Party</option>
@@ -463,11 +561,13 @@ $rating_map = [
                                         <option value="Birthday Party">Birthday Party</option>
                                         <option value="Party">Party</option>
                                         <option value="Party">On Studio</option>
+                                        <option value="Party">New Born Photoshoot</option>
+                                        <option value="Party">Other Wedding Photoshoot</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="event-date">Date of Event:</label>
-                                    <input type="text" id="event-date" name="date_event" required readonly>
+                                    <label for="event-date" style="position: relative;">Date of Event:</label>
+                                    <input type="text" id="event-date" name="date_event" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -480,10 +580,9 @@ $rating_map = [
                         </form>
                     </div>
                 </div>
-            </div>
         </div>
         <div class="feedback-container">
-        <div class="services-title" style="padding-bottom: 10px;">CLIENT'S FEEDBACK</div>
+        <div class="services-title" style="padding-bottom: 10px">CLIENT'S FEEDBACK</div>
     <div class="feedback-carousel">
         <div class="feedback-slides">
             <?php while ($row = mysqli_fetch_assoc($result)) : ?>
@@ -570,9 +669,10 @@ $rating_map = [
         // Auto-next every 3 seconds
         setInterval(nextSlide, 3000);
 
-            // Get all the avail buttons
-// Get all the avail buttons
-const availButtons = document.querySelectorAll('.avail-btn');
+        
+        const availButtons = document.querySelectorAll('.avail-btn');
+const eventDropdown = document.getElementById('event');
+const hiddenEventInput = document.getElementById('hidden-event'); // Hidden input for event value
 
 // Button click listener
 availButtons.forEach(button => {
@@ -580,19 +680,127 @@ availButtons.forEach(button => {
         const serviceCard = button.closest('.service-card');
         const title = serviceCard.querySelector('.service-title').innerText;
         const price = serviceCard.querySelector('.service-price').innerText;
+        const servicesTitle = serviceCard.closest('.services-cards').previousElementSibling.innerText.trim(); // Get the section title
 
         document.getElementById('modal-title').innerText = `Package: ${title}`;
         document.getElementById('modal-price').innerText = `Price: ${price}`;
         document.getElementById('modal-package').value = title;
         document.getElementById('modal-price-hidden').value = price.replace('₱', '');
         document.getElementById('popup1').style.display = 'flex';
+
+        // Modify event dropdown based on the service type
+        if (servicesTitle === "IN STUDIO PHOTOSHOOT") {
+            // Remove "Wedding" option
+            Array.from(eventDropdown.options).forEach(option => {
+                if (option.value === "Wedding") {
+                    option.style.display = "none";
+                }
+            });
+            eventDropdown.removeAttribute("disabled"); // Enable dropdown
+        } else {
+            // Show all options if not in In Studio Services
+            Array.from(eventDropdown.options).forEach(option => {
+                option.style.display = "block";
+            });
+        }
+
+        // If New Born Photoshoot, set default and disable event selection
+        if (servicesTitle === "NEW BORN PHOTOSHOOT") {
+            let found = false;
+            Array.from(eventDropdown.options).forEach(option => {
+                if (option.value === "New Born Photoshoot") {
+                    option.selected = true;
+                    found = true;
+                }
+            });
+
+            // If "Wedding Photoshoot" is not in the dropdown, add it
+            if (!found) {
+                const newOption = document.createElement("option");
+                newOption.value = "New Born Photoshoot";
+                newOption.text = "New Born Photoshoot";
+                newOption.selected = true;
+                eventDropdown.appendChild(newOption);
+            }
+
+            eventDropdown.setAttribute("disabled", "disabled");
+
+            // ✅ Update hidden input to store event value even when disabled
+            hiddenEventInput.value = "New Born Photoshoot";
+        } else {
+            eventDropdown.removeAttribute("disabled");
+            hiddenEventInput.value = eventDropdown.value; // Sync hidden input with event dropdown
+        }
+
+        // If Wedding Photoshoot, set default and disable event selection        
+        if (servicesTitle === "WEDDING PHOTOSHOOT") {
+            let found = false;
+            Array.from(eventDropdown.options).forEach(option => {
+                if (option.value === "Wedding") {
+                    option.selected = true;
+                    found = true;
+                }
+            });
+
+            // If "Wedding Photoshoot" is not in the dropdown, add it
+            if (!found) {
+                const newOption = document.createElement("option");
+                newOption.value = "Wedding";
+                newOption.text = "Wedding";
+                newOption.selected = true;
+                eventDropdown.appendChild(newOption);
+            }
+
+            eventDropdown.setAttribute("disabled", "disabled");
+
+            // ✅ Update hidden input to store event value even when disabled
+            hiddenEventInput.value = "Wedding";
+        } else {
+            eventDropdown.removeAttribute("disabled");
+            hiddenEventInput.value = eventDropdown.value; // Sync hidden input with event dropdown
+        }
+
+         // If Other Photoshoot, set default and disable event selection        
+         if (servicesTitle === "OTHER WEDDING PHOTOSHOOT") {
+            let found = false;
+            Array.from(eventDropdown.options).forEach(option => {
+                if (option.value === "Other Wedding Photoshoot") {
+                    option.selected = true;
+                    found = true;
+                }
+            });
+
+            // If "other Photoshoot" is not in the dropdown, add it
+            if (!found) {
+                const newOption = document.createElement("option");
+                newOption.value = "Other Wedding Photoshoot";
+                newOption.text = "Other Wedding Photoshoot";
+                newOption.selected = true;
+                eventDropdown.appendChild(newOption);
+            }
+
+            eventDropdown.setAttribute("disabled", "disabled");
+
+            // ✅ Update hidden input to store event value even when disabled
+            hiddenEventInput.value = "Other Wedding Photoshoot";
+        } else {
+            eventDropdown.removeAttribute("disabled");
+            hiddenEventInput.value = eventDropdown.value; // Sync hidden input with event dropdown
+        }
     });
+});
+
+// ✅ Ensure hidden input updates when event dropdown changes
+eventDropdown.addEventListener('change', function() {
+    hiddenEventInput.value = eventDropdown.value;
 });
 
 // Close modal
 function closeModal() {
     document.getElementById('popup1').style.display = 'none';
 }
+
+
 let feedbackIndex = 0;
 const feedbackSlides = document.querySelectorAll(".feedback-slide");
 
@@ -627,6 +835,8 @@ document.getElementById('service-form').addEventListener('submit', function(e) {
     // Close the modal after submission (optional)
     closeModal();
 });
+
+
 
 $(document).ready(function () {
         var bookedDates = [];
@@ -668,8 +878,8 @@ $(document).ready(function () {
                             confirmButtonColor: "#3085d6",
                             confirmButtonText: "OK"
                         }).then(() => {
-            window.location.href = "bookings.php"; // Redirect sa booking.php
-        });
+                            window.location.href = "bookings.php"; // Redirect to bookings.php
+                        });
                     } else {
                         Swal.fire({
                             title: "Error!",
@@ -692,8 +902,8 @@ $(document).ready(function () {
             });
         });
     });
-    
-function showLogoutModal() {
+
+    function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
         let modalContent = document.getElementById("logoutModalContent");
         modal.style.display = "flex";
@@ -713,6 +923,9 @@ function showLogoutModal() {
     function logoutUser() {
         window.location.href = "../logout.php"; // Redirect to logout page
     }
+
+    </script>
+
 
     </script>
 </body>

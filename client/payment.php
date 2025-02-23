@@ -221,19 +221,22 @@ if (isset($_GET['booking_id'])) {
     }
     
 }
+
 .btn {
-    padding: 10px 20px;
-    margin-top: 20px;
-    background:#46B1C9; ;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
+   
+   background:#46B1C9; ;
+   color: #fff;
+   text-decoration: none;
+   border-radius: 5px;
+   cursor: pointer;
+   border: none;
 }
 .btn:hover {
-    background: #4da0e0 ;
+   background: #4da0e0 ;
 }
+
+
+
 </style>
 
 <div class="header">
@@ -265,16 +268,15 @@ if (isset($_GET['booking_id'])) {
                                 <td colspan="2">
                                     <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
                                 </td>
-                            </tr>    
+                            </tr>
                     </table>
-                     <!-- Logout Confirmation Modal -->
-                     <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
-                            <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
-                                <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
-                                <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
-                                <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
-                            </div>
-                        </div>
+                    <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
+                                <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
+                                    <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
+                                    <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
+                                    <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
+                                </div>
+                            </div>    
                     </td>
                 </tr>
                 <tr class="menu-row" >
@@ -305,59 +307,75 @@ if (isset($_GET['booking_id'])) {
             </table>
         </div>
         <div class="dash-body" style="margin-top: 15px">
-        <table border="0" width="100%" style=" border-spacing: 0;margin:0;padding:0;margin-top:25px; ">
-            <div class="form-container">
+    <table border="0" width="100%" style="border-spacing: 0; margin: 0; padding: 0; margin-top: 25px;">
+        <div class="form-container">
             <h2>Payment Details</h2>
 
             <!-- Transaction Details -->
             <div class="details-container">
-                <span><strong>Transaction Number:</strong> <?php echo $transactionNumber; ?></span>
+                <span><strong>Transaction Number:</strong> <?php echo htmlspecialchars($transactionNumber); ?></span>
                 <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
                 <span><strong>Price:</strong> <?php echo htmlspecialchars($price); ?> PHP</span>
             </div>
 
-            <form method="POST" action="save_payment.php">
-            <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
-            <input type="hidden" name="transac_num" value="<?php echo htmlspecialchars($transactionNumber); ?>">
-    <div class="form-group">
-        
-        <label for="amt_payment">Amount to Pay</label>
-        <div style="display: flex; align-items: center;">
-         
-            <input type="text" name="amt_payment" id="amt_payment" value="<?php echo htmlspecialchars($price); ?>" readonly>
-        </div>
-    </div>
+            <form method="POST" action="save_payment.php" id="paymentForm">
+                <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
+                <input type="hidden" name="transac_num" value="<?php echo htmlspecialchars($transactionNumber); ?>">
 
-    <div class="form-group">
-        <label for="payment_status">Payment Status</label>
-        <select name="payment_status" id="payment_status" required onchange="togglePaymentFields()">
-            <option value="">Select Payment Method</option>
-            <option value="walk-in">Walk-in</option>
-            <option value="through gcash">Through GCash</option>
-        </select>
-    </div>
+                <!-- Payment Status Dropdown -->
+                <div class="form-group">
+                    <label for="payment_status">Payment Method</label>
+                    <select name="payment_status" id="payment_status" required onchange="togglePaymentFields()">
+                        <option value="">Select Payment Method</option>
+                        <option value="walk-in">Walk-in</option>
+                        <option value="through gcash">Through GCash</option>
+                    </select>
+                </div>
 
-    <div id="gcash-fields" class="hidden">
-        <div class="form-group">
-            <label for="gcash_qr">Scan QR Code</label>
-            <div>
-                <img src="gcash.jpg" alt="GCash QR Code" style="width: 200px; height: auto;">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="reference_no">Reference Number</label>
-            <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number" maxlength="13" pattern="\d{13}" required>
-            <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
-        </div>
-    </div>
+                <!-- Message for Walk-in -->
+                <div id="walkin-message" style="color: blue; font-size: 14px; margin-bottom: 10px; display: none;">
+                    Please wait for 5 minutes for the admin to call you. Make sure your contact number is reachable, or your booking may be rejected.
+                </div>
 
-    <button type="submit" class="btn-primary">Submit Payment</button>
-</form>
+                <!-- GCash Payment Fields (ALWAYS VISIBLE WHEN SELECTED) -->
+                <div id="gcash-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="gcash_qr">Scan QR Code</label>
+                        <div>
+                            <img src="gcash.jpg" alt="GCash QR Code" style="width: 200px; height: auto;">
+                        </div>
+                    </div>
 
-            </div>
-             
-        </table>
+                    <div class="form-group">
+                        <label for="reference_no">Reference Number</label>
+                        <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number"
+                            maxlength="13" pattern="\d{13}" onkeypress="return event.charCode>=48 && event.charCode<=57">
+                        <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment_type">Payment Type</label>
+                        <select name="payment_type" id="payment_type">
+                            <option value="">Select Payment Type</option>
+                            <option value="partial">Partial Payment</option>
+                            <option value="full">Full Payment</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amt_payment">Amount to Pay</label>
+                        <input type="text" name="amt_payment" id="amt_payment"
+                            onkeypress="return event.charCode>=48 && event.charCode<=57"
+                            placeholder="Enter amount ex 1000, 100, 10, 1">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">Submit Payment</button>
+            </form>
         </div>
+    </table>
+</div>
+
     </div>
 
     <script>
@@ -367,29 +385,40 @@ if (isset($_GET['booking_id'])) {
         }
 
         function togglePaymentFields() {
-    const paymentStatus = document.getElementById('payment_status').value;
-    const gcashFields = document.getElementById('gcash-fields');
+    var paymentStatus = document.getElementById("payment_status").value;
+    var walkinMessage = document.getElementById("walkin-message");
+    var gcashFields = document.getElementById("gcash-fields");
+    var referenceNo = document.getElementById("reference_no");
 
-    if (paymentStatus === 'through gcash') {
-        gcashFields.classList.remove('hidden');
+    if (paymentStatus === "walk-in") {
+        walkinMessage.style.display = "block";
+        gcashFields.style.display = "none";
+
+        // Remove required attributes for GCash
+        referenceNo.removeAttribute("required");
+    } else if (paymentStatus === "through gcash") {
+        walkinMessage.style.display = "none";
+        gcashFields.style.display = "block";
+
+        // Make reference number required
+        referenceNo.setAttribute("required", "true");
     } else {
-        gcashFields.classList.add('hidden');
+        walkinMessage.style.display = "none";
+        gcashFields.style.display = "none";
     }
 }
-document.getElementById("reference_no").addEventListener("input", function (event) {
-    let input = event.target;
-    let errorMessage = document.getElementById("error-message");
 
-    // Remove non-numeric characters
-    input.value = input.value.replace(/\D/g, '');
+document.getElementById("reference_no").addEventListener("input", function () {
+    var referenceNo = this.value;
+    var errorMessage = document.getElementById("error-message");
 
-    // Show error message if not exactly 13 digits
-    if (input.value.length !== 13) {
-        errorMessage.style.display = "block";
-    } else {
+    if (/^\d{13}$/.test(referenceNo)) {
         errorMessage.style.display = "none";
+    } else {
+        errorMessage.style.display = "block";
     }
 });
+
 function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
         let modalContent = document.getElementById("logoutModalContent");
@@ -410,6 +439,7 @@ function showLogoutModal() {
     function logoutUser() {
         window.location.href = "../logout.php"; // Redirect to logout page
     }
+
 
     </script>
 
