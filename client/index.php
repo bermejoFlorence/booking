@@ -917,7 +917,7 @@ $(document).ready(function () {
             document.getElementById("logoutModal").style.display = "none";
         }, 300);
     }
-   // function sa paglogout ng user
+
     function logoutUser() {
         window.location.href = "../logout.php"; // Redirect to logout page
     }
