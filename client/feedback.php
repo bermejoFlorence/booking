@@ -228,11 +228,11 @@ button {
                     </td>
                 </tr>
 
-                <!-- <tr class="menu-row" >
+                <tr class="menu-row">
                     <td class="menu-btn menu-icon-settings">
-                        <a href="settings.php" class="non-style-link-menu"><div><p class="menu-text">Settings</p></a></div>
+                        <a href="profile_set.php" class="non-style-link-menu"><div><p class="menu-text">Profile Settings</p></a></div>
                     </td>
-                </tr> -->
+                </tr>
             </table>
         </div>
         <div class="dash-body" style="margin-top: 15px">
