@@ -26,7 +26,7 @@ if (isset($_GET['code'])) {
                 icon: "success",
                 confirmButtonText: "OK"
             }).then(() => {
-                 window.location.href = "https://exzphotograpy.com/login.php";
+                window.location.href = "login.php";
             });
         </script>';
     } else {
@@ -37,11 +37,11 @@ if (isset($_GET['code'])) {
                 icon: "error",
                 confirmButtonText: "OK"
             }).then(() => {
-                window.location.href = "https://exzphotograpy.com/login.php";
+                window.location.href = "login.php";
             });
         </script>';
     }
 } else {
-    header("Location: https://exzphotograpy.com/login.php");
+    header("Location: login.php");
 }
 ?>
