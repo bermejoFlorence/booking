@@ -322,23 +322,8 @@ if (isset($_GET['booking_id'])) {
                 <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
                 <input type="hidden" name="transac_num" value="<?php echo htmlspecialchars($transactionNumber); ?>">
 
-                <!-- Payment Status Dropdown -->
-                <div class="form-group">
-                    <label for="payment_status">Payment Method</label>
-                    <select name="payment_status" id="payment_status" required onchange="togglePaymentFields()">
-                        <option value="">Select Payment Method</option>
-                        <option value="walk-in">Walk-in</option>
-                        <option value="through gcash">Through GCash</option>
-                    </select>
-                </div>
-
-                <!-- Message for Walk-in -->
-                <div id="walkin-message" style="color: blue; font-size: 14px; margin-bottom: 10px; display: none;">
-                    Please wait for 5 minutes for the admin to call you. Make sure your contact number is reachable, or your booking may be rejected.
-                </div>
-
-                <!-- GCash Payment Fields (ALWAYS VISIBLE WHEN SELECTED) -->
-                <div id="gcash-fields" style="display: none;">
+                <!-- GCash Payment Fields -->
+                <div id="gcash-fields">
                     <div class="form-group">
                         <label for="gcash_qr">Scan QR Code</label>
                         <div>
@@ -349,22 +334,13 @@ if (isset($_GET['booking_id'])) {
                     <div class="form-group">
                         <label for="reference_no">Reference Number</label>
                         <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number"
-                            maxlength="13" pattern="\d{13}" onkeypress="return event.charCode>=48 && event.charCode<=57">
+                            maxlength="13" pattern="\d{13}" required onkeypress="return event.charCode>=48 && event.charCode<=57">
                         <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
                     </div>
-
-                    <div class="form-group">
-                        <label for="payment_type">Payment Type</label>
-                        <select name="payment_type" id="payment_type">
-                            <option value="">Select Payment Type</option>
-                            <option value="partial">Partial Payment</option>
-                            <option value="full">Full Payment</option>
-                        </select>
-                    </div>
-
+                    
                     <div class="form-group">
                         <label for="amt_payment">Amount to Pay</label>
-                        <input type="text" name="amt_payment" id="amt_payment"
+                        <input type="text" name="amt_payment" id="amt_payment" required
                             onkeypress="return event.charCode>=48 && event.charCode<=57"
                             placeholder="Enter amount ex 1000, 100, 10, 1">
                     </div>

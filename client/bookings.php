@@ -536,106 +536,100 @@ hr {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                            if ($bookingData && $bookingData->num_rows > 0) {
-                                $counter = 1;
-                                while ($row = $bookingData->fetch_assoc()) {
-                                    echo "<tr>";
-                                    echo "<td class='col-number' style='text-align: center; vertical-align: middle;'>" . $counter++ . "</td>";
-                                    echo "<td class='col-name' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($username) . "</td>";
-                                    echo "<td class='col-event' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['date_event']) . "</td>";
-                                    echo "<td class='col-event' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['event']) . "</td>";
-                                    echo "<td class='col-package' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['package']) . "</td>";
-                                    echo "<td class='col-address' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['address_event']) . "</td>";
+<?php
+if ($bookingData && $bookingData->num_rows > 0) {
+    $counter = 1;
+    while ($row = $bookingData->fetch_assoc()) {
+        echo "<tr>";
+        echo "<td class='col-number' style='text-align: center; vertical-align: middle;'>" . $counter++ . "</td>";
+        echo "<td class='col-name' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($username) . "</td>";
+        echo "<td class='col-event' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['date_event']) . "</td>";
+        echo "<td class='col-event' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['event']) . "</td>";
+        echo "<td class='col-package' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['package']) . "</td>";
+        echo "<td class='col-address' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['address_event']) . "</td>";
 
-                                    // Set status with background color
-                                    $statusClass = '';
-                                    $statusText = htmlspecialchars($row['stat']);
-                                    if ($row['stat'] === 'pending') {
-                                        $statusClass = 'background-color: rgb(241, 137, 80);; color: white;';
-                                    } elseif ($row['stat'] === 'processing') {
-                                        $statusClass = 'background-color: #46B1C9; color: white;';
-                                    } elseif ($row['stat'] === 'approved') {
-                                        $statusClass = 'background-color: rgb(77, 224, 126); color: white;';
-                                    }
-                                    elseif ($row['stat'] === 'rejected') {
-                                        $statusClass = 'background-color: red; color: white;';
-                                    }
-                                    elseif ($row['stat'] === 'cancelled') {
-                                        $statusClass = 'background-color: #rgb(235, 63, 63); color: white;';
-                                        
-                                    }
+        // Determine status and style
+        $statusClass = '';
+        $statusText = htmlspecialchars($row['stat']); // default
 
-                                    // Display the status with background color
-                                    echo "<td class='col-status' style='text-align: center; vertical-align: middle; font-size: 0.9em; $statusClass'>";
-                                    echo $statusText;
-                                    echo "</td>";
+        if ($row['stat'] === 'pending') {
+            $statusClass = 'background-color: rgb(241, 137, 80); color: white;';
+        } elseif ($row['stat'] === 'processing') {
+            $statusClass = 'background-color: #46B1C9; color: white;';
+        } elseif ($row['stat'] === 'approved') {
+            $statusClass = 'background-color: rgb(77, 224, 126); color: white;';
+        } elseif ($row['stat'] === 'rejected') {
+            $statusClass = 'background-color: red; color: white;';
+        } elseif ($row['stat'] === 'cancelled') {
+            $statusClass = 'background-color: rgb(235, 63, 63); color: white;';
+        }
 
-                                    // Add Checkout, View Details, or Printer icon based on the status
-                                    echo "<td class='col-action' style='text-align: center; vertical-align: middle;'>";
-                                    if ($row['stat'] === 'pending') {
-                                        // Checkout button
-                                        echo "<button class='checkout-btn' style='padding: 5px 10px; border: none; background-color: #46B1C9; color: white; border-radius: 3px; cursor: pointer; margin-right: 5px;' onclick=\"showConfirmationModal('checkout', '" . htmlspecialchars($row['booking_id']) . "')\">Checkout</button>";
-                                    
-                                        // Cancel button
-                                        echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
+        // Override with payment_status for specific cases
+        $paymentStatusLower = strtolower($row['payment_status']);
+        if ($paymentStatusLower === 'partial payment') {
+            $statusClass = 'background-color: orange; color: white;';
+            $statusText = 'Partial Payment';
+        } elseif ($paymentStatusLower === 'full payment') {
+            $statusClass = 'background-color: #0d6efd; color: white;';
+            $statusText = 'Full Payment';
+        }
 
-                                    }
-                                     elseif ($row['stat'] === 'processing') {
-                                        echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer;' 
-                                                onclick=\"viewDetails(
-                                                    '" . htmlspecialchars($row['booking_id']) . "', 
-                                                    '" . htmlspecialchars($row['package']) . "',
-                                                    '" . htmlspecialchars($row['price']) . "',
-                                                    '" . htmlspecialchars($row['event']) . "',
-                                                    '" . htmlspecialchars($row['date_event']) . "',
-                                                    '" . htmlspecialchars($row['address_event']) . "',
-                                                    '" . htmlspecialchars($row['transac_num']) . "',
-                                                    '" . htmlspecialchars($row['amt_payment']) . "',
-                                                    '" . htmlspecialchars($row['payment_status']) . "',
-                                                    '" . htmlspecialchars($row['reference_no']) . "'
-                                                )\">View Details</button>";
+        echo "<td class='col-status' style='text-align: center; vertical-align: middle; font-size: 0.9em; $statusClass'>";
+        echo $statusText;
+        echo "</td>";
 
-                                    
-                                    } elseif ($row['stat'] === 'approved') {
-                                        echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer; margin-right: 5px;' 
-                                        onclick=\"viewDetails(
-                                            '" . htmlspecialchars($row['booking_id']) . "', 
-                                            '" . htmlspecialchars($row['package']) . "',
-                                            '" . htmlspecialchars($row['price']) . "',
-                                            '" . htmlspecialchars($row['event']) . "',
-                                            '" . htmlspecialchars($row['date_event']) . "',
-                                            '" . htmlspecialchars($row['address_event']) . "',
-                                            '" . htmlspecialchars($row['transac_num']) . "',
-                                            '" . htmlspecialchars($row['amt_payment']) . "',
-                                            '" . htmlspecialchars($row['payment_status']) . "',
-                                            '" . htmlspecialchars($row['reference_no']) . "'
-                                        )\">View Details</button>";
-                                        
-                                        echo "<span class='print-btn' onclick=\"printInvoice(
-                                            '" . htmlspecialchars($row['receipt_no']) . "',
-                                            '" . htmlspecialchars($row['transac_num']) . "',
-                                            '" . htmlspecialchars($row['amt_payment']) . "',
-                                            '" . htmlspecialchars($row['payment_status']) . "',
-                                            '" . htmlspecialchars($row['package']) . "',
-                                            '" . htmlspecialchars($row['price']) . "',
-                                            '" . htmlspecialchars($row['event']) . "'
-                                        )\">";
-                                        echo "<img src='../img/icons/printer.png' alt='Print Icon' width='20' style='cursor: pointer;'>";
-                                        echo "</span>";
-                                    } elseif ($row['stat'] === 'cancelled') {
-                                        // Delete button
-                                        echo "<button class='delete-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('delete', '" . htmlspecialchars($row['booking_id']) . "')\">Delete</button>";
-                                    }
-                                    echo "</td>";
+        // ACTIONS
+        echo "<td class='col-action' style='text-align: center; vertical-align: middle;'>";
 
-                                    echo "</tr>";
-                                }
-                            } else {
-                                echo "<tr><td colspan='8' style='text-align: center; vertical-align: middle;'>No bookings found.</td></tr>";
-                            }
-                            ?>
-                        </tbody>
+        // For Partial/Full Payment: only View Details
+        if (in_array($paymentStatusLower, ['partial payment', 'full payment'])) {
+            echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer;' 
+                onclick=\"viewDetails(
+                    '" . htmlspecialchars($row['booking_id']) . "', 
+                    '" . htmlspecialchars($row['package']) . "',
+                    '" . htmlspecialchars($row['price']) . "',
+                    '" . htmlspecialchars($row['event']) . "',
+                    '" . htmlspecialchars($row['date_event']) . "',
+                    '" . htmlspecialchars($row['address_event']) . "',
+                    '" . htmlspecialchars($row['transac_num']) . "',
+                    '" . htmlspecialchars($row['amt_payment']) . "',
+                    '" . htmlspecialchars($row['payment_status']) . "',
+                    '" . htmlspecialchars($row['reference_no']) . "',
+                    '" . htmlspecialchars($row['receipt_no']) . "'
+                )\">View Details</button>";
+        } elseif ($row['stat'] === 'pending') {
+            echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
+        } elseif ($row['stat'] === 'approved') {
+            echo "<button class='checkout-btn' style='padding: 5px 10px; border: none; background-color: #46B1C9; color: white; border-radius: 3px; cursor: pointer; margin-right: 5px;' onclick=\"showConfirmationModal('checkout', '" . htmlspecialchars($row['booking_id']) . "')\">Checkout</button>";
+            echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
+        } elseif ($row['stat'] === 'processing') {
+            echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer;' 
+                onclick=\"viewDetails(
+                    '" . htmlspecialchars($row['booking_id']) . "', 
+                    '" . htmlspecialchars($row['package']) . "',
+                    '" . htmlspecialchars($row['price']) . "',
+                    '" . htmlspecialchars($row['event']) . "',
+                    '" . htmlspecialchars($row['date_event']) . "',
+                    '" . htmlspecialchars($row['address_event']) . "',
+                    '" . htmlspecialchars($row['transac_num']) . "',
+                    '" . htmlspecialchars($row['amt_payment']) . "',
+                    '" . htmlspecialchars($row['payment_status']) . "',
+                    '" . htmlspecialchars($row['reference_no']) . "',
+                    '" . htmlspecialchars($row['receipt_no']) . "'
+                )\">View Details</button>";
+        } elseif ($row['stat'] === 'cancelled') {
+            echo "<button class='delete-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('delete', '" . htmlspecialchars($row['booking_id']) . "')\">Delete</button>";
+        }
+
+        echo "</td>";
+        echo "</tr>";
+    }
+} else {
+    echo "<tr><td colspan='8' style='text-align: center; vertical-align: middle;'>No bookings found.</td></tr>";
+}
+?>
+</tbody>
+
                         <div id="viewDetailsModal" class="overlay" style="display: none;">
                             <div class="popup medium">
                                 <span class="close" onclick="closeModal();">&times;</span>
@@ -721,33 +715,7 @@ hr {
     </div>
 
     <script>
-             function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            menu.classList.toggle('open');
-        }
-
-        updatePaymentBtn.onclick = function() {
-    console.log("Update Payment button clicked!"); // Debugging step
-    console.log("Booking ID before redirect:", bookingId); // Siguraduhin may value
-    
-    if (bookingId) {
-        let redirectURL = `update_payment.php?booking_id=${bookingId}`;
-        console.log("Redirecting to:", redirectURL); // I-check ang final URL
-        window.location.href = redirectURL;
-    } else {
-        alert("Error: No Booking ID found!");
-    }
-};
-
-
-function closeModal() {
-    // Hide the modal
-    document.getElementById('viewDetailsModal').style.display = 'none';
-}
-
-
-function showConfirmationModal(action, bookingId) {
-    let modal = document.getElementById("confirmationModal");
+     ("confirmationModal");
     let modalContent = document.getElementById("modalContent");
     let modalMessage = document.getElementById("modalMessage");
     let confirmBtn = document.getElementById("confirmBtn");
@@ -834,7 +802,33 @@ function showConfirmationModal(action, bookingId) {
 
             closeConfirmationModal();
         };
+    }        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('open');
+        }
+
+        updatePaymentBtn.onclick = function() {
+    console.log("Update Payment button clicked!"); // Debugging step
+    console.log("Booking ID before redirect:", bookingId); // Siguraduhin may value
+    
+    if (bookingId) {
+        let redirectURL = `update_payment.php?booking_id=${bookingId}`;
+        console.log("Redirecting to:", redirectURL); // I-check ang final URL
+        window.location.href = redirectURL;
+    } else {
+        alert("Error: No Booking ID found!");
     }
+};
+
+
+function closeModal() {
+    // Hide the modal
+    document.getElementById('viewDetailsModal').style.display = 'none';
+}
+
+
+function showConfirmationModal(action, bookingId) {
+    let modal = document.getElementById
 }
 
 function printInvoice(receiptNo, transactionNum, amountPayment, paymentStatus, packageName, price, eventName) {
@@ -940,7 +934,7 @@ function printInvoice(receiptNo, transactionNum, amountPayment, paymentStatus, p
 }
 
 }
-function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo) {
+function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo, receiptNo) {
     // Set booking details in modal
     document.getElementById('modal-package').textContent = package;
     document.getElementById('modal-price').textContent = price;
@@ -954,26 +948,26 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
 
     // Compute balance
     let balanceElement = document.getElementById('modal-balance');
-    let updateButton = document.getElementById('update-payment-btn'); // Get button element
+    let updateButton = document.getElementById('update-payment-btn');
 
     let cleanedPrice = parseFloat(price.replace(/,/g, '')) || 0;
     let cleanedAmtPayment = parseFloat(amtPayment) || 0;
     let balance = cleanedPrice - cleanedAmtPayment;
 
-    if (paymentStatus.trim() === 'Partial Paid') {
+    if (paymentStatus.trim().toLowerCase() === 'partial payment') {
         balanceElement.textContent = `₱${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        balanceElement.parentElement.style.display = 'flex'; 
-        updateButton.style.display = 'block'; 
+        balanceElement.parentElement.style.display = 'flex';
+        updateButton.style.display = 'block';
     } else {
-        balanceElement.parentElement.style.display = 'none'; 
-        updateButton.style.display = 'none'; 
+        balanceElement.parentElement.style.display = 'none';
+        updateButton.style.display = 'none';
     }
 
     // Modify payment status display
-    if (paymentStatus.trim() === 'Fully Paid') {
+    if (paymentStatus.trim().toLowerCase() === 'full payment') {
         document.getElementById('modal-payment-status').textContent = 'Gcash';
         document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
-    } else if (paymentStatus.trim() === 'No Payment') {
+    } else if (paymentStatus.trim().toLowerCase() === 'no payment') {
         document.getElementById('modal-payment-status').textContent = 'Walk-In';
         document.getElementById('modal-reference-no').textContent = 'N/A';
     } else {
@@ -981,10 +975,31 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
     }
 
-    // Update button function with bookingId, transactionNumber, package, and balance
+    // Update Payment button logic
     updateButton.onclick = function () {
         updatePayment(bookingId, transacNum, package, balance);
     };
+
+    // ADD: Print Button (if Partial or Full Payment)
+    const modalContentDiv = document.querySelector("#viewDetailsModal .modal-content");
+
+    // Remove any existing print button to avoid duplicates
+    const existingPrintBtn = modalContentDiv.querySelector("button.print-invoice");
+    if (existingPrintBtn) {
+        existingPrintBtn.remove();
+    }
+
+    // Create and insert the print button if applicable
+    if (['partial payment', 'full payment'].includes(paymentStatus.trim().toLowerCase())) {
+        const printBtn = document.createElement("button");
+        printBtn.textContent = "Print Invoice";
+        printBtn.className = "print-invoice";
+        printBtn.style.cssText = "margin-top: 15px; padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 6px; cursor: pointer;";
+        printBtn.onclick = function () {
+            printInvoice(receiptNo, transacNum, amtPayment, paymentStatus, package, price, event);
+        };
+        modalContentDiv.appendChild(printBtn);
+    }
 
     // Show the modal
     document.getElementById('viewDetailsModal').style.display = 'block';

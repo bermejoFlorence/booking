@@ -129,7 +129,53 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
         $badCount++;
     }
 }
+// Fetch data from the payment table
+$limit = 10; // Number of rows per page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$start = ($page - 1) * $limit;
 
+// --- GET FILTER VALUE (from POST or GET for pagination support) ---
+$filter = '';
+if (isset($_POST['filter_option'])) {
+    $filter = $_POST['filter_option'];
+} elseif (isset($_GET['filter_option'])) {
+    $filter = $_GET['filter_option'];
+}
+
+// --- BUILD BASE QUERY BASED ON FILTER ---
+$baseQuery = "";
+if ($filter === "daily") {
+    $today = date('Y-m-d');
+    $baseQuery = "WHERE DATE(date) = '$today'";
+} elseif ($filter === "weekly") {
+    $today = date('Y-m-d');
+    $last7Days = date('Y-m-d', strtotime('-6 days'));
+    $baseQuery = "WHERE DATE(date) BETWEEN '$last7Days' AND '$today'";
+} elseif ($filter === "monthly") {
+    $currentYear = date('Y');
+    $currentMonth = date('m');
+    $baseQuery = "WHERE MONTH(date) = '$currentMonth' AND YEAR(date) = '$currentYear'";
+} elseif ($filter === "yearly") {
+    // No base query — show all years
+    $baseQuery = "";
+}
+
+// --- QUERY BASED ON FILTER TYPE ---
+if ($filter === "yearly") {
+    // Grouped by year
+    $query = "SELECT YEAR(date) AS sales_date, SUM(total_sales) AS total_amount FROM sales $baseQuery GROUP BY YEAR(date) ORDER BY sales_date DESC LIMIT $start, $limit";
+    $countQuery = "SELECT COUNT(DISTINCT YEAR(date)) as total FROM sales $baseQuery";
+} else {
+    // Grouped by date
+    $query = "SELECT DATE(date) AS sales_date, SUM(total_sales) AS total_amount FROM sales $baseQuery GROUP BY DATE(date) ORDER BY sales_date DESC LIMIT $start, $limit";
+    $countQuery = "SELECT COUNT(DISTINCT DATE(date)) as total FROM sales $baseQuery";
+}
+
+// --- RUN QUERIES ---
+$result = $database->query($query);
+$countResult = $database->query($countQuery);
+$totalRows = $countResult->fetch_assoc()['total'];
+$totalPages = ceil($totalRows / $limit);
 ?>
     <style>
 
@@ -197,6 +243,38 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
     color: #555;
     margin: 5px 0 0 0;
 }
+.table-container {
+        margin-top: 20px;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .sub-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .sub-table th,
+    .sub-table td {
+        text-align: left;
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .sub-table th {
+        background-color: #f2f2f2;
+    }
+    
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: #aaa;
+    border-radius: 4px;
+}
 
 .dashboard-icons {
     width: 60px;
@@ -232,17 +310,16 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
 
 .calendar-container {
     flex: 1;
-    max-width: 40%; /* Bawasan ang lapad ng calendar */
-    height: 100px;
-    
+    max-width: 50%; /* Ginawang 50% para mas maayos ang alignment */
+    height: auto; /* Iwasan ang fixed height, hayaan itong mag-adjust */
 }
 
 #calendar {
-    border: 20pxrgb(50, 52, 60);/* Itim na border *
-    border-radius: 10px; /* Para medyo rounded ang kanto */
+    border-radius: 10px; /* Rounded edges */
     padding: 20px;
-
+    min-height: 300px; /* Minimum height para maiwasan ang overlapping */
 }
+
 .fc-button {
     background-color:#46B1C9 !important; /* Blue background */
     color: white !important; /* White text */
@@ -262,6 +339,25 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
 
 .fc-prev-button:hover, .fc-next-button:hover {
     background-color:#46B1C9 !important; /* Darker gray on hover */
+}
+.search-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 10px; /* Space sa taas ng search at reset button */
+}
+
+.header-searchbar {
+    flex: 1;
+    min-width: 200px;
+    max-width: 400px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px; /* Space sa taas ng search input */
 }
 
 
@@ -524,8 +620,72 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
             </div>
         </div>    
         </table>
+        <div class="table-container">
+        <div id="summary" class="table-responsive">
+        <h2 style="text-align: center; font-size: 22px; margin-bottom: 10px; color: #4a4e69;">SUMMARY OF TRANSACTIONS</h2>
+        <form id="filterForm" method="post" class="header-search">
+    <div class="search-container">
+        <select name="filter_option" class="input-text header-searchbar">
+            <option value="">-- Filter by --</option>
+            <option value="daily" <?php if($filter == 'daily') echo 'selected'; ?>>Daily</option>
+            <option value="weekly" <?php if($filter == 'weekly') echo 'selected'; ?>>Weekly</option>
+            <option value="monthly" <?php if($filter == 'monthly') echo 'selected'; ?>>Monthly</option>
+            <option value="yearly" <?php if($filter == 'yearly') echo 'selected'; ?>>Yearly</option>
+        </select>
+        <button type="submit" class="login-btn btn-primary btn">Apply</button>
+        <a href="bookings.php" class="login-btn btn-secondary btn">Reset</a>
+    </div>
+</form>
+
+
+        <table class="sub-table" style="width: 100%; border-collapse: collapse; text-align: center;">
+    <thead>
+        <tr>
+            <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd;">#</th>
+            <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd;">Date</th>
+            <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd;">Total Sales</th>
+            <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php
+        $num = 1;
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $date = $row['sales_date'];
+                $amount = $row['total_amount'];
+                echo "<tr>
+                    <td>$num</td>
+                    <td>$date</td>
+                    <td>₱" . number_format($amount, 2) . "</td>
+                    <td><a href='bookings.php' style='color: white; background-color: #4da0e0; padding: 5px 10px; border-radius: 5px; text-decoration: none;'>View Details</a></td>
+                </tr>";
+                $num++;
+            }
+        } else {
+            echo "<tr><td colspan='4' style='padding: 10px;'>No data found.</td></tr>";
+        }
+        ?>
+        
+    </tbody>
+</table>
+<div style="text-align:center; margin-top: 15px;">
+<?php if ($totalPages > 1): ?>
+    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+        <?php if ($i == $page): ?>
+            <strong style='margin: 0 5px;'><?= $i ?></strong>
+        <?php else: ?>
+            <a href="?page=<?= $i ?>&filter_option=<?= urlencode($filter) ?>" style='margin: 0 5px;'><?= $i ?></a>
+        <?php endif; ?>
+    <?php endfor; ?>
+<?php endif; ?>
+</div>
         </div>
     </div>
+        </div>
+    </div>
+
+   
     <script>
         function toggleMenu() {
             const menu = document.querySelector('.menu');
@@ -604,6 +764,17 @@ function showLogoutModal() {
     function logoutUser() {
         window.location.href = "../logout.php"; // Redirect to logout page
     }
+
+    document.getElementById('filterForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent normal page reload
+    
+    // Get form data
+    const formData = new FormData(this);
+    const params = new URLSearchParams(formData).toString();
+    
+    // Redirect with filter param and scroll to summary
+    window.location.href = `?${params}#summary`;
+});
 
     </script>
 </body>

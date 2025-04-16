@@ -54,15 +54,14 @@ $records_per_page = 10; // Number of records per page
 $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Get current page, default to 1
 $offset = ($current_page - 1) * $records_per_page; // Calculate the offset
 
-// Query to count total records
-$total_records_query = "SELECT COUNT(*) AS total FROM booking WHERE stat != 'pending'";
+// ✅ Bagong Query para mabilang lahat ng bookings (kasama na ang pending)
+$total_records_query = "SELECT COUNT(*) AS total FROM booking";
 $total_records_result = $database->query($total_records_query);
 $total_records = $total_records_result->fetch_assoc()['total'];
 
 // Calculate total pages
 $total_pages = ceil($total_records / $records_per_page);
 
-// Query to fetch data with LIMIT and OFFSET
 $sql = "SELECT 
             b.booking_id, 
             c.c_fullname AS full_name, 
@@ -73,23 +72,22 @@ $sql = "SELECT
             b.price,
             b.stat,  
             p.receipt_no,
-            p.transac_num,
             p.amt_payment,
-            p.payment_status as payment_status,
-            p.reference_no as reference_no
+            p.payment_status AS payment_status,
+            p.reference_no AS reference_no
         FROM 
             booking b 
         LEFT JOIN 
             client c ON b.client_id = c.client_id 
         LEFT JOIN 
             payment p ON b.booking_id = p.booking_id 
-        WHERE 
-            b.stat != 'pending' 
         ORDER BY 
-            b.date_event DESC
+            FIELD(b.stat, 'pending', 'approved', 'rejected'), 
+            b.date_created DESC
         LIMIT $records_per_page OFFSET $offset";
 
-$result = $database->query($sql);?>
+$result = $database->query($sql);
+?>
 
    <style>
            .dash-body {
@@ -541,69 +539,84 @@ hr {
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Full Name</th>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Date of Event</th>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Event</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Package Price</th>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Payment Status</th>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Reference No.</th>
-                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Amount</th>
+                    <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Amount Paid</th>
                     <th style="font-size: 16px; font-weight: bold; padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">Action</th>
                 </tr>
             </thead>
 
             <tbody>
-    <?php
-    if ($result->num_rows > 0) {
-        $counter = $offset + 1; // Start the numbering from the correct offset
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>";
-            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$counter}</td>";
-            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['full_name']}</td>";
-            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['date_event']}</td>";
-            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['event']}</td>";
+<?php
+if ($result->num_rows > 0) {
+    $counter = $offset + 1; // Start the numbering from the correct offset
+    while ($row = $result->fetch_assoc()) {
+        echo "<tr>";
+        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$counter}</td>";
+        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['full_name']}</td>";
+        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['date_event']}</td>";
+        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['event']}</td>";
+        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₱{$row['price']}</td>";
+
+        // ✅ Custom logic for payment fields based on stat
+        if ($row['stat'] === 'pending') {
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Pending Approval</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Pending Approval</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Pending Approval</td>";
+        } elseif ($row['stat'] === 'approved' && (empty($row['payment_status']) || $row['payment_status'] === 'No Payment')) {
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Pending Payment</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Pending Payment</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Pending Payment</td>";
+        } else {
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['payment_status']}</td>";
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['reference_no']}</td>";
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₱{$row['amt_payment']}.00</td>";
-
-            // **Condition para sa Status ng Booking**
-            if ($row['stat'] == 'approved') {
-                echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
-                        <button style='background-color: rgb(77, 224, 126); color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>
-                        <button style='background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
-                            onclick=\"printBooking(
-                                '{$row['booking_id']}', 
-                                '{$row['receipt_no']}', 
-                                '{$row['transac_num']}', 
-                                '{$row['amt_payment']}',  
-                                '{$row['reference_no']}', 
-                                '{$row['package']}', 
-                                '{$row['price']}', 
-                                '{$row['event']}', 
-                                '{$row['date_event']}', 
-                                '{$row['address_event']}'
-                            )\">
-                            View Receipt
-                        </button>
-                    </td>";
-            } elseif ($row['stat'] == 'rejected') {
-                echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
-                        <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Rejected</button>
-                    </td>";
-            } else {
-                echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
-                        <button style='background-color: rgb(98, 54, 246); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
-                            onclick=\"openModal('accept', {$row['booking_id']});\">Accept</button>
-                        <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
-                            onclick=\"openModal('reject', {$row['booking_id']});\">Reject</button>
-                    </td>";
-            }
-
-            echo "</tr>";
-            $counter++;
         }
-    } else {
-        echo "<tr><td colspan='8' style='padding: 10px; text-align: center;'>No bookings available.</td></tr>";
-    }
-    ?>
-</tbody>
 
+        // ✅ Booking status actions
+        if ($row['stat'] == 'approved' || $row['stat'] == 'processing'){
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center; white-space: nowrap;'>
+                    <div style='display: inline-flex; gap: 5px;'>
+                    <button style='background-color: rgb(77, 224, 126); color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>
+                    <button style='background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                        onclick=\"printBooking(
+                            '{$row['booking_id']}', 
+                            '{$row['receipt_no']}', 
+                            '{$row['amt_payment']}',  
+                            '{$row['payment_status']}', 
+                            '{$row['reference_no']}', 
+                            '{$row['package']}', 
+                            '{$row['price']}', 
+                            '{$row['event']}', 
+                            '{$row['date_event']}', 
+                            '{$row['address_event']}'
+                        )\">
+                        Payment Process
+                    </button>
+                    </div>
+                </td>";
+        } elseif ($row['stat'] == 'rejected') {
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
+                    <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Rejected</button>
+                </td>";
+        } else {
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
+                    <button style='background-color: rgb(98, 54, 246); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                        onclick=\"openModal('accept', {$row['booking_id']});\">Accept</button>
+                    <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                        onclick=\"openModal('reject', {$row['booking_id']});\">Reject</button>
+                </td>";
+        }
+
+        echo "</tr>";
+        $counter++;
+    }
+} else {
+    echo "<tr><td colspan='9' style='padding: 10px; text-align: center;'>No bookings available.</td></tr>";
+}
+?>
+</tbody>
 
                 <div id="confirmationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
                 <div id="modalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
@@ -627,17 +640,16 @@ hr {
                                     <span id="modal-receipt-num"></span>
                                 </div>
                                 <div class="info-row">
-                                    <span>Transaction No.:</span> 
-                                    <span id="modal-transac-num"></span>
-                                </div>
-                                <div class="info-row">
                                     <span>Amount Paid:</span> 
                                     <span id="modal-amt-payment"></span>
                                 </div>
                                 <div class="info-row">
                                     <span>Payment Status:</span> 
-                                    <span id="modal-payment-status"></span>
+                                    <span id="modal-payment-status">
+                                        <!-- JS will inject dropdown or plain text here -->
+                                    </span>
                                 </div>
+
                                 <div class="info-row">
                                     <span>Reference Number:</span> 
                                     <span id="modal-reference-no"></span>
@@ -666,6 +678,11 @@ hr {
                                     <span>Event Address:</span> 
                                     <span id="modal-event-address"></span>
                                 </div>
+                            </div>
+                            <div id="submit-btn-container" style="display: none; text-align: center; margin-top: 20px;">
+                                <button onclick="submitPaymentUpdate()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer;">
+                                    Submit Payment Update
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -701,35 +718,40 @@ hr {
             menu.classList.toggle('open');
         }
 
-       function openModal(action, bookingId) {
+        function openModal(action, bookingId) {
     const modal = document.getElementById('confirmationModal');
     const modalContent = document.getElementById('modalContent');
     const modalMessage = document.getElementById('modalMessage');
     const confirmBtn = document.getElementById('confirmBtn');
 
-    // Set the modal message and button style based on action
+    // Remove existing event listeners by cloning the button
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    // Re-reference after replacement
+    const updatedConfirmBtn = document.getElementById('confirmBtn');
+
+    // Set modal content
     if (action === 'accept') {
         modalMessage.textContent = 'Are you sure you want to accept this booking?';
-        confirmBtn.style.backgroundColor = '#007bff';
-        confirmBtn.onclick = function () {
-            // Call the function to update the booking status
+        updatedConfirmBtn.style.backgroundColor = '#007bff';
+        updatedConfirmBtn.onclick = function () {
             updateBookingStatus(bookingId, 'approved');
-            closeModal();
+            closeConfirmationModal();
         };
     } else if (action === 'reject') {
         modalMessage.textContent = 'Are you sure you want to reject this booking?';
-        confirmBtn.style.backgroundColor = '#007bff';
-        confirmBtn.onclick = function () {
+        updatedConfirmBtn.style.backgroundColor = '#007bff';
+        updatedConfirmBtn.onclick = function () {
             updateBookingStatus(bookingId, 'rejected');
-            closeModal();
+            closeConfirmationModal();
         };
     }
 
-    // Show the modal with animation
     modal.style.display = 'flex';
     setTimeout(() => {
         modalContent.style.transform = 'scale(1)';
-    }, 10); // Trigger the animation after displaying the modal
+    }, 10);
 }
 
 function closeConfirmationModal() {
@@ -743,6 +765,7 @@ function closeConfirmationModal() {
     }, 300);
 }
 
+updatedConfirmBtn.disabled = true;
 
 function updateBookingStatus(bookingId, status) {
     const xhr = new XMLHttpRequest();
@@ -776,21 +799,45 @@ function updateBookingStatus(bookingId, status) {
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
 
-function printBooking(bookingId, receiptNo, transacNum, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress) {
+function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress){
     var modal = document.getElementById("viewReceiptModal");
-
-    // Ipakita ang modal
     modal.style.display = "block";
 
-    // Update modal contents gamit ang tamang data
+    if (paymentStatus === "No Payment") {
+    const italicMsg = "<i>No payment has been made yet</i>";
+    document.getElementById("modal-receipt-num").innerHTML = italicMsg;
+    document.getElementById("modal-amt-payment").innerHTML = italicMsg;
+    document.getElementById("modal-payment-status").innerHTML = italicMsg;
+    document.getElementById("modal-reference-no").innerHTML = italicMsg;
+} else if (paymentStatus === "processing payment") {
     document.getElementById("modal-receipt-num").innerText = receiptNo;
-    document.getElementById("modal-transac-num").innerText = transacNum;
-    document.getElementById("modal-amt-payment").innerText = "₱" + amtPayment + ".00";
-    document.getElementById("modal-payment-status").innerText = paymentStatus;
+    document.getElementById("modal-amt-payment").innerText = "₱" + amtPayment;
     document.getElementById("modal-reference-no").innerText = referenceNo;
-    
+
+    // Inject dropdown
+    document.getElementById("modal-payment-status").innerHTML = `
+        <select id="paymentType" name="paymentType" style="padding: 5px;">
+            <option value="">-- Choose Payment Type --</option>
+            <option value="Partial Payment">Partial Payment</option>
+            <option value="Full Payment">Full Payment</option>
+        </select>
+    `;
+
+    // Show submit button
+    document.getElementById("submit-btn-container").style.display = "block";
+
+    // Save current booking_id in a global variable for submission
+    window.selectedBookingId = bookingId;
+} else {
+    document.getElementById("modal-receipt-num").innerText = receiptNo;
+    document.getElementById("modal-amt-payment").innerText = "₱" + amtPayment  + ".00";
+    document.getElementById("modal-reference-no").innerText = referenceNo;
+    document.getElementById("modal-payment-status").innerText = paymentStatus;
+}
+
+ // Set the rest of the booking information
     document.getElementById("modal-package").innerText = packageName;
-    document.getElementById("modal-price").innerText = "₱" + price + ".00";
+    document.getElementById("modal-price").innerText = "₱" + price;
     document.getElementById("modal-event").innerText = event;
     document.getElementById("modal-event-date").innerText = eventDate;
     document.getElementById("modal-event-address").innerText = eventAddress;
@@ -799,6 +846,70 @@ function printBooking(bookingId, receiptNo, transacNum, amtPayment, paymentStatu
 function closeModal() {
     document.getElementById("viewReceiptModal").style.display = "none";
 }
+
+function submitPaymentUpdate() {
+    const paymentType = document.getElementById("paymentType").value;
+
+    if (paymentType === "") {
+        closeModal(); // ✅ Close modal before showing alert
+        Swal.fire({
+            title: 'Warning!',
+            text: 'Please select a payment type before submitting.',
+            icon: 'warning',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+
+    const bookingId = window.selectedBookingId;
+    const receiptNo = Math.floor(100000 + Math.random() * 900000); // 6-digit
+    const amtPaymentRaw = document.getElementById("modal-amt-payment").innerText;
+    const amtPaymentClean = amtPaymentRaw.replace(/₱|,/g, '').trim();
+    const amtPayment = parseFloat(amtPaymentClean);
+
+    // Disable button to prevent double click
+    document.querySelector("#submit-btn-container button").disabled = true;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "update_payment.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onload = function () {
+        closeModal(); // ✅ Hide modal first
+
+        if (xhr.status === 200) {
+            const responseMessage = xhr.responseText.trim();
+
+            Swal.fire({
+                title: 'Success!',
+                text: responseMessage,
+                icon: 'success',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.reload();
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: xhr.responseText.trim() || 'An error occurred. Please try again.', // ✅ Show PHP error
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+
+            // Re-enable button in case of error
+            document.querySelector("#submit-btn-container button").disabled = false;
+        }
+    };
+
+    const data = `booking_id=${bookingId}&payment_status=${encodeURIComponent(paymentType)}&receipt_no=${receiptNo}&amt_payment=${amtPayment}`;
+    xhr.send(data);
+}
+
 
 
 function showLogoutModal() {

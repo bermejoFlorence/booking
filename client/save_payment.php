@@ -4,62 +4,37 @@ include("../connection.php");
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Debugging: Print received data
-    error_log("Received POST Data: " . print_r($_POST, true));
-
-    // Retrieve form data
     $booking_id = $_POST['booking_id'] ?? null;
-    $transac_num = $_POST['transac_num'] ?? null;
     $amt_payment = $_POST['amt_payment'] ?? null;
-    $payment_method = $_POST['payment_status'] ?? null;
-    $payment_type = $_POST['payment_type'] ?? null; // This will be saved as `payment_status`
     $reference_no = $_POST['reference_no'] ?? null;
 
-    // Debugging: Log received data
-    error_log("Booking ID: $booking_id, Transac Num: $transac_num, Amount: $amt_payment, Method: $payment_method, Type: $payment_type, Reference: $reference_no");
-
-    // Generate a random 6-digit receipt number
-    $receipt_no = mt_rand(100000, 999999);
-
     // Validate required fields
-    if (empty($booking_id) || empty($transac_num) || empty($payment_method)) {
+    if (empty($booking_id) || empty($amt_payment) || empty($reference_no)) {
         echo "<script>
-                alert('Error: Missing required fields.');
+                alert('Error: All fields are required.');
                 window.history.back();
               </script>";
         exit();
     }
 
-    // Payment handling logic
-    if ($payment_method === "walk-in") {
-        $payment_status = "No Payment"; // Default status for walk-in
-        $reference_no = "walkinpayment";
-        $amt_payment = 0; // Ensure amount is 0 for Walk-in
-    } elseif ($payment_method === "through gcash") {
-        if (empty($reference_no) || empty($payment_type)) {
-            echo "<script>
-                    alert('Error: Reference number and payment type are required for GCash payments.');
-                    window.history.back();
-                  </script>";
-            exit();
-        }
-        $payment_status = ucfirst($payment_type) . " Paid"; // "Partial Paid" or "Full Paid"
-    }
+    date_default_timezone_set('Asia/Manila');
+    $current_datetime = date('Y-m-d H:i:s');
 
-    // Start transaction
     $database->begin_transaction();
 
     try {
-        // Insert into payment table
-        $query = "INSERT INTO payment (booking_id, transac_num, amt_payment, payment_status, reference_no, receipt_no) 
+        // ✅ 1. INSERT into payment table
+        $query = "INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status, receipt_no, date_created) 
                   VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $database->prepare($query);
 
         if ($stmt) {
-            $stmt->bind_param("isissi", $booking_id, $transac_num, $amt_payment, $payment_status, $reference_no, $receipt_no);
-            
+            $payment_status = "processing payment";
+            $receipt_no = "processing payment";
+
+            $stmt->bind_param("isssss", $booking_id, $amt_payment, $reference_no, $payment_status, $receipt_no, $current_datetime);
+
             if (!$stmt->execute()) {
                 throw new Exception("Error inserting payment: " . $stmt->error);
             }
@@ -68,46 +43,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             throw new Exception("Error preparing payment query: " . $database->error);
         }
 
-        // Update booking status
-        $update_query = "UPDATE booking SET stat = 'processing' WHERE booking_id = ?";
-        $update_stmt = $database->prepare($update_query);
-
-        if ($update_stmt) {
-            $update_stmt->bind_param("i", $booking_id);
-
-            if (!$update_stmt->execute()) {
-                throw new Exception("Error updating booking status: " . $update_stmt->error);
-            }
-            $update_stmt->close();
-        } else {
-            throw new Exception("Error preparing booking update query: " . $database->error);
+        // ✅ 2. UPDATE booking.stat = 'processing'
+        $updateBooking = $database->prepare("UPDATE booking SET stat = ? WHERE booking_id = ?");
+        $processingStat = "processing";
+        $updateBooking->bind_param("si", $processingStat, $booking_id);
+        if (!$updateBooking->execute()) {
+            throw new Exception("Error updating booking status: " . $updateBooking->error);
         }
+        $updateBooking->close();
 
-        if ($amt_payment > 0) { // Only save to sales if amount > 0
-            date_default_timezone_set('Asia/Manila'); // Set timezone to Philippine Time
-            $emp_id = 1; // Fixed Employee ID
-            $date = date('Y-m-d'); // Get current date
-            
-            $sales_query = "INSERT INTO sales (emp_id, date, total_sales) VALUES (?, ?, ?)";
-            $sales_stmt = $database->prepare($sales_query);
-        
-            if ($sales_stmt) {
-                $sales_stmt->bind_param("isd", $emp_id, $date, $amt_payment);
-        
-                if (!$sales_stmt->execute()) {
-                    throw new Exception("Error inserting sales: " . $sales_stmt->error);
-                }
-                $sales_stmt->close();
-            } else {
-                throw new Exception("Error preparing sales query: " . $database->error);
-            }
-        }
-        
-
-
-        // Commit transaction
+        // ✅ 3. Commit changes
         $database->commit();
 
+        // ✅ 4. SweetAlert success
         echo "
         <!DOCTYPE html>
         <html lang='en'>
@@ -119,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <script>
                 Swal.fire({
                     title: 'Payment Successful!',
-                    text: 'Your payment has been recorded successfully. Receipt No: $receipt_no',
+                    text: 'Your payment has been recorded successfully.',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(() => {

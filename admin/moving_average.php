@@ -105,6 +105,17 @@ for ($i = 0; $i < 12; $i++) {
     max-width: 1200px;
     flex-wrap: nowrap; /* Prevent stacking */
 }
+.dashboard-container {
+    display: flex;
+    justify-content: space-between; /* Distribute items evenly */
+    gap: 20px;
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 1200px;
+    flex-wrap: nowrap; /* Prevent stacking */
+    margin-top: 4%;
+}
+
 canvas { max-width: 100%; height: 400px; }
 
 .dashboard-items {
@@ -249,6 +260,32 @@ canvas { max-width: 100%; height: 400px; }
 .btn:hover {
     background: #4da0e0 ;
 }
+
+.dashboard-items {
+    text-decoration: none; /* Remove underline */
+    color: inherit; /* Maintain text color */
+    display: flex;
+    align-items: center; /* Center-align vertically */
+    justify-content: space-between; /* Space between icon and content */
+    padding: 20px;
+    width: 30%; /* Ensure each item takes up 30% of the row */
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-items:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-items .content {
+    display: flex;
+    flex-direction: column; /* Align number and label vertically */
+    justify-content: center; /* Vertically center-align content */
+    text-align: left; /* Align text to the left */
+}
     </style>
 
 <div class="header">
@@ -332,6 +369,7 @@ canvas { max-width: 100%; height: 400px; }
 
         <div class="dash-body" style="margin-top: 15px;">
         <table class="filter-container" style="border: none;" border="0">
+       
         <h2>Sales Report (<?php echo $previous_year . ' & ' . $forecast_year; ?>)</h2>
         <canvas id="salesChart"></canvas>
         
