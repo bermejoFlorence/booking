@@ -238,7 +238,7 @@ while ($rowFeedback = $resultFeedback->fetch_assoc()) {
 }
 
 #calendar {
-    border: 20pxrgb(50, 52, 60);/* Itim na border */
+    border: 20pxrgb(50, 52, 60);/* Itim na border *
     border-radius: 10px; /* Para medyo rounded ang kanto */
     padding: 20px;
 
