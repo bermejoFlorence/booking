@@ -831,118 +831,168 @@ function showConfirmationModal(action, bookingId) {
     }
 }
 
-function printInvoice(receiptNo, transactionNum, amountPayment, paymentStatus, packageName, price, eventName) {
-    // Remove old print container if exists
-    const existingPrint = document.getElementById("print-container");
-    if (existingPrint) existingPrint.remove();
+function printInvoiceFromBooking(bookingId) {
+    fetch(`generate_invoice.php?booking_id=${bookingId}`)
+        .then(response => response.json())
+        .then(data => {
+            const {
+                receipt_no, transac_num, amt_payment, payment_status, date_created,
+                date_event, event, package, price, address_event,
+                c_fullname, c_contactnum, c_address
+            } = data;
 
-    // Create print-friendly container
-    const printDiv = document.createElement("div");
-    printDiv.id = "print-container";
-    printDiv.innerHTML = `
-        <style>
-            @media print {
-                body * {
-                    visibility: hidden;
+            const balance = parseFloat(price) - parseFloat(amt_payment);
+
+            const printDiv = document.createElement("div");
+            printDiv.id = "print-container";
+            printDiv.innerHTML = `
+                <style>
+                    @media print {
+                        body * { visibility: hidden; }
+                        #print-container, #print-container * { visibility: visible; }
+                        #print-container {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            padding: 30px;
+                            font-family: Arial, sans-serif;
+                        }
+                    }
+
+                    .invoice-wrapper {
+                        max-width: 800px;
+                        margin: auto;
+                        border: 1px solid #ccc;
+                        padding: 30px;
+                        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                    }
+
+                    .header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 30px;
+                    }
+
+                    .company-info {
+                        font-size: 14px;
+                    }
+
+                    .receipt-banner {
+                        background-color: #007bff;
+                        color: white;
+                        padding: 10px 15px;
+                        font-size: 18px;
+                        font-weight: bold;
+                        border-radius: 6px;
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 20px;
+                        font-size: 15px;
+                    }
+
+                    th, td {
+                        border: 1px solid #ccc;
+                        padding: 10px;
+                        text-align: left;
+                    }
+
+                    th {
+                        background-color: #eaf1f9;
+                    }
+
+                    .totals {
+                        margin-top: 30px;
+                        font-size: 16px;
+                        text-align: right;
+                    }
+
+                    .footer {
+                        margin-top: 40px;
+                        text-align: center;
+                        font-size: 14px;
+                        color: #555;
+                    }
+
+                    .logo {
+                        max-height: 60px;
+                    }
+                </style>
+
+                <div class="invoice-wrapper">
+                    <div class="header">
+                        <div class="logo">
+                            <img src="your-logo.png" alt="LOGO" class="logo">
+                        </div>
+                        <div class="company-info">
+                            <strong>EXZPHOTOGRAPHY STUDIO</strong><br>
+                            123 Studio Address, Manila<br>
+                            0912-345-6789 | exzstudio@gmail.com
+                        </div>
+                    </div>
+
+                    <div class="receipt-banner">Receipt for #${receipt_no}</div>
+                    <div style="margin-bottom: 10px;"><strong>Transaction Date:</strong> ${date_created}</div>
+
+                    <div style="margin: 20px 0;">
+                        <strong>Client:</strong><br>
+                        ${c_fullname}<br>
+                        ${c_address}<br>
+                        ${c_contactnum}
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th>Event</th>
+                            <th>Package</th>
+                            <th>Event Date</th>
+                            <th>Location</th>
+                            <th>Price</th>
+                            <th>Amount Paid</th>
+                            <th>Status</th>
+                        </tr>
+                        <tr>
+                            <td>${event}</td>
+                            <td>${package}</td>
+                            <td>${date_event}</td>
+                            <td>${address_event}</td>
+                            <td>₱${parseFloat(price).toLocaleString()}</td>
+                            <td>₱${parseFloat(amt_payment).toLocaleString()}</td>
+                            <td>${payment_status}</td>
+                        </tr>
+                    </table>
+
+                    <div class="totals">
+                        <p><strong>Balance:</strong> ₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                    </div>
+
+                    <div class="footer">
+                        Thank you for your business!<br>
+                        EXZPHOTOGRAPHY STUDIO
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(printDiv);
+            window.print();
+
+            // Optional: remove print content after print
+            setTimeout(() => {
+                if (document.getElementById("print-container")) {
+                    document.getElementById("print-container").remove();
                 }
-                #print-container, #print-container * {
-                    visibility: visible;
-                }
-                #print-container {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    width: 100%;
-                    padding: 30px;
-                    box-sizing: border-box;
-                    font-family: Arial, sans-serif;
-                }
-            }
-
-            .invoice-wrapper {
-                max-width: 800px;
-                margin: auto;
-                border: 1px solid #333;
-                padding: 30px;
-            }
-
-            .invoice-wrapper h1 {
-                text-align: center;
-                font-size: 28px;
-                margin-bottom: 0;
-            }
-
-            .invoice-wrapper h3 {
-                text-align: center;
-                margin-top: 5px;
-                margin-bottom: 30px;
-                font-weight: normal;
-            }
-
-            .invoice-wrapper table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 16px;
-            }
-
-            .invoice-wrapper th, .invoice-wrapper td {
-                border: 1px solid #333;
-                padding: 10px 12px;
-                text-align: left;
-            }
-
-            .invoice-wrapper th {
-                background-color: #f0f0f0;
-                width: 40%;
-            }
-        </style>
-
-        <div class="invoice-wrapper">
-            <h1>EXZPHOTOGRAPHY STUDIO</h1>
-            <h3>SALES INVOICE</h3>
-            <table>
-                <tr>
-                    <th>Receipt No:</th>
-                    <td>${receiptNo}</td>
-                </tr>
-                <tr>
-                    <th>Transaction No:</th>
-                    <td>${transactionNum || 'N/A'}</td>
-                </tr>
-                <tr>
-                    <th>Event:</th>
-                    <td>${eventName}</td>
-                </tr>
-                <tr>
-                    <th>Package:</th>
-                    <td>${packageName}</td>
-                </tr>
-                <tr>
-                    <th>Price:</th>
-                    <td>₱${parseFloat(price).toLocaleString()}</td>
-                </tr>
-                <tr>
-                    <th>Amount Paid:</th>
-                    <td>₱${parseFloat(amountPayment).toLocaleString()}</td>
-                </tr>
-                <tr>
-                    <th>Payment Status:</th>
-                    <td>${paymentStatus}</td>
-                </tr>
-            </table>
-        </div>
-    `;
-
-    // Append to body and trigger print
-    document.body.appendChild(printDiv);
-    window.print();
-
-    // Optional: clean up after print (not required, but tidy)
-    setTimeout(() => {
-        if (document.getElementById("print-container")) {
-            document.getElementById("print-container").remove();
-        }
-    }, 1000);
+            }, 1000);
+        })
+        .catch(err => {
+            console.error('Error fetching invoice data:', err);
+            alert('Failed to load invoice. Please try again.');
+        });
 }
 
 function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo, receiptNo) {
@@ -1007,7 +1057,7 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         printBtn.className = "print-invoice";
         printBtn.style.cssText = "margin-top: 15px; padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 6px; cursor: pointer;";
         printBtn.onclick = function () {
-            printInvoice(receiptNo, transacNum, amtPayment, paymentStatus, package, price, event);
+            printInvoiceFromBooking(bookingId);
         };
         modalContentDiv.appendChild(printBtn);
     }
