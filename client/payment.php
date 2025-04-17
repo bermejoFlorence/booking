@@ -312,7 +312,7 @@ if (isset($_GET['booking_id'])) {
             <!-- Transaction Details -->
             <div class="details-container">
                 <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
-                <span><strong>Price:</strong>₱<?php echo htmlspecialchars($price); ?>.00</span>
+                <span><strong>Price:</strong><?php echo htmlspecialchars($price); ?></span>
             </div>
 
             <form method="POST" action="save_payment.php" id="paymentForm">
