@@ -316,8 +316,8 @@ $balance = $_GET['balance'] ?? '0';
 
             <!-- Transaction Details -->
             <div class="details-container" style="margin-bottom: 15px;">
-                <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span><br>
-                <span><strong>Price:</strong> ₱<?php echo htmlspecialchars($price); ?>.00</span><br>
+                <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
+                <span><strong>Price:</strong> ₱<?php echo htmlspecialchars($price); ?>.00</span>
                 <span><strong>Balance:</strong> ₱<?php echo htmlspecialchars($balance); ?>.00</span>
             </div>
 
