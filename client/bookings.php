@@ -998,7 +998,7 @@ function printInvoiceFromBooking(bookingId) {
 function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo, receiptNo) {
     // Set booking details in modal
     document.getElementById('modal-package').textContent = package;
-    document.getElementById('modal-price').textContent = price;
+    document.getElementById('modal-price').textContent = `₱${payment}`;
     document.getElementById('modal-event').textContent = event;
     document.getElementById('modal-event-date').textContent = eventDate;
     document.getElementById('modal-event-address').textContent = eventAddress;
