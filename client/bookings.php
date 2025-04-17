@@ -832,108 +832,121 @@ function showConfirmationModal(action, bookingId) {
 }
 
 function printInvoice(receiptNo, transactionNum, amountPayment, paymentStatus, packageName, price, eventName) {
-    // Gumawa ng hidden div para sa printing
-    let printArea = document.createElement('div');
-    printArea.innerHTML = `
+    // Create a printable area
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+
+    const content = `
+    <html>
+    <head>
+        <title>Sales Invoice</title>
         <style>
+            @media print {
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-family: Arial, sans-serif;
+                    font-size: 14px;
+                    color: #333;
+                }
+                .invoice-container {
+                    width: 100%;
+                    max-width: 800px;
+                    margin: auto;
+                    padding: 40px;
+                    box-sizing: border-box;
+                }
+            }
+
             body {
                 font-family: Arial, sans-serif;
-                width: 8.5in;
-                height: 11in;
-                padding: 20px;
+                padding: 40px;
+                background: white;
             }
+
             .invoice-container {
                 width: 100%;
-                border: 1px solid black;
-                padding: 20px;
+                max-width: 700px;
+                margin: auto;
+                border: 1px solid #ccc;
+                padding: 30px;
                 box-sizing: border-box;
-                text-align: center;
             }
+
+            h1, h3 {
+                text-align: center;
+                margin: 0;
+            }
+
             h1 {
-                text-align: center;
-                margin-bottom: 30px;
+                font-size: 26px;
+                margin-bottom: 5px;
+                color: #2c3e50;
             }
+
+            h3 {
+                font-size: 18px;
+                margin-bottom: 30px;
+                color: #555;
+            }
+
             table {
                 width: 100%;
                 border-collapse: collapse;
-                margin: 20px 0;
+                margin-bottom: 20px;
             }
-            table, th, td {
-                border: 1px solid black;
-            }
+
             th, td {
-                padding: 10px;
                 text-align: left;
+                padding: 10px;
+                border: 1px solid #ddd;
             }
-            .no-border {
-                border: none !important;
+
+            th {
+                background-color: #f4f4f4;
+                font-weight: bold;
+                width: 200px;
+            }
+
+            .footer {
+                text-align: center;
+                font-size: 12px;
+                color: #888;
+                margin-top: 40px;
             }
         </style>
-
+    </head>
+    <body>
         <div class="invoice-container">
-            
-             <h1>EXZPHOTOGRAPHY STUDIO</h1>
+            <h1>EXZPHOTOGRAPHY STUDIO</h1>
             <h3>SALES INVOICE</h3>
             <table>
-                <tr>
-                    <th>Receipt No:</th>
-                    <td>${receiptNo}</td>
-                </tr>
-                <tr>
-                    <th>Transaction No:</th>
-                    <td>${transactionNum}</td>
-                </tr>
-                <tr>
-                    <th>Event:</th>
-                    <td>${eventName}</td>
-                </tr>
-                <tr>
-                    <th>Package:</th>
-                    <td>${packageName}</td>
-                </tr>
-                <tr>
-                    <th>Price:</th>
-                    <td>₱${parseFloat(price).toLocaleString()}</td>
-                </tr>
-                <tr>
-                    <th>Amount Paid:</th>
-                    <td>₱${parseFloat(amountPayment).toLocaleString()}</td>
-                </tr>
-                <tr>
-                    <th>Payment Status:</th>
-                    <td>${paymentStatus}</td>
-                </tr>
+                <tr><th>Receipt No:</th><td>${receiptNo}</td></tr>
+                <tr><th>Transaction No:</th><td>${transactionNum}</td></tr>
+                <tr><th>Event:</th><td>${eventName}</td></tr>
+                <tr><th>Package:</th><td>${packageName}</td></tr>
+                <tr><th>Price:</th><td>₱${parseFloat(price).toLocaleString()}</td></tr>
+                <tr><th>Amount Paid:</th><td>₱${parseFloat(amountPayment).toLocaleString()}</td></tr>
+                <tr><th>Payment Status:</th><td>${paymentStatus}</td></tr>
             </table>
+            <div class="footer">This is a system-generated invoice. No signature is required.</div>
         </div>
+        <script>
+            window.onload = function() {
+                window.print();
+                window.onafterprint = function () {
+                    window.close();
+                };
+            };
+        </script>
+    </body>
+    </html>
     `;
 
-    // Itago ang lahat ng ibang content sa page
-    let originalBody = document.body.innerHTML;
-    document.body.innerHTML = printArea.innerHTML;
-
-    // Mag-trigger ng print dialog
-    window.print();
-
-    // Ibalik ang original na content pagkatapos ng printing
-    document.body.innerHTML = originalBody;
-
-    function updateBookingStatus(bookingId, status) {
-    // Use AJAX to send a request to update the booking status in the database
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'update_booking_status.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            alert(xhr.responseText); // Show success message
-            location.reload(); // Reload the page to update the table
-        } else {
-            alert('An error occurred. Please try again.');
-        }
-    };
-    xhr.send(`booking_id=${bookingId}&status=${status}`);
+    printWindow.document.open();
+    printWindow.document.write(content);
+    printWindow.document.close();
 }
 
-}
 function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo, receiptNo) {
     // Set booking details in modal
     document.getElementById('modal-package').textContent = package;
