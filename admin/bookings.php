@@ -575,7 +575,7 @@ if ($result->num_rows > 0) {
         }
 
         // ✅ Booking status actions
-        if ($row['stat'] == 'approved' || $row['stat'] == 'processing'){
+        if ($row['stat'] == 'approved' || $row['stat'] == 'processing' || $row['stat'] == 'completed'){
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center; white-space: nowrap;'>
                     <div style='display: inline-flex; gap: 5px;'>
                     <button style='background-color: rgb(77, 224, 126); color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>
