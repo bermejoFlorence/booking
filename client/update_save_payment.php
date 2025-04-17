@@ -18,16 +18,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // Start transaction
+    $payment_status = "processing payment";
+
     $database->begin_transaction();
 
     try {
-        // Insert payment record
-        $query = "INSERT INTO payment (booking_id, amt_payment, reference_no) VALUES (?, ?, ?)";
+        // Insert payment record with status
+        $query = "INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status) VALUES (?, ?, ?, ?)";
         $stmt = $database->prepare($query);
 
         if ($stmt) {
-            $stmt->bind_param("ids", $booking_id, $amt_payment, $reference_no);
+            $stmt->bind_param("idss", $booking_id, $amt_payment, $reference_no, $payment_status);
 
             if (!$stmt->execute()) {
                 throw new Exception("Error inserting payment: " . $stmt->error);
@@ -52,7 +53,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             throw new Exception("Error preparing booking update query: " . $database->error);
         }
 
-        // Commit all
         $database->commit();
 
         echo "
