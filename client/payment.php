@@ -412,6 +412,25 @@ function showLogoutModal() {
         window.location.href = "../logout.php"; // Redirect to logout page
     }
 
+    document.getElementById("paymentForm").addEventListener("submit", function (e) {
+    const priceStr = "<?php echo str_replace(',', '', $price); ?>"; // raw price
+    const inputAmtStr = document.getElementById("amt_payment").value;
+
+    const cleanedPrice = parseFloat(priceStr) || 0;
+    const cleanedInput = parseFloat(inputAmtStr.replace(/,/g, '')) || 0;
+
+    if (cleanedInput > cleanedPrice) {
+        e.preventDefault(); // Block submission
+        Swal.fire({
+            icon: 'warning',
+            title: 'Overpayment Detected',
+            text: `You entered ₱${cleanedInput.toLocaleString()} but the required amount is only ₱${cleanedPrice.toLocaleString()}.`,
+            confirmButtonColor: '#dc3545',
+        });
+    }
+});
+
+
 
     </script>
 

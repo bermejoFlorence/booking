@@ -640,8 +640,8 @@ if ($bookingData && $bookingData->num_rows > 0) {
                                     <div class="section">
                                         <h3>Payment Information</h3>
                                         <div class="info-row">
-                                            <span>Transaction No.:</span> 
-                                            <span id="modal-transac-num"></span>
+                                            <span>Receipt No.:</span> 
+                                            <span id="modal-receipt-no"></span>
                                         </div>
                                         <div class="info-row">
                                             <span>Amount Paid:</span> 
@@ -1004,7 +1004,7 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
     document.getElementById('modal-event-address').textContent = eventAddress;
 
     // Set transaction details
-    document.getElementById('modal-transac-num').textContent = transacNum || 'N/A';
+    document.getElementById('modal-receipt-no').textContent = receiptNo || 'N/A';
     document.getElementById('modal-amt-payment').textContent = `₱${amtPayment}`;
 
     // Compute balance
