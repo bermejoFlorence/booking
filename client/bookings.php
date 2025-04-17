@@ -995,27 +995,40 @@ function printInvoiceFromBooking(bookingId) {
         });
 }
 function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo, receiptNo) {
-    // Clean and format price + amtPayment
-    let cleanedPrice = parseFloat(price.toString().replace(/,/g, '')) || 0;
-    let cleanedAmtPayment = parseFloat(amtPayment.toString().replace(/,/g, '')) || 0;
+    // Clean numeric strings
+    const cleanedPrice = parseFloat(price.toString().replace(/,/g, '')) || 0;
+    const cleanedAmtPayment = parseFloat(amtPayment.toString().replace(/,/g, '')) || 0;
+    const status = paymentStatus.trim().toLowerCase();
 
-    // Set booking details in modal
+    // Set Booking Info
     document.getElementById('modal-package').textContent = package;
     document.getElementById('modal-price').textContent = `₱${cleanedPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     document.getElementById('modal-event').textContent = event;
     document.getElementById('modal-event-date').textContent = eventDate;
     document.getElementById('modal-event-address').textContent = eventAddress;
 
-    // Set receipt number
-    document.getElementById('modal-receipt-no').textContent = receiptNo || 'N/A';
+    // Set Payment Info
     document.getElementById('modal-amt-payment').textContent = `₱${cleanedAmtPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    document.getElementById('modal-receipt-no').textContent = receiptNo || 'N/A';
 
-    // Compute balance
-    let balanceElement = document.getElementById('modal-balance');
-    let updateButton = document.getElementById('update-payment-btn');
-    let balance = cleanedPrice - cleanedAmtPayment;
+    // Set Payment Status Display
+    if (status === 'full payment') {
+        document.getElementById('modal-payment-status').textContent = 'Gcash';
+        document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
+    } else if (status === 'no payment') {
+        document.getElementById('modal-payment-status').textContent = 'Walk-In';
+        document.getElementById('modal-reference-no').textContent = 'N/A';
+    } else {
+        document.getElementById('modal-payment-status').textContent = paymentStatus || 'N/A';
+        document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
+    }
 
-    if (paymentStatus.trim().toLowerCase() === 'partial payment') {
+    // Balance + Update Button Logic
+    const balance = cleanedPrice - cleanedAmtPayment;
+    const balanceElement = document.getElementById('modal-balance');
+    const updateButton = document.getElementById('update-payment-btn');
+
+    if (status === 'partial payment') {
         balanceElement.textContent = `₱${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         balanceElement.parentElement.style.display = 'flex';
         updateButton.style.display = 'block';
@@ -1024,29 +1037,17 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         updateButton.style.display = 'none';
     }
 
-    // Modify payment status display
-    if (paymentStatus.trim().toLowerCase() === 'full payment') {
-        document.getElementById('modal-payment-status').textContent = 'Gcash';
-        document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
-    } else if (paymentStatus.trim().toLowerCase() === 'no payment') {
-        document.getElementById('modal-payment-status').textContent = 'Walk-In';
-        document.getElementById('modal-reference-no').textContent = 'N/A';
-    } else {
-        document.getElementById('modal-payment-status').textContent = paymentStatus || 'N/A';
-        document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
-    }
-
-    // Update Payment button logic
+    // Update payment handler
     updateButton.onclick = function () {
         updatePayment(bookingId, transacNum, package, balance);
     };
 
-    // Add Print button if Partial or Full Payment
+    // Handle Print Button (only for partial/full payment)
     const modalContentDiv = document.querySelector("#viewDetailsModal .modal-content");
     const existingPrintBtn = modalContentDiv.querySelector("button.print-invoice");
     if (existingPrintBtn) existingPrintBtn.remove();
 
-    if (['partial payment', 'full payment'].includes(paymentStatus.trim().toLowerCase())) {
+    if (['partial payment', 'full payment'].includes(status)) {
         const printBtn = document.createElement("button");
         printBtn.textContent = "Print Invoice";
         printBtn.className = "print-invoice";
@@ -1057,7 +1058,7 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         modalContentDiv.appendChild(printBtn);
     }
 
-    // Show the modal
+    // Show modal
     document.getElementById('viewDetailsModal').style.display = 'block';
 }
 
