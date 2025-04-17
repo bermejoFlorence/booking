@@ -314,32 +314,17 @@ $balance = $_GET['balance'] ?? '0';
         <div class="form-container">
             <h2>Payment Details</h2>
 
-              <!-- Transaction Details -->
-              <div class="details-container">
+            <!-- Transaction Details -->
+            <div class="details-container">
                 <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
-                <span><strong>Balance:</strong>₱<?php echo htmlspecialchars($balance); ?>.00</span>
+                <span><strong>Balance:</strong> ₱<?php echo htmlspecialchars($balance); ?>.00</span>
             </div>
 
             <form method="POST" action="update_save_payment.php" id="paymentForm">
                 <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
 
-                <!-- Payment Status Dropdown -->
-                <div class="form-group">
-                    <label for="payment_status">Payment Method</label>
-                    <select name="payment_status" id="payment_status" required onchange="togglePaymentFields()">
-                        <option value="">Select Payment Method</option>
-                        <option value="walk-in">Walk-in</option>
-                        <option value="through gcash">Through GCash</option>
-                    </select>
-                </div>
-
-                <!-- Message for Walk-in -->
-                <div id="walkin-message" style="color: blue; font-size: 14px; margin-bottom: 10px; display: none;">
-                    Please wait for 5 minutes for the admin to call you. Make sure your contact number is reachable, or your booking may be rejected.
-                </div>
-
-                <!-- GCash Payment Fields (ALWAYS VISIBLE WHEN SELECTED) -->
-                <div id="gcash-fields" style="display: none;">
+                <!-- GCash Payment Fields -->
+                <div id="gcash-fields">
                     <div class="form-group">
                         <label for="gcash_qr">Scan QR Code</label>
                         <div>
@@ -350,22 +335,13 @@ $balance = $_GET['balance'] ?? '0';
                     <div class="form-group">
                         <label for="reference_no">Reference Number</label>
                         <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number"
-                            maxlength="13" pattern="\d{13}" onkeypress="return event.charCode>=48 && event.charCode<=57">
+                            maxlength="13" pattern="\d{13}" required onkeypress="return event.charCode>=48 && event.charCode<=57">
                         <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="payment_type">Payment Type</label>
-                        <select name="payment_type" id="payment_type">
-                            <option value="">Select Payment Type</option>
-                            <option value="partial">Partial Payment</option>
-                            <option value="full">Full Payment</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
                         <label for="amt_payment">Amount to Pay</label>
-                        <input type="text" name="amt_payment" id="amt_payment"
+                        <input type="text" name="amt_payment" id="amt_payment" required
                             onkeypress="return event.charCode>=48 && event.charCode<=57"
                             placeholder="Enter amount ex 1000, 100, 10, 1">
                     </div>
@@ -377,6 +353,7 @@ $balance = $_GET['balance'] ?? '0';
     </table>
 </div>
 
+
     </div>
 
     <script>
@@ -385,42 +362,36 @@ $balance = $_GET['balance'] ?? '0';
             menu.classList.toggle('open');
         }
 
-        function togglePaymentFields() {
-    var paymentStatus = document.getElementById("payment_status").value;
-    var walkinMessage = document.getElementById("walkin-message");
-    var gcashFields = document.getElementById("gcash-fields");
-    var referenceNo = document.getElementById("reference_no");
+        document.getElementById("reference_no").addEventListener("input", function () {
+        var referenceNo = this.value;
+        var errorMessage = document.getElementById("error-message");
 
-    if (paymentStatus === "walk-in") {
-        walkinMessage.style.display = "block";
-        gcashFields.style.display = "none";
+        if (/^\d{13}$/.test(referenceNo)) {
+            errorMessage.style.display = "none";
+        } else {
+            errorMessage.style.display = "block";
+        }
+    });
 
-        // Remove required attributes for GCash
-        referenceNo.removeAttribute("required");
-    } else if (paymentStatus === "through gcash") {
-        walkinMessage.style.display = "none";
-        gcashFields.style.display = "block";
+    document.getElementById("paymentForm").addEventListener("submit", function (e) {
+        const balanceStr = "<?php echo str_replace(',', '', $balance); ?>";
+        const inputAmtStr = document.getElementById("amt_payment").value;
 
-        // Make reference number required
-        referenceNo.setAttribute("required", "true");
-    } else {
-        walkinMessage.style.display = "none";
-        gcashFields.style.display = "none";
-    }
-}
+        const cleanedBalance = parseFloat(balanceStr) || 0;
+        const cleanedInput = parseFloat(inputAmtStr.replace(/,/g, '')) || 0;
 
-document.getElementById("reference_no").addEventListener("input", function () {
-    var referenceNo = this.value;
-    var errorMessage = document.getElementById("error-message");
+        if (cleanedInput > cleanedBalance) {
+            e.preventDefault(); // Block submission
+            Swal.fire({
+                icon: 'warning',
+                title: 'Overpayment Detected',
+                text: `You entered ₱${cleanedInput.toLocaleString()} but your remaining balance is only ₱${cleanedBalance.toLocaleString()}.`,
+                confirmButtonColor: '#dc3545',
+            });
+        }
+    });
 
-    if (/^\d{13}$/.test(referenceNo)) {
-        errorMessage.style.display = "none";
-    } else {
-        errorMessage.style.display = "block";
-    }
-});
-
-function showLogoutModal() {
+    function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
         let modalContent = document.getElementById("logoutModalContent");
         modal.style.display = "flex";
@@ -438,10 +409,9 @@ function showLogoutModal() {
     }
 
     function logoutUser() {
-        window.location.href = "../logout.php"; // Redirect to logout page
+        window.location.href = "../logout.php";
     }
-
-
+    
     </script>
 
 </body>
