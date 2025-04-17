@@ -994,25 +994,25 @@ function printInvoiceFromBooking(bookingId) {
             alert('Failed to load invoice. Please try again.');
         });
 }
-
 function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo, receiptNo) {
+    // Clean and format price + amtPayment
+    let cleanedPrice = parseFloat(price.toString().replace(/,/g, '')) || 0;
+    let cleanedAmtPayment = parseFloat(amtPayment.toString().replace(/,/g, '')) || 0;
+
     // Set booking details in modal
     document.getElementById('modal-package').textContent = package;
-    document.getElementById('modal-price').textContent = `₱${payment}`;
+    document.getElementById('modal-price').textContent = `₱${cleanedPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     document.getElementById('modal-event').textContent = event;
     document.getElementById('modal-event-date').textContent = eventDate;
     document.getElementById('modal-event-address').textContent = eventAddress;
 
-    // Set transaction details
+    // Set receipt number
     document.getElementById('modal-receipt-no').textContent = receiptNo || 'N/A';
-    document.getElementById('modal-amt-payment').textContent = `₱${amtPayment}`;
+    document.getElementById('modal-amt-payment').textContent = `₱${cleanedAmtPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     // Compute balance
     let balanceElement = document.getElementById('modal-balance');
     let updateButton = document.getElementById('update-payment-btn');
-
-    let cleanedPrice = parseFloat(price.replace(/,/g, '')) || 0;
-    let cleanedAmtPayment = parseFloat(amtPayment) || 0;
     let balance = cleanedPrice - cleanedAmtPayment;
 
     if (paymentStatus.trim().toLowerCase() === 'partial payment') {
@@ -1041,16 +1041,11 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         updatePayment(bookingId, transacNum, package, balance);
     };
 
-    // ADD: Print Button (if Partial or Full Payment)
+    // Add Print button if Partial or Full Payment
     const modalContentDiv = document.querySelector("#viewDetailsModal .modal-content");
-
-    // Remove any existing print button to avoid duplicates
     const existingPrintBtn = modalContentDiv.querySelector("button.print-invoice");
-    if (existingPrintBtn) {
-        existingPrintBtn.remove();
-    }
+    if (existingPrintBtn) existingPrintBtn.remove();
 
-    // Create and insert the print button if applicable
     if (['partial payment', 'full payment'].includes(paymentStatus.trim().toLowerCase())) {
         const printBtn = document.createElement("button");
         printBtn.textContent = "Print Invoice";
