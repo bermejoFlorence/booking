@@ -934,7 +934,7 @@ function printInvoice(receiptNo, transactionNum, amountPayment, paymentStatus, p
 }
 
 }
-function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo) {
+function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo, receiptNo) {
     // Set booking details in modal
     document.getElementById('modal-package').textContent = package;
     document.getElementById('modal-price').textContent = price;
@@ -948,26 +948,26 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
 
     // Compute balance
     let balanceElement = document.getElementById('modal-balance');
-    let updateButton = document.getElementById('update-payment-btn'); // Get button element
+    let updateButton = document.getElementById('update-payment-btn');
 
     let cleanedPrice = parseFloat(price.replace(/,/g, '')) || 0;
     let cleanedAmtPayment = parseFloat(amtPayment) || 0;
     let balance = cleanedPrice - cleanedAmtPayment;
 
-    if (paymentStatus.trim() === 'Partial Paid') {
+    if (paymentStatus.trim().toLowerCase() === 'partial payment') {
         balanceElement.textContent = `₱${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        balanceElement.parentElement.style.display = 'flex'; 
-        updateButton.style.display = 'block'; 
+        balanceElement.parentElement.style.display = 'flex';
+        updateButton.style.display = 'block';
     } else {
-        balanceElement.parentElement.style.display = 'none'; 
-        updateButton.style.display = 'none'; 
+        balanceElement.parentElement.style.display = 'none';
+        updateButton.style.display = 'none';
     }
 
     // Modify payment status display
-    if (paymentStatus.trim() === 'Fully Paid') {
+    if (paymentStatus.trim().toLowerCase() === 'full payment') {
         document.getElementById('modal-payment-status').textContent = 'Gcash';
         document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
-    } else if (paymentStatus.trim() === 'No Payment') {
+    } else if (paymentStatus.trim().toLowerCase() === 'no payment') {
         document.getElementById('modal-payment-status').textContent = 'Walk-In';
         document.getElementById('modal-reference-no').textContent = 'N/A';
     } else {
@@ -975,10 +975,31 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
     }
 
-    // Update button function with bookingId, transactionNumber, package, and balance
+    // Update Payment button logic
     updateButton.onclick = function () {
         updatePayment(bookingId, transacNum, package, balance);
     };
+
+    // ADD: Print Button (if Partial or Full Payment)
+    const modalContentDiv = document.querySelector("#viewDetailsModal .modal-content");
+
+    // Remove any existing print button to avoid duplicates
+    const existingPrintBtn = modalContentDiv.querySelector("button.print-invoice");
+    if (existingPrintBtn) {
+        existingPrintBtn.remove();
+    }
+
+    // Create and insert the print button if applicable
+    if (['partial payment', 'full payment'].includes(paymentStatus.trim().toLowerCase())) {
+        const printBtn = document.createElement("button");
+        printBtn.textContent = "Print Invoice";
+        printBtn.className = "print-invoice";
+        printBtn.style.cssText = "margin-top: 15px; padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 6px; cursor: pointer;";
+        printBtn.onclick = function () {
+            printInvoice(receiptNo, transacNum, amtPayment, paymentStatus, package, price, event);
+        };
+        modalContentDiv.appendChild(printBtn);
+    }
 
     // Show the modal
     document.getElementById('viewDetailsModal').style.display = 'block';
