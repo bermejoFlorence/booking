@@ -536,90 +536,100 @@ hr {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                            if ($bookingData && $bookingData->num_rows > 0) {
-                                $counter = 1;
-                                while ($row = $bookingData->fetch_assoc()) {
-                                    echo "<tr>";
-                                    echo "<td class='col-number' style='text-align: center; vertical-align: middle;'>" . $counter++ . "</td>";
-                                    echo "<td class='col-name' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($username) . "</td>";
-                                    echo "<td class='col-event' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['date_event']) . "</td>";
-                                    echo "<td class='col-event' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['event']) . "</td>";
-                                    echo "<td class='col-package' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['package']) . "</td>";
-                                    echo "<td class='col-address' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['address_event']) . "</td>";
+<?php
+if ($bookingData && $bookingData->num_rows > 0) {
+    $counter = 1;
+    while ($row = $bookingData->fetch_assoc()) {
+        echo "<tr>";
+        echo "<td class='col-number' style='text-align: center; vertical-align: middle;'>" . $counter++ . "</td>";
+        echo "<td class='col-name' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($username) . "</td>";
+        echo "<td class='col-event' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['date_event']) . "</td>";
+        echo "<td class='col-event' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['event']) . "</td>";
+        echo "<td class='col-package' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['package']) . "</td>";
+        echo "<td class='col-address' style='text-align: center; vertical-align: middle;'>" . htmlspecialchars($row['address_event']) . "</td>";
 
-                                    // Set status with background color
-                                    $statusClass = '';
-                                    $statusText = htmlspecialchars($row['stat']);
-                                    if ($row['stat'] === 'pending') {
-                                        $statusClass = 'background-color: rgb(241, 137, 80); color: white;';
-                                    } elseif ($row['stat'] === 'processing') {
-                                        $statusClass = 'background-color: #46B1C9; color: white;';
-                                    } elseif ($row['stat'] === 'approved') {
-                                        $statusClass = 'background-color: rgb(77, 224, 126); color: white;';
-                                    } elseif ($row['stat'] === 'rejected') {
-                                        $statusClass = 'background-color: red; color: white;';
-                                    } elseif ($row['stat'] === 'cancelled') {
-                                        $statusClass = 'background-color: rgb(235, 63, 63); color: white;';
-                                    } elseif ($row['stat'] === 'partial payment') {
-                                        $statusClass = 'background-color: orange; color: white;';
-                                    } elseif ($row['stat'] === 'full payment') {
-                                        $statusClass = 'background-color: #0d6efd; color: white;';
-                                    }                                    
+        // Determine status and style
+        $statusClass = '';
+        $statusText = htmlspecialchars($row['stat']); // default
 
-                                    // Display the status with background color
-                                    echo "<td class='col-status' style='text-align: center; vertical-align: middle; font-size: 0.9em; $statusClass'>";
-                                    echo $statusText;
-                                    echo "</td>";
+        if ($row['stat'] === 'pending') {
+            $statusClass = 'background-color: rgb(241, 137, 80); color: white;';
+        } elseif ($row['stat'] === 'processing') {
+            $statusClass = 'background-color: #46B1C9; color: white;';
+        } elseif ($row['stat'] === 'approved') {
+            $statusClass = 'background-color: rgb(77, 224, 126); color: white;';
+        } elseif ($row['stat'] === 'rejected') {
+            $statusClass = 'background-color: red; color: white;';
+        } elseif ($row['stat'] === 'cancelled') {
+            $statusClass = 'background-color: rgb(235, 63, 63); color: white;';
+        }
 
-                                    // Add Checkout, View Details, or Printer icon based on the status
-                                    echo "<td class='col-action' style='text-align: center; vertical-align: middle;'>";
+        // Override with payment_status for specific cases
+        $paymentStatusLower = strtolower($row['payment_status']);
+        if ($paymentStatusLower === 'partial payment') {
+            $statusClass = 'background-color: orange; color: white;';
+            $statusText = 'Partial Payment';
+        } elseif ($paymentStatusLower === 'full payment') {
+            $statusClass = 'background-color: #0d6efd; color: white;';
+            $statusText = 'Full Payment';
+        }
 
-                                            if ($row['stat'] === 'pending') {
-                                                // Cancel button only
-                                                echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
+        echo "<td class='col-status' style='text-align: center; vertical-align: middle; font-size: 0.9em; $statusClass'>";
+        echo $statusText;
+        echo "</td>";
 
-                                            } elseif ($row['stat'] === 'approved') {
-                                                // Checkout + Cancel buttons
-                                                echo "<button class='checkout-btn' style='padding: 5px 10px; border: none; background-color: #46B1C9; color: white; border-radius: 3px; cursor: pointer; margin-right: 5px;' onclick=\"showConfirmationModal('checkout', '" . htmlspecialchars($row['booking_id']) . "')\">Checkout</button>";
+        // ACTIONS
+        echo "<td class='col-action' style='text-align: center; vertical-align: middle;'>";
 
-                                                echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
+        // For Partial/Full Payment: only View Details
+        if (in_array($paymentStatusLower, ['partial payment', 'full payment'])) {
+            echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer;' 
+                onclick=\"viewDetails(
+                    '" . htmlspecialchars($row['booking_id']) . "', 
+                    '" . htmlspecialchars($row['package']) . "',
+                    '" . htmlspecialchars($row['price']) . "',
+                    '" . htmlspecialchars($row['event']) . "',
+                    '" . htmlspecialchars($row['date_event']) . "',
+                    '" . htmlspecialchars($row['address_event']) . "',
+                    '" . htmlspecialchars($row['transac_num']) . "',
+                    '" . htmlspecialchars($row['amt_payment']) . "',
+                    '" . htmlspecialchars($row['payment_status']) . "',
+                    '" . htmlspecialchars($row['reference_no']) . "',
+                    '" . htmlspecialchars($row['receipt_no']) . "'
+                )\">View Details</button>";
+        } elseif ($row['stat'] === 'pending') {
+            echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
+        } elseif ($row['stat'] === 'approved') {
+            echo "<button class='checkout-btn' style='padding: 5px 10px; border: none; background-color: #46B1C9; color: white; border-radius: 3px; cursor: pointer; margin-right: 5px;' onclick=\"showConfirmationModal('checkout', '" . htmlspecialchars($row['booking_id']) . "')\">Checkout</button>";
+            echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
+        } elseif ($row['stat'] === 'processing') {
+            echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer;' 
+                onclick=\"viewDetails(
+                    '" . htmlspecialchars($row['booking_id']) . "', 
+                    '" . htmlspecialchars($row['package']) . "',
+                    '" . htmlspecialchars($row['price']) . "',
+                    '" . htmlspecialchars($row['event']) . "',
+                    '" . htmlspecialchars($row['date_event']) . "',
+                    '" . htmlspecialchars($row['address_event']) . "',
+                    '" . htmlspecialchars($row['transac_num']) . "',
+                    '" . htmlspecialchars($row['amt_payment']) . "',
+                    '" . htmlspecialchars($row['payment_status']) . "',
+                    '" . htmlspecialchars($row['reference_no']) . "',
+                    '" . htmlspecialchars($row['receipt_no']) . "'
+                )\">View Details</button>";
+        } elseif ($row['stat'] === 'cancelled') {
+            echo "<button class='delete-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('delete', '" . htmlspecialchars($row['booking_id']) . "')\">Delete</button>";
+        }
 
-                                            } elseif ($row['stat'] === 'processing') {
-                                                // View Details
-                                                echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer;' 
-                                                    onclick=\"viewDetails(
-                                                        '" . htmlspecialchars($row['booking_id']) . "', 
-                                                        '" . htmlspecialchars($row['package']) . "',
-                                                        '" . htmlspecialchars($row['price']) . "',
-                                                        '" . htmlspecialchars($row['event']) . "',
-                                                        '" . htmlspecialchars($row['date_event']) . "',
-                                                        '" . htmlspecialchars($row['address_event']) . "',
-                                                        '" . htmlspecialchars($row['transac_num']) . "',
-                                                        '" . htmlspecialchars($row['amt_payment']) . "',
-                                                        '" . htmlspecialchars($row['payment_status']) . "',
-                                                        '" . htmlspecialchars($row['reference_no']) . "'
-                                                    )\">View Details</button>";
+        echo "</td>";
+        echo "</tr>";
+    }
+} else {
+    echo "<tr><td colspan='8' style='text-align: center; vertical-align: middle;'>No bookings found.</td></tr>";
+}
+?>
+</tbody>
 
-                                            } elseif ($row['stat'] === 'approved') {
-                                                // Already handled above (optional)
-                                            } elseif ($row['stat'] === 'cancelled') {
-                                                // Delete button
-                                                echo "<button class='delete-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('delete', '" . htmlspecialchars($row['booking_id']) . "')\">Delete</button>";
-                                            }
-
-                                            
-
-                                            echo "</td>";
-
-
-                                    echo "</tr>";
-                                }
-                            } else {
-                                echo "<tr><td colspan='8' style='text-align: center; vertical-align: middle;'>No bookings found.</td></tr>";
-                            }
-                            ?>
-                        </tbody>
                         <div id="viewDetailsModal" class="overlay" style="display: none;">
                             <div class="popup medium">
                                 <span class="close" onclick="closeModal();">&times;</span>
