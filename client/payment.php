@@ -61,8 +61,6 @@ if (isset($_GET['booking_id'])) {
 
         echo "<script>console.log('Package: " . $package . " | Price: " . $price . "');</script>";
 
-        // Generate a random 10-digit transaction number
-        $transactionNumber = random_int(1000000000, 9999999999);
     } else {
         echo "Booking not found or unauthorized access!";
         exit();
@@ -313,14 +311,12 @@ if (isset($_GET['booking_id'])) {
 
             <!-- Transaction Details -->
             <div class="details-container">
-                <span><strong>Transaction Number:</strong> <?php echo htmlspecialchars($transactionNumber); ?></span>
                 <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
-                <span><strong>Price:</strong> <?php echo htmlspecialchars($price); ?> PHP</span>
+                <span><strong>Price:</strong>₱<?php echo htmlspecialchars($price); ?>.00</span>
             </div>
 
             <form method="POST" action="save_payment.php" id="paymentForm">
                 <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
-                <input type="hidden" name="transac_num" value="<?php echo htmlspecialchars($transactionNumber); ?>">
 
                 <!-- GCash Payment Fields -->
                 <div id="gcash-fields">

@@ -316,14 +316,12 @@ $balance = $_GET['balance'] ?? '0';
 
               <!-- Transaction Details -->
               <div class="details-container">
-                <span><strong>Transaction Number:</strong> <?php echo htmlspecialchars($transactionNumber); ?></span>
                 <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
-                <span><strong>Balance:</strong> <?php echo htmlspecialchars($balance); ?> PHP</span>
+                <span><strong>Balance:</strong>₱<?php echo htmlspecialchars($balance); ?>.00</span>
             </div>
 
             <form method="POST" action="update_save_payment.php" id="paymentForm">
                 <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
-                <input type="hidden" name="transac_num" value="<?php echo htmlspecialchars($transactionNumber); ?>">
 
                 <!-- Payment Status Dropdown -->
                 <div class="form-group">
