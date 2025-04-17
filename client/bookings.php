@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     
-    <title>Settings</title>
+    <title>Bookings</title>
 
     <?php
 session_start();

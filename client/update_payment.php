@@ -315,8 +315,9 @@ $balance = $_GET['balance'] ?? '0';
             <h2>Payment Details</h2>
 
             <!-- Transaction Details -->
-            <div class="details-container">
-                <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
+            <div class="details-container" style="margin-bottom: 15px;">
+                <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span><br>
+                <span><strong>Price:</strong> ₱<?php echo htmlspecialchars($price); ?>.00</span><br>
                 <span><strong>Balance:</strong> ₱<?php echo htmlspecialchars($balance); ?>.00</span>
             </div>
 
@@ -352,8 +353,6 @@ $balance = $_GET['balance'] ?? '0';
         </div>
     </table>
 </div>
-
-
     </div>
 
     <script>
@@ -381,7 +380,7 @@ $balance = $_GET['balance'] ?? '0';
         const cleanedInput = parseFloat(inputAmtStr.replace(/,/g, '')) || 0;
 
         if (cleanedInput > cleanedBalance) {
-            e.preventDefault(); // Block submission
+            e.preventDefault();
             Swal.fire({
                 icon: 'warning',
                 title: 'Overpayment Detected',
@@ -411,7 +410,6 @@ $balance = $_GET['balance'] ?? '0';
     function logoutUser() {
         window.location.href = "../logout.php";
     }
-    
     </script>
 
 </body>
