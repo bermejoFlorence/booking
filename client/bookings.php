@@ -678,57 +678,69 @@ if ($bookingData && $bookingData->num_rows > 0) {
                             </div>
                         </div>
         </table> 
-        <!-- Booking Details Modal -->
+    <!-- Enhanced Booking Details Modal -->
 <div id="viewDetailsModal" class="overlay" style="display: none;">
-    <div class="popup medium">
-        <span class="close" onclick="closeModal();">&times;</span>
-        <div class="modal-header">
-            <h2>Booking Details</h2>
+    <div class="popup medium" style="max-height: 90vh; overflow-y: auto; border-radius: 12px;">
+        <span class="close" onclick="closeModal();" style="font-size: 24px; float: right; cursor: pointer;">&times;</span>
+        <div class="modal-header" style="margin-top: 20px;">
+            <h2 style="text-align: center;">📄 Booking Details</h2>
         </div>
-        <div class="modal-content">
-            <!-- Payment Info -->
-            <div class="section">
-                <h3>Payment Information</h3>
-                <div class="info-row"><span>Receipt No.:</span> <span id="modal-receipt-no"></span></div>
-                <div class="info-row"><span>Amount Paid:</span> <span id="modal-amt-payment"></span></div>
-                <div class="info-row"><span>Payment Status:</span> <span id="modal-payment-status"></span></div>
-                <div class="info-row"><span>Reference Number:</span> <span id="modal-reference-no"></span></div>
-                <div class="info-row" id="balance-row" style="display: none;">
-                    <span>Balance:</span> <span id="modal-balance"></span>
-                </div>
+        <div class="modal-content" style="padding: 20px 30px; font-family: sans-serif;">
+            
+            <!-- Section: Payment Info -->
+            <div class="section" style="margin-bottom: 20px;">
+                <h3 style="color: #007bff;">💰 Payment Information</h3>
+                <div class="info-row"><strong>Receipt No.:</strong> <span id="modal-receipt-no"></span></div>
+                <div class="info-row"><strong>Amount Paid:</strong> <span id="modal-amt-payment"></span></div>
+                <div class="info-row"><strong>Payment Status:</strong> <span id="modal-payment-status"></span></div>
+                <div class="info-row"><strong>Reference Number:</strong> <span id="modal-reference-no"></span></div>
+                <div class="info-row" id="balance-row" style="display: none;"><strong>Balance:</strong> <span id="modal-balance"></span></div>
             </div>
 
-            <hr>
+            <!-- Section: Booking Info -->
+            <div class="section" style="margin-bottom: 20px;">
+                <h3 style="color: #007bff;">📸 Booking Information</h3>
+                <div class="info-row"><strong>Package:</strong> <span id="modal-package"></span></div>
+                <div class="info-row"><strong>Price:</strong> <span id="modal-price"></span></div>
+                <div class="info-row"><strong>Event:</strong> <span id="modal-event"></span></div>
+                <div class="info-row"><strong>Event Date:</strong> <span id="modal-event-date"></span></div>
+                <div class="info-row"><strong>Event Address:</strong> <span id="modal-event-address"></span></div>
 
-            <!-- Booking Info -->
-            <div class="section">
-                <h3>Booking Information</h3>
-                <div class="info-row"><span>Package:</span> <span id="modal-package"></span></div>
-                <div class="info-row"><span>Price:</span> <span id="modal-price"></span></div>
-                <div class="info-row"><span>Event:</span> <span id="modal-event"></span></div>
-                <div class="info-row"><span>Event Date:</span> <span id="modal-event-date"></span></div>
-                <div class="info-row"><span>Event Address:</span> <span id="modal-event-address"></span></div>
-                <button id="update-payment-btn" style="display: none; margin-top: 10px;" onclick="updatePayment()">Update Payment</button>
+                <button id="update-payment-btn" style="display: none; margin-top: 15px; background-color: #0dcaf0; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
+                    Update Payment
+                </button>
             </div>
 
-            <!-- Payment History -->
+            <!-- Section: Payment History Table -->
             <div id="payment-history-section" class="info-row" style="flex-direction: column; margin-top: 20px; display: none;">
                 <h3 style="text-align: center;">📜 Payment History</h3>
                 <div style="overflow-x: auto;">
-                    <table id="payment-history-table" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px;">
+                    <table id="payment-history-table" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; border: 1px solid #ccc; border-radius: 8px; overflow: hidden;">
                         <thead>
-                            <tr style="background: #f1f1f1;">
-                                <th style="padding: 8px; border: 1px solid #ddd;">Date</th>
-                                <th style="padding: 8px; border: 1px solid #ddd;">Amount</th>
-                                <th style="padding: 8px; border: 1px solid #ddd;">Status</th>
-                                <th style="padding: 8px; border: 1px solid #ddd;">Transaction #</th>
-                                <th style="padding: 8px; border: 1px solid #ddd;">Reference #</th>
+                            <tr style="background: #f5f5f5;">
+                                <th style="padding: 10px; border-bottom: 1px solid #ccc;">Date</th>
+                                <th style="padding: 10px; border-bottom: 1px solid #ccc; text-align: right;">Amount</th>
+                                <th style="padding: 10px; border-bottom: 1px solid #ccc; text-align: center;">Status</th>
+                                <th style="padding: 10px; border-bottom: 1px solid #ccc;">Transaction #</th>
+                                <th style="padding: 10px; border-bottom: 1px solid #ccc;">Reference #</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 12px;">No payment records found.</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- Optional Print Button -->
+            <div style="text-align: center; margin-top: 25px;">
+                <button class="print-invoice" style="display: none; padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    Print Invoice
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
