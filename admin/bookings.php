@@ -62,30 +62,38 @@ $total_records = $total_records_result->fetch_assoc()['total'];
 // Calculate total pages
 $total_pages = ceil($total_records / $records_per_page);
 
-$sql = "SELECT 
-            b.booking_id, 
-            c.c_fullname AS full_name, 
-            b.date_event, 
-            b.event, 
-            b.address_event, 
-            b.package, 
-            b.price,
-            b.stat,  
-            p.receipt_no,
-            p.amt_payment,
-            p.payment_status AS payment_status,
-            p.reference_no AS reference_no
-        FROM 
-            booking b 
-        LEFT JOIN 
-            client c ON b.client_id = c.client_id 
-        LEFT JOIN 
-            payment p ON b.booking_id = p.booking_id 
-        ORDER BY 
-            FIELD(b.stat, 'pending', 'approved', 'rejected'), 
-            b.date_created DESC
-        LIMIT $records_per_page OFFSET $offset";
-
+$sql = "
+SELECT 
+    b.booking_id, 
+    c.c_fullname AS full_name, 
+    b.date_event, 
+    b.event, 
+    b.address_event, 
+    b.package, 
+    b.price,
+    b.stat,
+    p.receipt_no,
+    p.amt_payment,
+    p.payment_status,
+    p.reference_no
+FROM 
+    booking b
+LEFT JOIN 
+    client c ON b.client_id = c.client_id
+LEFT JOIN (
+    SELECT *
+    FROM payment
+    WHERE (booking_id, date_created) IN (
+        SELECT booking_id, MAX(date_created)
+        FROM payment
+        GROUP BY booking_id
+    )
+) p ON b.booking_id = p.booking_id
+ORDER BY 
+    FIELD(b.stat, 'pending', 'approved', 'rejected'),
+    b.date_created DESC
+LIMIT $records_per_page OFFSET $offset
+";
 $result = $database->query($sql);
 ?>
 
