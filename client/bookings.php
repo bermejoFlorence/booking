@@ -1151,7 +1151,7 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         const printBtn = document.createElement("button");
         printBtn.textContent = "Print Invoice";
         printBtn.className = "print-invoice";
-        printBtn.style.cssText = "margin-top: 15px; padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 6px; cursor: pointer;";
+        printBtn.style.cssText = "margin-top: 15px; padding: 10px 20px; background-color: #0d6efd; color: white; border: none; border-radius: 6px; cursor: pointer;";
         printBtn.onclick = () => printInvoiceFromBooking(bookingId);
         modalContentDiv.appendChild(printBtn);
     }
