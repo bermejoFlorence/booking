@@ -770,10 +770,20 @@ if ($bookingData && $bookingData->num_rows > 0) {
                 <div class="info-pair"><div class="label">Event Address:</div><div class="value" id="modal-event-address"></div></div>
 
                 <div class="update-payment-container">
-                    <button id="update-payment-btn" style="display: none; background-color: #0dcaf0; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-                        Update Payment
-                    </button>
-                </div>
+    <button id="update-payment-btn" style="
+        display: none;
+        background-color: #0dcaf0;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 0 auto;
+    ">
+        Update Payment
+    </button>
+</div>
+
             </div>
 
             <!-- Payment History -->
