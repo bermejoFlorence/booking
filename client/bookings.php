@@ -239,70 +239,46 @@ ORDER BY b.booking_id DESC
     text-align: left;
     color: #333;
 }
-.info-group {
-        display: grid;
-        grid-template-columns: 160px 1fr;
-        row-gap: 8px;
-        font-size: 15px;
-        margin-bottom: 10px;
-    }
 
-    .info-group div {
-        padding: 4px 0;
-    }
+/* FIX alignment layout */
+.section-title,
+.info-title {
+    text-align: center !important;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #007bff;
+}
 
-    .info-group div:first-child {
-        font-weight: 600;
-        color: #333;
-    }
+.info-pair {
+    display: flex;
+    justify-content: flex-start;
+    gap: 12px;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
 
-    .info-title {
-        font-size: 18px;
-        font-weight: bold;
-        color: #007bff;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+.info-pair .label {
+    width: 160px;
+    min-width: 160px;
+    font-weight: bold;
+    color: #333;
+    text-align: left;
+}
 
-    .info-title i {
-        font-size: 20px;
-    }
+.info-pair .value {
+    flex: 1;
+    color: #555;
+    text-align: left;
+}
 
-    .section-title {
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-        color: #007bff;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
+/* fix button alignment */
+.update-payment-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 15px;
+}
 
-    .info-pair {
-        display: flex;
-        margin-bottom: 6px;
-        font-size: 15px;
-    }
-
-    .info-pair .label {
-        font-weight: bold;
-        width: 160px;
-        min-width: 160px;
-    }
-
-    .info-pair .value {
-        flex: 1;
-    }
-
-    .update-payment-container {
-        margin-top: 20px;
-        display: flex;
-        justify-content: flex-start;
-    }
 /* Divider */
 hr {
     border: 0;
