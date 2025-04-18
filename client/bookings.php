@@ -740,7 +740,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
         <div class="modal-content" style="padding: 20px 30px; font-family: sans-serif;">
 
             <!-- Payment Information -->
-            <div class="section" style="margin-bottom: 25px;">
+            <div class="section" style="margin-bottom: 10px;">
                 <div class="info-title">💰 Payment Information</div>
                 <div class="info-group">
                     <div>Receipt No.:</div><div id="modal-receipt-no"></div>
@@ -755,7 +755,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
 
 
             <!-- Booking Information -->
-            <div class="section" style="margin-bottom: 25px;">
+            <div class="section" style="margin-bottom: 10px;">
     <div class="info-title">📸 Booking Information</div>
     <div class="info-group">
         <div>Package:</div><div id="modal-package"></div>
@@ -774,7 +774,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
 
 
             <!-- Payment History -->
-            <div id="payment-history-section" class="info-row" style="flex-direction: column; margin-top: 20px; display: none;">
+            <div id="payment-history-section" class="info-row" style="flex-direction: column; margin-top: 10x; display: none;">
                 <h3 style="text-align: center;">📜 Payment History</h3>
                 <div style="overflow-x: auto;">
                     <table id="payment-history-table" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; border: 1px solid #ccc; border-radius: 8px; overflow: hidden;">
@@ -783,7 +783,6 @@ if ($bookingData && $bookingData->num_rows > 0) {
                                 <th style="padding: 10px; border-bottom: 1px solid #ccc;">Date</th>
                                 <th style="padding: 10px; border-bottom: 1px solid #ccc; text-align: right;">Amount</th>
                                 <th style="padding: 10px; border-bottom: 1px solid #ccc; text-align: center;">Status</th>
-                                <th style="padding: 10px; border-bottom: 1px solid #ccc;">Transaction #</th>
                                 <th style="padding: 10px; border-bottom: 1px solid #ccc;">Reference #</th>
                             </tr>
                         </thead>
@@ -1103,41 +1102,34 @@ function printInvoiceFromBooking(bookingId) {
 
 function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo, receiptNo) {
     const cleanedPrice = parseFloat(price.toString().replace(/,/g, '')) || 0;
-    const cleanedAmtPayment = parseFloat(amtPayment.toString().replace(/,/g, '')) || 0;
     const status = paymentStatus.trim().toLowerCase();
 
-    // Booking Info
+    // Format date like: Apr-01-25
+    const formatDate = (rawDate) => {
+        const d = new Date(rawDate);
+        const month = d.toLocaleString('default', { month: 'short' });
+        const day = d.getDate().toString().padStart(2, '0');
+        const year = d.getFullYear().toString().slice(-2);
+        return `${month}-${day}-${year}`;
+    };
+
+    // Populate Booking Info
     document.getElementById('modal-package').textContent = package;
     document.getElementById('modal-price').textContent = `₱${cleanedPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     document.getElementById('modal-event').textContent = event;
     document.getElementById('modal-event-date').textContent = eventDate;
     document.getElementById('modal-event-address').textContent = eventAddress;
 
-    // Payment Info
-    document.getElementById('modal-amt-payment').textContent = `₱${cleanedAmtPayment.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    // Populate Payment Info
+    document.getElementById('modal-amt-payment').textContent = `₱${parseFloat(amtPayment).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     document.getElementById('modal-receipt-no').textContent = receiptNo || 'N/A';
     document.getElementById('modal-payment-status').textContent = (status === 'full payment') ? 'Gcash' : (status === 'no payment') ? 'Walk-In' : paymentStatus;
     document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
 
-    // Balance + Update Button
-    const balance = cleanedPrice - cleanedAmtPayment;
     const balanceElement = document.getElementById('modal-balance');
     const updateButton = document.getElementById('update-payment-btn');
 
-    if (status === 'partial payment') {
-        balanceElement.textContent = `₱${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-        balanceElement.parentElement.style.display = 'flex';
-        updateButton.style.display = 'block';
-    } else {
-        balanceElement.parentElement.style.display = 'none';
-        updateButton.style.display = 'none';
-    }
-
-    updateButton.onclick = function () {
-        updatePayment(bookingId, transacNum, package, balance);
-    };
-
-    // Remove old print button
+    // Remove old Print Button
     const modalContentDiv = document.querySelector("#viewDetailsModal .modal-content");
     const existingPrintBtn = modalContentDiv.querySelector("button.print-invoice");
     if (existingPrintBtn) existingPrintBtn.remove();
@@ -1151,33 +1143,41 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         modalContentDiv.appendChild(printBtn);
     }
 
-    // 🔁 Payment History
+    // Fetch payment history & calculate total paid
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
         .then(res => res.json())
         .then(history => {
             const historySection = document.getElementById('payment-history-section');
             const tbody = document.querySelector('#payment-history-table tbody');
-                  // ✅ Add these lines here
-        console.log("📦 Fetched history:", history);
-        console.log("📌 Tbody element:", tbody);
-        console.log("🧩 History section:", historySection);
             tbody.innerHTML = '';
 
-            console.log("Fetched history:", history);
-            if (history.length >= 2 && status !== 'full payment') {
-                historySection.style.display = 'block';
+            let totalPaid = 0;
+
+            if (history.length > 0) {
+                historySection.style.display = 'flex';
 
                 history.forEach(payment => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td style="padding: 6px; border: 1px solid #ddd;">${payment.date_created}</td>
+                        <td style="padding: 6px; border: 1px solid #ddd;">${formatDate(payment.date_created)}</td>
                         <td style="padding: 6px; border: 1px solid #ddd;">₱${parseFloat(payment.amt_payment).toLocaleString()}</td>
                         <td style="padding: 6px; border: 1px solid #ddd;">${payment.payment_status}</td>
-                        <td style="padding: 6px; border: 1px solid #ddd;">${payment.transac_num}</td>
                         <td style="padding: 6px; border: 1px solid #ddd;">${payment.reference_no || 'N/A'}</td>
                     `;
                     tbody.appendChild(row);
+                    totalPaid += parseFloat(payment.amt_payment);
                 });
+
+                const newBalance = cleanedPrice - totalPaid;
+
+                if (newBalance > 0) {
+                    balanceElement.textContent = `₱${newBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                    balanceElement.parentElement.style.display = 'flex';
+                    updateButton.style.display = 'block';
+                } else {
+                    balanceElement.parentElement.style.display = 'none';
+                    updateButton.style.display = 'none';
+                }
             } else {
                 historySection.style.display = 'none';
             }
@@ -1185,6 +1185,11 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         .catch(err => {
             console.error('Error loading payment history:', err);
         });
+
+    // Button update action
+    updateButton.onclick = function () {
+        updatePayment(bookingId, transacNum, package, cleanedPrice); // cleanedPrice used as base
+    };
 
     // Show modal
     document.getElementById('viewDetailsModal').style.display = 'block';
