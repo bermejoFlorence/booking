@@ -168,6 +168,24 @@ ORDER BY b.booking_id DESC
     padding-bottom: 10px;
 }
 
+#payment-history-section {
+    width: 100%;
+}
+
+#payment-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#payment-history-table td,
+#payment-history-table th {
+    padding: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    text-align: left;
+}
+
 /* Close Button */
 .close {
     position: absolute;
