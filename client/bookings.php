@@ -91,11 +91,6 @@ if ($bookingData && $bookingData->num_rows > 0) {
         $bookings[] = $row;
     }
 }
-
-// ✅ For debugging (optional)
-echo "<pre>";
-print_r($bookings);
-echo "</pre>";
 ?>
 
 
