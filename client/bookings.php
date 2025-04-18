@@ -954,14 +954,21 @@ function printInvoiceFromBooking(bookingId) {
         .then(response => response.json())
         .then(data => {
             const {
-                receipt_no, transac_num, amt_payment, payment_status, date_created,
-                date_event, event, package, price, address_event,
-                c_fullname, c_contactnum, c_address
+                receipt_no,
+                price,
+                package,
+                event,
+                date_event,
+                address_event,
+                c_fullname,
+                c_contactnum,
+                c_address,
+                payment_history // Array of all payments [{ amt_payment, date_created, payment_status, reference_no }]
             } = data;
 
-            const balance = parseFloat(price) - parseFloat(amt_payment);
+            const totalPaid = payment_history.reduce((sum, p) => sum + parseFloat(p.amt_payment), 0);
+            const balance = parseFloat(price) - totalPaid;
 
-            // Format current date (PH time)
             const phDate = new Date().toLocaleDateString('en-US', {
                 timeZone: 'Asia/Manila',
                 day: 'numeric',
@@ -983,6 +990,7 @@ function printInvoiceFromBooking(bookingId) {
                             width: 100%;
                             padding: 30px;
                             font-family: Arial, sans-serif;
+                            margin-top: 40px;
                         }
                     }
 
@@ -997,28 +1005,21 @@ function printInvoiceFromBooking(bookingId) {
                     .header {
                         display: flex;
                         justify-content: space-between;
-                        align-items: center;
-                        margin-bottom: 20px;
-                    }
-
-                    .receipt-info {
-                        display: flex;
-                        justify-content: space-between;
                         font-size: 16px;
                         font-weight: bold;
                         margin-bottom: 20px;
                     }
 
-                    .company-info {
-                        font-size: 14px;
-                        text-align: right;
+                    .client-info {
+                        margin: 20px 0;
+                        font-size: 15px;
                     }
 
                     table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin-top: 20px;
-                        font-size: 15px;
+                        font-size: 14px;
+                        margin-top: 10px;
                     }
 
                     th, td {
@@ -1044,30 +1045,15 @@ function printInvoiceFromBooking(bookingId) {
                         font-size: 14px;
                         color: #555;
                     }
-
-                    .logo {
-                        max-height: 60px;
-                    }
                 </style>
 
                 <div class="invoice-wrapper">
                     <div class="header">
-                        <div>
-                            <strong>EXZPHOTOGRAPHY STUDIO</strong><br>
-                            123 Studio Address, Manila<br>
-                            0912-345-6789 | exzstudio@gmail.com
-                        </div>
-                        <div class="company-info">
-                            Date: ${phDate}
-                        </div>
-                    </div>
-
-                    <div class="receipt-info">
                         <div>Receipt No.: ${receipt_no}</div>
-                        <div></div>
+                        <div>Date: ${phDate}</div>
                     </div>
 
-                    <div style="margin-bottom: 20px;">
+                    <div class="client-info">
                         <strong>Client:</strong><br>
                         ${c_fullname}<br>
                         ${c_address}<br>
@@ -1086,14 +1072,16 @@ function printInvoiceFromBooking(bookingId) {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>${date_event}</td>
-                                <td>${event}</td>
-                                <td>${package}</td>
-                                <td>₱${parseFloat(price).toLocaleString()}</td>
-                                <td>₱${parseFloat(amt_payment).toLocaleString()}</td>
-                                <td>${payment_status}</td>
-                            </tr>
+                            ${payment_history.map(payment => `
+                                <tr>
+                                    <td>${payment.date_created.split(" ")[0]}</td>
+                                    <td>${event}</td>
+                                    <td>${package}</td>
+                                    <td>₱${parseFloat(price).toLocaleString()}</td>
+                                    <td>₱${parseFloat(payment.amt_payment).toLocaleString()}</td>
+                                    <td>${payment.payment_status}</td>
+                                </tr>
+                            `).join("")}
                         </tbody>
                     </table>
 
@@ -1115,7 +1103,6 @@ function printInvoiceFromBooking(bookingId) {
             document.body.appendChild(printDiv);
             window.print();
 
-            // Remove after print
             setTimeout(() => {
                 document.getElementById("print-container")?.remove();
             }, 1000);
