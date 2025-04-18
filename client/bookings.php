@@ -629,7 +629,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
                     '" . htmlspecialchars($row['amt_payment']) . "',
                     '" . htmlspecialchars($row['payment_status']) . "',
                     '" . htmlspecialchars($row['reference_no']) . "',
-                    '" . htmlspecialchars($row['receipt_no']) . "'
+                    '" . htmlspecialchars($row['receipt_no']) . "',
                     " . json_encode($paymentHistories[$row['booking_id']]) . "
                 )\">View Details</button>";
         } elseif ($row['stat'] === 'pending') {
@@ -698,7 +698,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
                 </div>
             </div>
 
-            <!-- 🔥 NEW: Payment History Table (Rendered by JS) -->
+            <!-- Payment History (Dynamic via JS) -->
             <div class="section" id="payment-history-section" style="display: none;">
                 <h3>Payment History</h3>
                 <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 6px;">
@@ -713,7 +713,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
                             </tr>
                         </thead>
                         <tbody id="payment-history-body">
-                            <!-- JS will populate this -->
+                            <!-- JavaScript will populate this -->
                         </tbody>
                     </table>
                 </div>
@@ -753,6 +753,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
         </div>
     </div>
 </div>
+
 
                         <div id="confirmationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
                             <div id="modalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
@@ -1143,7 +1144,7 @@ function viewDetails(
                 <td style="padding: 8px; border: 1px solid #ccc;">₱${parseFloat(item.amt_payment).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 <td style="padding: 8px; border: 1px solid #ccc;">${item.reference_no || 'N/A'}</td>
                 <td style="padding: 8px; border: 1px solid #ccc;">${item.payment_status || 'N/A'}</td>
-                <td style="padding: 8px; border: 1px solid #ccc;">${new Date(item.payment_date).toLocaleDateString()}</td>
+                <td style="padding: 8px; border: 1px solid #ccc;">${new Date(item.date_created).toLocaleDateString()}</td>
             `;
             tableBody.appendChild(row);
         });
