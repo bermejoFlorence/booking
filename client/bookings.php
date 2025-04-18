@@ -726,7 +726,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
 
                                     <!-- START: Payment History (conditionally visible) -->
                                     <div class="info-row" style="flex-direction: column; margin-top: 10px;">
-                                        <h3 style="text-align: center;">📜 Payment History</h3>
+                                    <div id="payment-history-section" class="info-row" style="flex-direction: column; margin-top: 10px;">
                                         <table id="payment-history-table" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px;">
                                             <thead>
                                                 <tr style="background: #f1f1f1;">
