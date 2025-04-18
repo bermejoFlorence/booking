@@ -11,9 +11,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     
-    <title>Bookings</title>
+    <title>Settings</title>
 
-  <?php
+    <?php
 session_start();
 
 if (isset($_SESSION["user"])) {
@@ -30,13 +30,13 @@ if (isset($_SESSION["user"])) {
 
 include("../connection.php");
 
-// Get client info
 $userrow = $database->query("SELECT * FROM client WHERE c_email='$useremail'");
 
 if ($userrow && $userrow->num_rows > 0) {
     $userfetch = $userrow->fetch_assoc();
     $userid = $userfetch["client_id"];
     $username = $userfetch["c_fullname"];
+
 } else {
     session_unset();
     session_destroy();
@@ -44,7 +44,6 @@ if ($userrow && $userrow->num_rows > 0) {
     exit();
 }
 
-// Booking with latest payment (LEFT JOIN)
 $bookingData = $database->query("
     SELECT 
         b.*,
@@ -54,48 +53,13 @@ $bookingData = $database->query("
         p.payment_status, 
         p.reference_no
     FROM booking AS b
-    LEFT JOIN (
-        SELECT * FROM payment
-        WHERE (booking_id, payment_date) IN (
-            SELECT booking_id, MAX(payment_date)
-            FROM payment
-            GROUP BY booking_id
-        )
-    ) AS p ON b.booking_id = p.booking_id
+    LEFT JOIN payment AS p ON b.booking_id = p.booking_id
     WHERE b.client_id = '$userid' AND b.is_deleted = 0
     ORDER BY b.booking_id DESC
 ");
 
-// ⬇️ Payment history per booking (you can pass this later to modal via JS or AJAX)
-$paymentHistories = [];
 
-if ($bookingData && $bookingData->num_rows > 0) {
-    while ($row = $bookingData->fetch_assoc()) {
-        $bookingId = $row['booking_id'];
-
-        // Query for payment history of this booking
-        $historyQuery = $database->query("
-            SELECT * FROM payment 
-            WHERE booking_id = '$bookingId'
-            ORDER BY payment_date ASC
-        ");
-
-        $historyList = [];
-        if ($historyQuery && $historyQuery->num_rows > 0) {
-            while ($payment = $historyQuery->fetch_assoc()) {
-                $historyList[] = $payment;
-            }
-        }
-
-        // Store in associative array with booking_id as key
-        $paymentHistories[$bookingId] = $historyList;
-
-        // Optionally: you may store the booking rows as well for looping later
-        $bookings[] = $row;
-    }
-}
 ?>
-
 </head>
 <body>
 <style>
