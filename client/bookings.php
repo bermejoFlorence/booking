@@ -745,12 +745,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
                                                     <th style="padding: 8px; border: 1px solid #ddd;">Reference #</th>
                                                 </tr>
                                             </thead>
-                                            <tbody style="background: #f9f9f9;">
-    <tr>
-        <td colspan="5">This is a test row</td>
-    </tr>
-</tbody>
-
+                                            
                                         </table>
                                     </div>
 
