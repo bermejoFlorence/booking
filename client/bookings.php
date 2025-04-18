@@ -16,35 +16,34 @@
     <?php
 session_start();
 
-if (isset($_SESSION["user"])) {
-    if (empty($_SESSION["user"]) || $_SESSION['usertype'] != 'p') {
-        header("location: ../login.php");
-        exit();
-    } else {
-        $useremail = $_SESSION["user"];
-    }
-} else {
+if (!isset($_SESSION["user"]) || empty($_SESSION["user"]) || $_SESSION['usertype'] != 'p') {
     header("location: ../login.php");
     exit();
 }
 
 include("../connection.php");
 
-// Get client info
-$userrow = $database->query("SELECT * FROM client WHERE c_email='$useremail'");
+$useremail = $_SESSION["user"];
 
-if ($userrow && $userrow->num_rows > 0) {
-    $userfetch = $userrow->fetch_assoc();
-    $userid = $userfetch["client_id"];
-    $username = $userfetch["c_fullname"];
-} else {
+// ✅ Get client info
+$userrow = $database->query("SELECT * FROM client WHERE c_email='" . $database->real_escape_string($useremail) . "'");
+
+if (!$userrow || $userrow->num_rows === 0) {
     session_unset();
     session_destroy();
     header("location: ../login.php");
     exit();
 }
 
-// Booking with latest payment (LEFT JOIN)
+$userfetch = $userrow->fetch_assoc();
+$userid = $userfetch["client_id"];
+$username = $userfetch["c_fullname"];
+
+// ✅ Initialize arrays
+$bookings = [];
+$paymentHistories = [];
+
+// ✅ Fetch bookings with latest payment (LEFT JOIN)
 $bookingData = $database->query("
     SELECT 
         b.*,
@@ -55,25 +54,23 @@ $bookingData = $database->query("
         p.reference_no
     FROM booking AS b
     LEFT JOIN (
-        SELECT * FROM payment
-        WHERE (booking_id, payment_date) IN (
-            SELECT booking_id, MAX(payment_date)
+        SELECT t1.*
+        FROM payment t1
+        INNER JOIN (
+            SELECT booking_id, MAX(payment_date) AS latest_date
             FROM payment
             GROUP BY booking_id
-        )
+        ) t2 ON t1.booking_id = t2.booking_id AND t1.payment_date = t2.latest_date
     ) AS p ON b.booking_id = p.booking_id
     WHERE b.client_id = '$userid' AND b.is_deleted = 0
     ORDER BY b.booking_id DESC
 ");
 
-// ⬇️ Payment history per booking (you can pass this later to modal via JS or AJAX)
-$paymentHistories = [];
-
 if ($bookingData && $bookingData->num_rows > 0) {
     while ($row = $bookingData->fetch_assoc()) {
         $bookingId = $row['booking_id'];
 
-        // Query for payment history of this booking
+        // 🧾 Fetch full payment history per booking
         $historyQuery = $database->query("
             SELECT * FROM payment 
             WHERE booking_id = '$bookingId'
@@ -87,18 +84,17 @@ if ($bookingData && $bookingData->num_rows > 0) {
             }
         }
 
-        // Store in associative array with booking_id as key
         $paymentHistories[$bookingId] = $historyList;
-
-        // Optionally: you may store the booking rows as well for looping later
         $bookings[] = $row;
     }
 }
 
+// ✅ For debugging (optional)
 echo "<pre>";
 print_r($bookings);
 echo "</pre>";
 ?>
+
 
 </head>
 <body>
