@@ -239,6 +239,36 @@ ORDER BY b.booking_id DESC
     text-align: left;
     color: #333;
 }
+.info-group {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        row-gap: 8px;
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+    .info-group div {
+        padding: 4px 0;
+    }
+
+    .info-group div:first-child {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .info-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-title i {
+        font-size: 20px;
+    }
 
 /* Divider */
 hr {
@@ -710,28 +740,38 @@ if ($bookingData && $bookingData->num_rows > 0) {
         <div class="modal-content" style="padding: 20px 30px; font-family: sans-serif;">
 
             <!-- Payment Information -->
-            <div class="section" style="margin-bottom: 20px;">
-                <h3 style="color: #007bff; margin-bottom: 15px;">💰 Payment Information</h3>
-                <div class="info-row"><span>Receipt No.:</span><span id="modal-receipt-no"></span></div>
-                <div class="info-row"><span>Amount Paid:</span><span id="modal-amt-payment"></span></div>
-                <div class="info-row"><span>Payment Status:</span><span id="modal-payment-status"></span></div>
-                <div class="info-row"><span>Reference Number:</span><span id="modal-reference-no"></span></div>
-                <div class="info-row" id="balance-row" style="display: none;"><span>Balance:</span><span id="modal-balance"></span></div>
+            <div class="section" style="margin-bottom: 25px;">
+                <div class="info-title">💰 Payment Information</div>
+                <div class="info-group">
+                    <div>Receipt No.:</div><div id="modal-receipt-no"></div>
+                    <div>Amount Paid:</div><div id="modal-amt-payment"></div>
+                    <div>Payment Status:</div><div id="modal-payment-status"></div>
+                    <div>Reference Number:</div><div id="modal-reference-no"></div>
+                    <div id="balance-row" style="display: contents;">
+                        <div>Balance:</div><div id="modal-balance"></div>
+                    </div>
+                </div>
             </div>
+
 
             <!-- Booking Information -->
-            <div class="section" style="margin-bottom: 20px;">
-                <h3 style="color: #007bff; margin-bottom: 15px;">📸 Booking Information</h3>
-                <div class="info-row"><span>Package:</span><span id="modal-package"></span></div>
-                <div class="info-row"><span>Price:</span><span id="modal-price"></span></div>
-                <div class="info-row"><span>Event:</span><span id="modal-event"></span></div>
-                <div class="info-row"><span>Event Date:</span><span id="modal-event-date"></span></div>
-                <div class="info-row"><span>Event Address:</span><span id="modal-event-address"></span></div>
+            <div class="section" style="margin-bottom: 25px;">
+    <div class="info-title">📸 Booking Information</div>
+    <div class="info-group">
+        <div>Package:</div><div id="modal-package"></div>
+        <div>Price:</div><div id="modal-price"></div>
+        <div>Event:</div><div id="modal-event"></div>
+        <div>Event Date:</div><div id="modal-event-date"></div>
+        <div>Event Address:</div><div id="modal-event-address"></div>
+    </div>
 
-                <button id="update-payment-btn" style="display: none; margin-top: 15px; background-color: #0dcaf0; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-                    Update Payment
-                </button>
-            </div>
+    <div style="text-align: center;">
+        <button id="update-payment-btn" style="display: none; background-color: #0dcaf0; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
+            Update Payment
+        </button>
+    </div>
+</div>
+
 
             <!-- Payment History -->
             <div id="payment-history-section" class="info-row" style="flex-direction: column; margin-top: 20px; display: none;">
