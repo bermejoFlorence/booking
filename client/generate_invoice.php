@@ -1,24 +1,55 @@
 <?php
-include '../connection.php';
+include("../connection.php");
 
-if (isset($_GET['booking_id'])) {
-    $booking_id = $_GET['booking_id'];
+if (isset($_GET['booking_id']) && !empty($_GET['booking_id'])) {
+    $bookingId = $_GET['booking_id'];
 
-    $stmt = $database->prepare("
+    // Booking and client info
+    $stmt1 = $database->prepare("
         SELECT 
-            p.receipt_no, p.transac_num, p.amt_payment, p.payment_status, p.date_created,
-            b.date_event, b.event, b.package, b.price, b.address_event,
-            c.c_fullname, c.c_contactnum, c.c_address
-        FROM payment p
-        JOIN booking b ON p.booking_id = b.booking_id
+            b.booking_id,
+            b.package,
+            b.price,
+            b.event,
+            b.date_event,
+            b.address_event,
+            b.client_id,
+            c.c_fullname,
+            c.c_contactnum,
+            c.c_address,
+            p.receipt_no
+        FROM booking b
         JOIN client c ON b.client_id = c.client_id
-        WHERE p.booking_id = ?
+        LEFT JOIN payment p ON p.booking_id = b.booking_id
+        WHERE b.booking_id = ?
+        ORDER BY p.date_created DESC
         LIMIT 1
     ");
-    $stmt->bind_param("i", $booking_id);
-    $stmt->execute();
-    $result = $stmt->get_result()->fetch_assoc();
-    
-    echo json_encode($result);
+    $stmt1->bind_param("s", $bookingId);
+    $stmt1->execute();
+    $result1 = $stmt1->get_result();
+    $info = $result1->fetch_assoc();
+
+    // Payment history
+    $stmt2 = $database->prepare("
+        SELECT amt_payment, reference_no, payment_status, date_created 
+        FROM payment 
+        WHERE booking_id = ?
+        ORDER BY date_created ASC
+    ");
+    $stmt2->bind_param("s", $bookingId);
+    $stmt2->execute();
+    $result2 = $stmt2->get_result();
+
+    $payments = [];
+    while ($row = $result2->fetch_assoc()) {
+        $payments[] = $row;
+    }
+
+    $info["payment_history"] = $payments;
+
+    echo json_encode($info);
+} else {
+    echo json_encode(["error" => "Missing booking ID"]);
 }
 ?>
