@@ -59,10 +59,10 @@ $bookingData = $database->query("
         SELECT t1.*
         FROM payment t1
         INNER JOIN (
-            SELECT booking_id, MAX(payment_date) AS latest_date
+            SELECT booking_id, MAX(date_created) AS latest_date
             FROM payment
             GROUP BY booking_id
-        ) t2 ON t1.booking_id = t2.booking_id AND t1.payment_date = t2.latest_date
+        ) t2 ON t1.booking_id = t2.booking_id AND t1.date_created = t2.latest_date
     ) AS p ON b.booking_id = p.booking_id
     WHERE b.client_id = '$userid' AND b.is_deleted = 0
     ORDER BY b.booking_id DESC
@@ -74,10 +74,11 @@ if ($bookingData && $bookingData->num_rows > 0) {
 
         // 🧾 Fetch full payment history per booking
         $historyQuery = $database->query("
-            SELECT * FROM payment 
-            WHERE booking_id = '$bookingId'
-            ORDER BY payment_date ASC
+    SELECT * FROM payment 
+    WHERE booking_id = '$bookingId'
+    ORDER BY date_created ASC
         ");
+
 
         $historyList = [];
         if ($historyQuery && $historyQuery->num_rows > 0) {
