@@ -94,6 +94,10 @@ if ($bookingData && $bookingData->num_rows > 0) {
         $bookings[] = $row;
     }
 }
+
+echo "<pre>";
+print_r($bookings);
+echo "</pre>";
 ?>
 
 </head>
