@@ -754,18 +754,22 @@ if ($bookingData && $bookingData->num_rows > 0) {
             menu.classList.toggle('open');
         }
 
-        updatePaymentBtn.onclick = function() {
-    console.log("Update Payment button clicked!"); // Debugging step
-    console.log("Booking ID before redirect:", bookingId); // Siguraduhin may value
-    
-    if (bookingId) {
-        let redirectURL = `update_payment.php?booking_id=${bookingId}`;
-        console.log("Redirecting to:", redirectURL); // I-check ang final URL
-        window.location.href = redirectURL;
-    } else {
-        alert("Error: No Booking ID found!");
-    }
-};
+        const updatePaymentBtn = document.getElementById('update-payment-btn');
+if (updatePaymentBtn) {
+    updatePaymentBtn.onclick = function () {
+        console.log("Update Payment button clicked!");
+        console.log("Booking ID before redirect:", bookingId);
+
+        if (bookingId) {
+            let redirectURL = `update_payment.php?booking_id=${bookingId}`;
+            console.log("Redirecting to:", redirectURL);
+            window.location.href = redirectURL;
+        } else {
+            alert("Error: No Booking ID found!");
+        }
+    };
+}
+
 
 
 function closeModal() {
