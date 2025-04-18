@@ -725,8 +725,8 @@ if ($bookingData && $bookingData->num_rows > 0) {
                                     </div>
 
                                     <!-- START: Payment History (conditionally visible) -->
-                                    <div class="info-row" style="flex-direction: column; margin-top: 10px;">
                                     <div id="payment-history-section" class="info-row" style="flex-direction: column; margin-top: 10px;">
+                                        <h3 style="text-align: center;">📜 Payment History</h3>
                                         <table id="payment-history-table" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px;">
                                             <thead>
                                                 <tr style="background: #f1f1f1;">
@@ -740,9 +740,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
                                             <tbody></tbody>
                                         </table>
                                     </div>
-                                    <!-- END: Payment History -->
 
-                                </div>
                             </div>
                         </div>
 
@@ -1109,6 +1107,7 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
             const tbody = document.querySelector('#payment-history-table tbody');
             tbody.innerHTML = '';
 
+            console.log("Fetched history:", history);
             if (history.length >= 2 && status !== 'full payment') {
                 historySection.style.display = 'block';
 
