@@ -1105,6 +1105,10 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         .then(history => {
             const historySection = document.getElementById('payment-history-section');
             const tbody = document.querySelector('#payment-history-table tbody');
+                  // ✅ Add these lines here
+        console.log("📦 Fetched history:", history);
+        console.log("📌 Tbody element:", tbody);
+        console.log("🧩 History section:", historySection);
             tbody.innerHTML = '';
 
             console.log("Fetched history:", history);
