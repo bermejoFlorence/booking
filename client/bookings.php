@@ -257,6 +257,26 @@ hr {
         transform: scale(1);
     }
 }
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row span:first-child {
+    font-weight: bold;
+    width: 160px;
+    min-width: 160px;
+    display: inline-block;
+}
+
+.info-row span:last-child {
+    flex: 1;
+    text-align: left;
+}
+
 
 
 
@@ -679,39 +699,39 @@ if ($bookingData && $bookingData->num_rows > 0) {
                         </div>
         </table> 
     <!-- Enhanced Booking Details Modal -->
-<div id="viewDetailsModal" class="overlay" style="display: none;">
+    <div id="viewDetailsModal" class="overlay" style="display: none;">
     <div class="popup medium" style="max-height: 90vh; overflow-y: auto; border-radius: 12px;">
         <span class="close" onclick="closeModal();" style="font-size: 24px; float: right; cursor: pointer;">&times;</span>
         <div class="modal-header" style="margin-top: 20px;">
             <h2 style="text-align: center;">📄 Booking Details</h2>
         </div>
         <div class="modal-content" style="padding: 20px 30px; font-family: sans-serif;">
-            
-            <!-- Section: Payment Info -->
+
+            <!-- Payment Information -->
             <div class="section" style="margin-bottom: 20px;">
-                <h3 style="color: #007bff;">💰 Payment Information</h3>
-                <div class="info-row"><strong>Receipt No.:</strong> <span id="modal-receipt-no"></span></div>
-                <div class="info-row"><strong>Amount Paid:</strong> <span id="modal-amt-payment"></span></div>
-                <div class="info-row"><strong>Payment Status:</strong> <span id="modal-payment-status"></span></div>
-                <div class="info-row"><strong>Reference Number:</strong> <span id="modal-reference-no"></span></div>
-                <div class="info-row" id="balance-row" style="display: none;"><strong>Balance:</strong> <span id="modal-balance"></span></div>
+                <h3 style="color: #007bff; margin-bottom: 15px;">💰 Payment Information</h3>
+                <div class="info-row"><span>Receipt No.:</span><span id="modal-receipt-no"></span></div>
+                <div class="info-row"><span>Amount Paid:</span><span id="modal-amt-payment"></span></div>
+                <div class="info-row"><span>Payment Status:</span><span id="modal-payment-status"></span></div>
+                <div class="info-row"><span>Reference Number:</span><span id="modal-reference-no"></span></div>
+                <div class="info-row" id="balance-row" style="display: none;"><span>Balance:</span><span id="modal-balance"></span></div>
             </div>
 
-            <!-- Section: Booking Info -->
+            <!-- Booking Information -->
             <div class="section" style="margin-bottom: 20px;">
-                <h3 style="color: #007bff;">📸 Booking Information</h3>
-                <div class="info-row"><strong>Package:</strong> <span id="modal-package"></span></div>
-                <div class="info-row"><strong>Price:</strong> <span id="modal-price"></span></div>
-                <div class="info-row"><strong>Event:</strong> <span id="modal-event"></span></div>
-                <div class="info-row"><strong>Event Date:</strong> <span id="modal-event-date"></span></div>
-                <div class="info-row"><strong>Event Address:</strong> <span id="modal-event-address"></span></div>
+                <h3 style="color: #007bff; margin-bottom: 15px;">📸 Booking Information</h3>
+                <div class="info-row"><span>Package:</span><span id="modal-package"></span></div>
+                <div class="info-row"><span>Price:</span><span id="modal-price"></span></div>
+                <div class="info-row"><span>Event:</span><span id="modal-event"></span></div>
+                <div class="info-row"><span>Event Date:</span><span id="modal-event-date"></span></div>
+                <div class="info-row"><span>Event Address:</span><span id="modal-event-address"></span></div>
 
                 <button id="update-payment-btn" style="display: none; margin-top: 15px; background-color: #0dcaf0; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
                     Update Payment
                 </button>
             </div>
 
-            <!-- Section: Payment History Table -->
+            <!-- Payment History -->
             <div id="payment-history-section" class="info-row" style="flex-direction: column; margin-top: 20px; display: none;">
                 <h3 style="text-align: center;">📜 Payment History</h3>
                 <div style="overflow-x: auto;">
@@ -734,17 +754,15 @@ if ($bookingData && $bookingData->num_rows > 0) {
                 </div>
             </div>
 
-            <!-- Optional Print Button -->
+            <!-- Print Button -->
             <div style="text-align: center; margin-top: 25px;">
                 <button class="print-invoice" style="display: none; padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 6px; cursor: pointer;">
                     Print Invoice
                 </button>
             </div>
-
         </div>
     </div>
 </div>
-
 
 
 
