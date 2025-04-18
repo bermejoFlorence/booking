@@ -632,6 +632,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
                     '" . htmlspecialchars($row['payment_status']) . "',
                     '" . htmlspecialchars($row['reference_no']) . "',
                     '" . htmlspecialchars($row['receipt_no']) . "'
+                    " . json_encode($paymentHistories[$row['booking_id']]) . "
                 )\">View Details</button>";
         } elseif ($row['stat'] === 'pending') {
             echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
@@ -666,104 +667,95 @@ if ($bookingData && $bookingData->num_rows > 0) {
 ?>
 </tbody>
 
-                <div id="viewDetailsModal" class="overlay" style="display: none;">
-                    <div class="popup medium">
-                        <span class="close" onclick="closeModal();">&times;</span>
-                        <div class="modal-header">
-                            <h2>Booking Details</h2>
-                        </div>
-                        <div class="modal-content">
-                            
-                            <!-- Payment Info -->
-                            <div class="section">
-                                <h3>Payment Information</h3>
-                                <div class="info-row">
-                                    <span>Receipt No.:</span> 
-                                    <span id="modal-receipt-no"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Amount Paid:</span> 
-                                    <span id="modal-amt-payment"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Payment Status:</span> 
-                                    <span id="modal-payment-status"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Reference Number:</span> 
-                                    <span id="modal-reference-no"></span>
-                                </div>
-                                <div class="info-row" id="balance-row" style="display: none;">
-                                    <span>Balance:</span> 
-                                    <span id="modal-balance"></span>
-                                </div>
-                            </div>
-
-                            <!-- 🔥 NEW: Kasaysayan ng Bayad Section -->
-                            <?php if (isset($paymentHistories[$row['booking_id']]) && count($paymentHistories[$row['booking_id']]) >= 1): ?>
-                                <div class="section">
-                                    <h3>Kasaysayan ng Bayad</h3>
-                                    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 6px;">
-                                        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                                            <thead>
-                                                <tr style="background-color: #f4f4f4;">
-                                                    <th style="padding: 8px; border: 1px solid #ccc;">Resibo No.</th>
-                                                    <th style="padding: 8px; border: 1px solid #ccc;">Halaga</th>
-                                                    <th style="padding: 8px; border: 1px solid #ccc;">Reference No.</th>
-                                                    <th style="padding: 8px; border: 1px solid #ccc;">Status</th>
-                                                    <th style="padding: 8px; border: 1px solid #ccc;">Petsa ng Bayad</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($paymentHistories[$row['booking_id']] as $history): ?>
-                                                    <tr>
-                                                        <td style="padding: 8px; border: 1px solid #ccc;"><?php echo htmlspecialchars($history['receipt_no']); ?></td>
-                                                        <td style="padding: 8px; border: 1px solid #ccc;">₱<?php echo number_format($history['amt_payment'], 2); ?></td>
-                                                        <td style="padding: 8px; border: 1px solid #ccc;"><?php echo htmlspecialchars($history['reference_no']); ?></td>
-                                                        <td style="padding: 8px; border: 1px solid #ccc;"><?php echo htmlspecialchars($history['payment_status']); ?></td>
-                                                        <td style="padding: 8px; border: 1px solid #ccc;"><?php echo date('F j, Y', strtotime($history['payment_date'])); ?></td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-
-                            <hr>
-
-                            <!-- Booking Info -->
-                            <div class="section">
-                                <h3>Booking Information</h3>
-                                <div class="info-row">
-                                    <span>Package:</span> 
-                                    <span id="modal-package"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Price:</span> 
-                                    <span id="modal-price"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Event:</span> 
-                                    <span id="modal-event"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Event Date:</span> 
-                                    <span id="modal-event-date"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Event Address:</span> 
-                                    <span id="modal-event-address"></span>
-                                </div>
-
-                                <!-- Update Payment Button -->
-                                <button id="update-payment-btn" style="display: none; margin-top: 10px;" onclick="updatePayment()">
-                                    Update Payment
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+<div id="viewDetailsModal" class="overlay" style="display: none;">
+    <div class="popup medium">
+        <span class="close" onclick="closeModal();">&times;</span>
+        <div class="modal-header">
+            <h2>Booking Details</h2>
+        </div>
+        <div class="modal-content">
+            
+            <!-- Payment Info -->
+            <div class="section">
+                <h3>Payment Information</h3>
+                <div class="info-row">
+                    <span>Receipt No.:</span> 
+                    <span id="modal-receipt-no"></span>
                 </div>
+                <div class="info-row">
+                    <span>Amount Paid:</span> 
+                    <span id="modal-amt-payment"></span>
+                </div>
+                <div class="info-row">
+                    <span>Payment Status:</span> 
+                    <span id="modal-payment-status"></span>
+                </div>
+                <div class="info-row">
+                    <span>Reference Number:</span> 
+                    <span id="modal-reference-no"></span>
+                </div>
+                <div class="info-row" id="balance-row" style="display: none;">
+                    <span>Balance:</span> 
+                    <span id="modal-balance"></span>
+                </div>
+            </div>
+
+            <!-- 🔥 NEW: Payment History Table (Rendered by JS) -->
+            <div class="section" id="payment-history-section" style="display: none;">
+                <h3>Payment History</h3>
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 6px;">
+                    <table id="payment-history-table" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <thead>
+                            <tr style="background-color: #f4f4f4;">
+                                <th style="padding: 8px; border: 1px solid #ccc;">Receipt No.</th>
+                                <th style="padding: 8px; border: 1px solid #ccc;">Amount</th>
+                                <th style="padding: 8px; border: 1px solid #ccc;">Reference No.</th>
+                                <th style="padding: 8px; border: 1px solid #ccc;">Status</th>
+                                <th style="padding: 8px; border: 1px solid #ccc;">Date Paid</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payment-history-body">
+                            <!-- JS will populate this -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Booking Info -->
+            <div class="section">
+                <h3>Booking Information</h3>
+                <div class="info-row">
+                    <span>Package:</span> 
+                    <span id="modal-package"></span>
+                </div>
+                <div class="info-row">
+                    <span>Price:</span> 
+                    <span id="modal-price"></span>
+                </div>
+                <div class="info-row">
+                    <span>Event:</span> 
+                    <span id="modal-event"></span>
+                </div>
+                <div class="info-row">
+                    <span>Event Date:</span> 
+                    <span id="modal-event-date"></span>
+                </div>
+                <div class="info-row">
+                    <span>Event Address:</span> 
+                    <span id="modal-event-address"></span>
+                </div>
+
+                <!-- Update Payment Button -->
+                <button id="update-payment-btn" style="display: none; margin-top: 10px;" onclick="updatePayment()">
+                    Update Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
                         <div id="confirmationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
                             <div id="modalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
                                 <p id="modalMessage" style="font-size: 18px; margin-bottom: 20px;"></p>
@@ -1064,59 +1056,71 @@ function printInvoiceFromBooking(bookingId) {
             alert('Failed to load invoice. Please try again.');
         });
 }
-function viewDetails(bookingId, package, price, event, eventDate, eventAddress, transacNum, amtPayment, paymentStatus, referenceNo, receiptNo) {
-    // Clean numeric strings
+function viewDetails(
+    bookingId,
+    packageName,
+    price,
+    event,
+    eventDate,
+    eventAddress,
+    transacNum,
+    amtPayment,
+    paymentStatus,
+    referenceNo,
+    receiptNo,
+    historyData = [] // 🆕 receive payment history array
+) {
+    // Clean numbers
     const cleanedPrice = parseFloat(price.toString().replace(/,/g, '')) || 0;
     const cleanedAmtPayment = parseFloat(amtPayment.toString().replace(/,/g, '')) || 0;
     const status = paymentStatus.trim().toLowerCase();
 
-    // Set Booking Info
-    document.getElementById('modal-package').textContent = package;
-    document.getElementById('modal-price').textContent = `₱${cleanedPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    // Booking Info
+    document.getElementById('modal-package').textContent = packageName;
+    document.getElementById('modal-price').textContent = `₱${cleanedPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     document.getElementById('modal-event').textContent = event;
     document.getElementById('modal-event-date').textContent = eventDate;
     document.getElementById('modal-event-address').textContent = eventAddress;
 
-    // Set Payment Info
-    document.getElementById('modal-amt-payment').textContent = `₱${cleanedAmtPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    // Payment Info
+    document.getElementById('modal-amt-payment').textContent = `₱${cleanedAmtPayment.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     document.getElementById('modal-receipt-no').textContent = receiptNo || 'N/A';
 
-    // Set Payment Status Display
-    if (status === 'full payment') {
-        document.getElementById('modal-payment-status').textContent = 'Gcash';
-        document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
-    } else if (status === 'no payment') {
-        document.getElementById('modal-payment-status').textContent = 'Walk-In';
-        document.getElementById('modal-reference-no').textContent = 'N/A';
-    } else {
-        document.getElementById('modal-payment-status').textContent = paymentStatus || 'N/A';
-        document.getElementById('modal-reference-no').textContent = referenceNo || 'N/A';
-    }
+    // Payment Status
+    const paymentStatusText = (status === 'full payment') ? 'Gcash' :
+                              (status === 'no payment') ? 'Walk-In' :
+                              paymentStatus;
+    const referenceText = (status === 'no payment') ? 'N/A' : (referenceNo || 'N/A');
 
-    // Balance + Update Button Logic
+    document.getElementById('modal-payment-status').textContent = paymentStatusText;
+    document.getElementById('modal-reference-no').textContent = referenceText;
+
+    // Balance Logic
     const balance = cleanedPrice - cleanedAmtPayment;
+    const balanceRow = document.getElementById('balance-row');
     const balanceElement = document.getElementById('modal-balance');
     const updateButton = document.getElementById('update-payment-btn');
 
     if (status === 'partial payment') {
-        balanceElement.textContent = `₱${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        balanceElement.parentElement.style.display = 'flex';
+        balanceElement.textContent = `₱${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        balanceRow.style.display = 'flex';
         updateButton.style.display = 'block';
     } else {
-        balanceElement.parentElement.style.display = 'none';
+        balanceRow.style.display = 'none';
         updateButton.style.display = 'none';
     }
 
-    // Update payment handler
+    // Update Payment Button Action
     updateButton.onclick = function () {
-        updatePayment(bookingId, transacNum, package, balance);
+        updatePayment(bookingId, transacNum, packageName, balance);
     };
 
-    // Handle Print Button (only for partial/full payment)
+    // 🔁 Clear previous print button
     const modalContentDiv = document.querySelector("#viewDetailsModal .modal-content");
     const existingPrintBtn = modalContentDiv.querySelector("button.print-invoice");
     if (existingPrintBtn) existingPrintBtn.remove();
 
+    // Add Print Button if partial/full
     if (['partial payment', 'full payment'].includes(status)) {
         const printBtn = document.createElement("button");
         printBtn.textContent = "Print Invoice";
@@ -1128,9 +1132,32 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         modalContentDiv.appendChild(printBtn);
     }
 
-    // Show modal
+    // 🔥 Populate Payment History Table
+    const historySection = document.getElementById("payment-history-section");
+    const tableBody = document.getElementById("payment-history-body");
+    tableBody.innerHTML = ""; // clear old rows
+
+    if (Array.isArray(historyData) && historyData.length >= 1) {
+        historyData.forEach(item => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td style="padding: 8px; border: 1px solid #ccc;">${item.receipt_no || 'N/A'}</td>
+                <td style="padding: 8px; border: 1px solid #ccc;">₱${parseFloat(item.amt_payment).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td style="padding: 8px; border: 1px solid #ccc;">${item.reference_no || 'N/A'}</td>
+                <td style="padding: 8px; border: 1px solid #ccc;">${item.payment_status || 'N/A'}</td>
+                <td style="padding: 8px; border: 1px solid #ccc;">${new Date(item.payment_date).toLocaleDateString()}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+        historySection.style.display = "block";
+    } else {
+        historySection.style.display = "none";
+    }
+
+    // ✅ Show modal
     document.getElementById('viewDetailsModal').style.display = 'block';
 }
+
 
 
 // Function to redirect to update_payment.php with parameters
