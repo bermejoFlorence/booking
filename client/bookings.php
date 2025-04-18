@@ -732,7 +732,6 @@ if ($bookingData && $bookingData->num_rows > 0) {
 
                                     </div>
 
-                                    <!-- START: Payment History (conditionally visible) -->
                                     <div id="payment-history-section" class="info-row" style="flex-direction: column; margin-top: 10px;">
                                         <h3 style="text-align: center;">📜 Payment History</h3>
                                         <table id="payment-history-table" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px;">
@@ -750,6 +749,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
                                     </div>
 
                             </div>
+                            
                         </div>
 
                         <div id="confirmationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
@@ -759,6 +759,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
                                 <button onclick="closeConfirmationModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
                             </div>
                         </div>
+
 
 
         </table> 
