@@ -131,6 +131,12 @@ ORDER BY b.booking_id DESC
             background-color: #f4f4f4;
         }
 
+        .popup.medium {
+    /* Add this */
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
         
 /* Modal Overlay */
 .overlay {
@@ -203,6 +209,7 @@ ORDER BY b.booking_id DESC
 /* Modal Content */
 .modal-content {
     margin-top: 20px;
+    padding-bottom: 30px; /* or more */
 }
 
 .section h3 {
@@ -387,6 +394,7 @@ hr {
             .table thead {
         display: none; /* Hide table headers */
     }
+    
 
     .table tr {
         display: block;
