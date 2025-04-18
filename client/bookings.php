@@ -810,7 +810,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
 
             <!-- Print Button -->
             <div style="text-align: center; margin-top: 25px;">
-                <button class="print-invoice" style="display: none; padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                <button class="print-invoice" style="display: none; padding: 10px 20px; background-color: #0d6efd; color: white; border: none; border-radius: 6px; cursor: pointer;">
                     Print Invoice
                 </button>
             </div>
@@ -961,6 +961,14 @@ function printInvoiceFromBooking(bookingId) {
 
             const balance = parseFloat(price) - parseFloat(amt_payment);
 
+            // Format current date (PH time)
+            const phDate = new Date().toLocaleDateString('en-US', {
+                timeZone: 'Asia/Manila',
+                day: 'numeric',
+                month: 'short',
+                year: '2-digit'
+            }).replace(',', '');
+
             const printDiv = document.createElement("div");
             printDiv.id = "print-container";
             printDiv.innerHTML = `
@@ -990,22 +998,20 @@ function printInvoiceFromBooking(bookingId) {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
-                        margin-bottom: 30px;
+                        margin-bottom: 20px;
+                    }
+
+                    .receipt-info {
+                        display: flex;
+                        justify-content: space-between;
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin-bottom: 20px;
                     }
 
                     .company-info {
                         font-size: 14px;
-                    }
-
-                    .receipt-banner {
-                        background-color: #007bff;
-                        color: white;
-                        padding: 10px 15px;
-                        font-size: 18px;
-                        font-weight: bold;
-                        border-radius: 6px;
-                        text-align: center;
-                        margin-bottom: 20px;
+                        text-align: right;
                     }
 
                     table {
@@ -1022,13 +1028,14 @@ function printInvoiceFromBooking(bookingId) {
                     }
 
                     th {
-                        background-color: #eaf1f9;
+                        background-color: #f5f5f5;
                     }
 
                     .totals {
-                        margin-top: 30px;
+                        margin-top: 20px;
                         font-size: 16px;
                         text-align: right;
+                        font-weight: bold;
                     }
 
                     .footer {
@@ -1045,20 +1052,22 @@ function printInvoiceFromBooking(bookingId) {
 
                 <div class="invoice-wrapper">
                     <div class="header">
-                        <div class="logo">
-                            <img src="your-logo.png" alt="LOGO" class="logo">
-                        </div>
-                        <div class="company-info">
+                        <div>
                             <strong>EXZPHOTOGRAPHY STUDIO</strong><br>
                             123 Studio Address, Manila<br>
                             0912-345-6789 | exzstudio@gmail.com
                         </div>
+                        <div class="company-info">
+                            Date: ${phDate}
+                        </div>
                     </div>
 
-                    <div class="receipt-banner">Receipt for #${receipt_no}</div>
-                    <div style="margin-bottom: 10px;"><strong>Transaction Date:</strong> ${date_created}</div>
+                    <div class="receipt-info">
+                        <div>Receipt No.: ${receipt_no}</div>
+                        <div></div>
+                    </div>
 
-                    <div style="margin: 20px 0;">
+                    <div style="margin-bottom: 20px;">
                         <strong>Client:</strong><br>
                         ${c_fullname}<br>
                         ${c_address}<br>
@@ -1066,28 +1075,34 @@ function printInvoiceFromBooking(bookingId) {
                     </div>
 
                     <table>
-                        <tr>
-                            <th>Event</th>
-                            <th>Package</th>
-                            <th>Event Date</th>
-                            <th>Location</th>
-                            <th>Price</th>
-                            <th>Amount Paid</th>
-                            <th>Status</th>
-                        </tr>
-                        <tr>
-                            <td>${event}</td>
-                            <td>${package}</td>
-                            <td>${date_event}</td>
-                            <td>${address_event}</td>
-                            <td>₱${parseFloat(price).toLocaleString()}</td>
-                            <td>₱${parseFloat(amt_payment).toLocaleString()}</td>
-                            <td>${payment_status}</td>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Event</th>
+                                <th>Package</th>
+                                <th>Price</th>
+                                <th>Amount Paid</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${date_event}</td>
+                                <td>${event}</td>
+                                <td>${package}</td>
+                                <td>₱${parseFloat(price).toLocaleString()}</td>
+                                <td>₱${parseFloat(amt_payment).toLocaleString()}</td>
+                                <td>${payment_status}</td>
+                            </tr>
+                        </tbody>
                     </table>
 
                     <div class="totals">
-                        <p><strong>Balance:</strong> ₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                        ${
+                            balance > 0
+                            ? `Balance: ₱${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                            : `<span style="color: green;">✔️ Fully Paid</span>`
+                        }
                     </div>
 
                     <div class="footer">
@@ -1100,16 +1115,14 @@ function printInvoiceFromBooking(bookingId) {
             document.body.appendChild(printDiv);
             window.print();
 
-            // Optional: remove print content after print
+            // Remove after print
             setTimeout(() => {
-                if (document.getElementById("print-container")) {
-                    document.getElementById("print-container").remove();
-                }
+                document.getElementById("print-container")?.remove();
             }, 1000);
         })
         .catch(err => {
-            console.error('Error fetching invoice data:', err);
-            alert('Failed to load invoice. Please try again.');
+            console.error('Error fetching invoice:', err);
+            alert('Failed to generate invoice.');
         });
 }
 
