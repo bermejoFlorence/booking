@@ -633,69 +633,69 @@ if ($result->num_rows > 0) {
                     <button onclick="closeConfirmationModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
                 </div>
                 </div>
-
-                <div id="viewReceiptModal" class="overlay" style="display: none;">
-                    <div class="popup medium">
-                        <span class="close" onclick="closeModal();">&times;</span>
-                        <div class="modal-header">
-                            <h2>Sale Invoice Details</h2>
-                        </div>
-                        <div class="modal-content">
-                            <div class="section">
-                                <h3>Payment Information</h3>
-                                <div class="info-row">
-                                    <span>Receipt No.:</span> 
-                                    <span id="modal-receipt-num"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Amount Paid:</span> 
-                                    <span id="modal-amt-payment"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Payment Status:</span> 
-                                    <span id="modal-payment-status">
-                                        <!-- JS will inject dropdown or plain text here -->
-                                    </span>
-                                </div>
-
-                                <div class="info-row">
-                                    <span>Reference Number:</span> 
-                                    <span id="modal-reference-no"></span>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="section">
-                                <h3>Booking Information</h3>
-                                <div class="info-row">
-                                    <span>Package:</span> 
-                                    <span id="modal-package"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Price:</span> 
-                                    <span id="modal-price"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Event:</span> 
-                                    <span id="modal-event"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Event Date:</span> 
-                                    <span id="modal-event-date"></span>
-                                </div>
-                                <div class="info-row">
-                                    <span>Event Address:</span> 
-                                    <span id="modal-event-address"></span>
-                                </div>
-                            </div>
-                            <div id="submit-btn-container" style="display: none; text-align: center; margin-top: 20px;">
-                                <button onclick="submitPaymentUpdate()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer;">
-                                    Submit Payment Update
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
         </table>
+        <div id="viewReceiptModal" class="overlay" style="display: none;">
+    <div class="popup medium" style="max-height: 90vh; overflow-y: auto; border-radius: 12px;">
+        <span class="close" onclick="closeModal();" style="font-size: 24px; float: right; cursor: pointer;">&times;</span>
+        <div class="modal-header" style="margin-top: 20px;">
+            <h2 style="text-align: center;">📄 Booking Details</h2>
+        </div>
+        <div class="modal-content" style="padding: 20px 30px; font-family: sans-serif;">
+
+            <!-- Payment Information -->
+            <div class="section" style="margin-bottom: 10px;">
+                <h3>💰 Payment Information</h3>
+                <div class="info-row"><span>Receipt No.:</span><span id="modal-receipt-num"></span></div>
+                <div class="info-row"><span>Amount Paid:</span><span id="modal-amt-payment"></span></div>
+                <div class="info-row"><span>Payment Status:</span><span id="modal-payment-status"></span></div>
+                <div class="info-row"><span>Reference Number:</span><span id="modal-reference-no"></span></div>
+                <div class="info-row" id="balance-row" style="display: none;">
+                    <span>Balance:</span><span id="modal-balance"></span>
+                </div>
+            </div>
+
+            <!-- Booking Information -->
+            <div class="section" style="margin-bottom: 10px;">
+                <h3>📸 Booking Information</h3>
+                <div class="info-row"><span>Package:</span><span id="modal-package"></span></div>
+                <div class="info-row"><span>Price:</span><span id="modal-price"></span></div>
+                <div class="info-row"><span>Event:</span><span id="modal-event"></span></div>
+                <div class="info-row"><span>Event Date:</span><span id="modal-event-date"></span></div>
+                <div class="info-row"><span>Event Address:</span><span id="modal-event-address"></span></div>
+            </div>
+
+            <!-- Payment History -->
+            <div id="payment-history-section" style="flex-direction: column; margin-top: 10px; display: none;">
+                <h3 style="text-align: center;">📜 Payment History</h3>
+                <div style="overflow-x: auto;">
+                    <table id="payment-history-table" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; border: 1px solid #ccc; border-radius: 8px; overflow: hidden;">
+                        <thead>
+                            <tr style="background: #f5f5f5;">
+                                <th style="padding: 10px;">Date</th>
+                                <th style="padding: 10px; text-align: right;">Amount</th>
+                                <th style="padding: 10px; text-align: center;">Status</th>
+                                <th style="padding: 10px;">Reference #</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 12px;">No payment records found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div id="submit-btn-container" style="display: none; text-align: center; margin-top: 20px;">
+                <button onclick="submitPaymentUpdate()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer;">
+                    Submit Payment Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
         <div style="text-align: center; margin-top: 20px;">
     <?php if ($current_page > 1): ?>
@@ -808,44 +808,97 @@ function updateBookingStatus(bookingId, status) {
 }
 
 function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress){
-    var modal = document.getElementById("viewReceiptModal");
+    const modal = document.getElementById("viewReceiptModal");
     modal.style.display = "block";
 
-    if (paymentStatus === "No Payment") {
-    const italicMsg = "<i>No payment has been made yet</i>";
-    document.getElementById("modal-receipt-num").innerHTML = italicMsg;
-    document.getElementById("modal-amt-payment").innerHTML = italicMsg;
-    document.getElementById("modal-payment-status").innerHTML = italicMsg;
-    document.getElementById("modal-reference-no").innerHTML = italicMsg;
-} else if (paymentStatus === "processing payment") {
-    document.getElementById("modal-receipt-num").innerText = receiptNo;
-    document.getElementById("modal-amt-payment").innerText = "₱" + amtPayment;
-    document.getElementById("modal-reference-no").innerText = referenceNo;
+    const priceClean = parseFloat(price.toString().replace(/,/g, ''));
+    const amtClean = parseFloat(amtPayment.toString().replace(/,/g, '') || 0);
+    const status = paymentStatus.toLowerCase();
 
-    // Inject dropdown
-    document.getElementById("modal-payment-status").innerHTML = `
-        <select id="paymentType" name="paymentType" style="padding: 5px;">
-            <option value="">-- Choose Payment Type --</option>
-            <option value="Partial Payment">Partial Payment</option>
-            <option value="Full Payment">Full Payment</option>
-        </select>
-    `;
+    const balanceElem = document.getElementById("modal-balance");
+    const balanceRow = document.getElementById("balance-row");
+    const updateBtn = document.querySelector("#submit-btn-container button");
+    const paymentDropdown = document.getElementById("modal-payment-status");
+    const historySection = document.getElementById("payment-history-section");
+    const historyBody = document.querySelector("#payment-history-table tbody");
 
-    // Show submit button
-    document.getElementById("submit-btn-container").style.display = "block";
+    // Reset UI
+    balanceRow.style.display = "none";
+    updateBtn.style.display = "none";
+    historySection.style.display = "none";
+    historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
 
-    // Save current booking_id in a global variable for submission
-    window.selectedBookingId = bookingId;
-} else {
-    document.getElementById("modal-receipt-num").innerText = receiptNo;
-    document.getElementById("modal-amt-payment").innerText = "₱" + amtPayment  + ".00";
-    document.getElementById("modal-reference-no").innerText = referenceNo;
-    document.getElementById("modal-payment-status").innerText = paymentStatus;
-}
+    // Show payment dropdown if status is "processing payment"
+    if (status === "processing payment") {
+        document.getElementById("modal-receipt-num").innerText = receiptNo;
+        document.getElementById("modal-amt-payment").innerText = "₱" + amtClean.toLocaleString();
+        document.getElementById("modal-reference-no").innerText = referenceNo;
 
- // Set the rest of the booking information
+        paymentDropdown.innerHTML = `
+            <select id="paymentType" name="paymentType" style="padding: 5px;">
+                <option value="">-- Choose Payment Type --</option>
+                <option value="Partial Payment">Partial Payment</option>
+                <option value="Full Payment">Full Payment</option>
+            </select>
+        `;
+        document.getElementById("submit-btn-container").style.display = "block";
+        window.selectedBookingId = bookingId;
+
+        // Fetch payment history
+        fetch(`get_payment_history.php?booking_id=${bookingId}`)
+        .then(res => res.json())
+        .then(history => {
+            historyBody.innerHTML = '';
+            let totalPaid = 0;
+
+            if (history.length === 0) {
+                historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
+                historySection.style.display = "none";
+                return;
+            }
+
+            const showHistory = history.length > 1 || (history.length === 1 && history[0].payment_status.toLowerCase() !== 'full payment');
+
+            if (showHistory) {
+                historySection.style.display = "flex";
+                history.forEach(p => {
+                    totalPaid += parseFloat(p.amt_payment || 0);
+                    historyBody.innerHTML += `
+                        <tr>
+                            <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
+                            <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
+                            <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
+                            <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Compute Balance
+            const balance = priceClean - totalPaid;
+            if (balance > 0) {
+                balanceElem.textContent = `₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                balanceRow.style.display = "flex";
+                updateBtn.style.display = "inline-block";
+            } else {
+                balanceRow.style.display = "none";
+                updateBtn.style.display = "none";
+            }
+        });
+    } else {
+        const italicMsg = "<i>No payment has been made yet</i>";
+        document.getElementById("modal-receipt-num").innerHTML = italicMsg;
+        document.getElementById("modal-amt-payment").innerHTML = italicMsg;
+        document.getElementById("modal-reference-no").innerHTML = italicMsg;
+        document.getElementById("modal-payment-status").innerHTML = italicMsg;
+        document.getElementById("submit-btn-container").style.display = "none";
+        historySection.style.display = "none";
+        balanceRow.style.display = "none";
+    }
+
+    // Booking Info
     document.getElementById("modal-package").innerText = packageName;
-    document.getElementById("modal-price").innerText = "₱" + price;
+    document.getElementById("modal-price").innerText = "₱" + parseFloat(price).toLocaleString();
     document.getElementById("modal-event").innerText = event;
     document.getElementById("modal-event-date").innerText = eventDate;
     document.getElementById("modal-event-address").innerText = eventAddress;
