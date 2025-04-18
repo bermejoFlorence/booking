@@ -427,6 +427,13 @@ hr {
 .btn:hover {
     background: #4da0e0 ;
 }
+
+.modal-content {
+    max-height: 75vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
     </style>
 
 <div class="header">
@@ -690,6 +697,25 @@ if ($bookingData && $bookingData->num_rows > 0) {
                                             </button>
 
                                     </div>
+
+                                    <!-- START: Payment History (conditionally visible) -->
+                                    <div class="section" id="payment-history-section" style="display: none; margin-top: 25px;">
+                                        <h3>📜 Payment History</h3>
+                                        <table id="payment-history-table" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px;">
+                                            <thead>
+                                                <tr style="background: #f1f1f1;">
+                                                    <th style="padding: 8px; border: 1px solid #ddd;">Date</th>
+                                                    <th style="padding: 8px; border: 1px solid #ddd;">Amount</th>
+                                                    <th style="padding: 8px; border: 1px solid #ddd;">Status</th>
+                                                    <th style="padding: 8px; border: 1px solid #ddd;">Transaction #</th>
+                                                    <th style="padding: 8px; border: 1px solid #ddd;">Reference #</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                    <!-- END: Payment History -->
+
                                 </div>
                             </div>
                         </div>
@@ -1058,8 +1084,43 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
         modalContentDiv.appendChild(printBtn);
     }
 
+    fetch(`get_payment_history.php?booking_id=${bookingId}`)
+    .then(res => res.json())
+    .then(history => {
+        const historySection = document.getElementById('payment-history-section');
+        const tbody = document.querySelector('#payment-history-table tbody');
+
+        // Clear previous data
+        tbody.innerHTML = '';
+
+        // Show only if >=2 records && not fully paid
+        if (history.length >= 2 && status !== 'full payment') {
+            historySection.style.display = 'block';
+
+            history.forEach(payment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="padding: 6px; border: 1px solid #ddd;">${payment.date_created}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd;">₱${parseFloat(payment.amt_payment).toLocaleString()}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd;">${payment.payment_status}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd;">${payment.transac_num}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd;">${payment.reference_no || 'N/A'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        } else {
+            historySection.style.display = 'none';
+        }
+    })
+    .catch(err => {
+        console.error('Error loading payment history:', err);
+    });
+
+
     // Show modal
     document.getElementById('viewDetailsModal').style.display = 'block';
+
+    
 }
 
 
