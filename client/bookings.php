@@ -1145,46 +1145,52 @@ function viewDetails(bookingId, package, price, event, eventDate, eventAddress, 
 
     // Fetch payment history & calculate total paid
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
-        .then(res => res.json())
-        .then(history => {
-            const historySection = document.getElementById('payment-history-section');
-            const tbody = document.querySelector('#payment-history-table tbody');
-            tbody.innerHTML = '';
+    .then(res => res.json())
+    .then(history => {
+        const historySection = document.getElementById('payment-history-section');
+        const tbody = document.querySelector('#payment-history-table tbody');
+        tbody.innerHTML = '';
 
-            let totalPaid = 0;
+        let totalPaid = 0; // ✅ Start total
 
-            if (history.length > 0) {
-                historySection.style.display = 'flex';
+        if (history.length > 0) {
+            historySection.style.display = 'flex';
 
-                history.forEach(payment => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td style="padding: 6px; border: 1px solid #ddd;">${formatDate(payment.date_created)}</td>
-                        <td style="padding: 6px; border: 1px solid #ddd;">₱${parseFloat(payment.amt_payment).toLocaleString()}</td>
-                        <td style="padding: 6px; border: 1px solid #ddd;">${payment.payment_status}</td>
-                        <td style="padding: 6px; border: 1px solid #ddd;">${payment.reference_no || 'N/A'}</td>
-                    `;
-                    tbody.appendChild(row);
-                    totalPaid += parseFloat(payment.amt_payment);
-                });
+            history.forEach(payment => {
+                // ➕ Add payment row to table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="padding: 6px; border: 1px solid #ddd;">${formatDate(payment.date_created)}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd;">₱${parseFloat(payment.amt_payment).toLocaleString()}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd;">${payment.payment_status}</td>
+                    <td style="padding: 6px; border: 1px solid #ddd;">${payment.reference_no || 'N/A'}</td>
+                `;
+                tbody.appendChild(row);
 
-                const newBalance = cleanedPrice - totalPaid;
+                // ➕ Accumulate payment total
+                totalPaid += parseFloat(payment.amt_payment);
+            });
 
-                if (newBalance > 0) {
-                    balanceElement.textContent = `₱${newBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-                    balanceElement.parentElement.style.display = 'flex';
-                    updateButton.style.display = 'block';
-                } else {
-                    balanceElement.parentElement.style.display = 'none';
-                    updateButton.style.display = 'none';
-                }
+            // ✅ Compute new balance
+            const newBalance = cleanedPrice - totalPaid;
+
+            if (newBalance > 0) {
+                balanceElement.textContent = `₱${newBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                balanceElement.parentElement.style.display = 'flex';
+                updateButton.style.display = 'block';
             } else {
-                historySection.style.display = 'none';
+                balanceElement.parentElement.style.display = 'none';
+                updateButton.style.display = 'none';
             }
-        })
-        .catch(err => {
-            console.error('Error loading payment history:', err);
-        });
+
+        } else {
+            historySection.style.display = 'none';
+        }
+    })
+    .catch(err => {
+        console.error('Error loading payment history:', err);
+    });
+
 
     // Button update action
     updateButton.onclick = function () {
