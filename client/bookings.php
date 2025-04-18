@@ -258,24 +258,26 @@ hr {
     }
 }
 .info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    font-size: 15px;
-    border-bottom: 1px solid #f0f0f0;
-}
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        font-size: 15px;
+        border-bottom: 1px solid #f0f0f0;
+    }
 
-.info-row span:first-child {
-    font-weight: bold;
-    width: 160px;
-    min-width: 160px;
-    display: inline-block;
-}
+    .info-row span:first-child {
+        font-weight: bold;
+        width: 160px;
+        min-width: 160px;
+        display: inline-block;
+        color: #333;
+    }
 
-.info-row span:last-child {
-    flex: 1;
-    text-align: left;
-}
+    .info-row span:last-child {
+        flex: 1;
+        text-align: left;
+        color: #555;
+    }
 
 
 
