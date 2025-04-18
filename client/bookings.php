@@ -30,13 +30,13 @@ if (isset($_SESSION["user"])) {
 
 include("../connection.php");
 
+// Get client info
 $userrow = $database->query("SELECT * FROM client WHERE c_email='$useremail'");
 
 if ($userrow && $userrow->num_rows > 0) {
     $userfetch = $userrow->fetch_assoc();
     $userid = $userfetch["client_id"];
     $username = $userfetch["c_fullname"];
-
 } else {
     session_unset();
     session_destroy();
@@ -44,6 +44,7 @@ if ($userrow && $userrow->num_rows > 0) {
     exit();
 }
 
+// Booking with latest payment (LEFT JOIN)
 $bookingData = $database->query("
     SELECT 
         b.*,
@@ -53,13 +54,48 @@ $bookingData = $database->query("
         p.payment_status, 
         p.reference_no
     FROM booking AS b
-    LEFT JOIN payment AS p ON b.booking_id = p.booking_id
+    LEFT JOIN (
+        SELECT * FROM payment
+        WHERE (booking_id, payment_date) IN (
+            SELECT booking_id, MAX(payment_date)
+            FROM payment
+            GROUP BY booking_id
+        )
+    ) AS p ON b.booking_id = p.booking_id
     WHERE b.client_id = '$userid' AND b.is_deleted = 0
     ORDER BY b.booking_id DESC
 ");
 
+// ⬇️ Payment history per booking (you can pass this later to modal via JS or AJAX)
+$paymentHistories = [];
 
+if ($bookingData && $bookingData->num_rows > 0) {
+    while ($row = $bookingData->fetch_assoc()) {
+        $bookingId = $row['booking_id'];
+
+        // Query for payment history of this booking
+        $historyQuery = $database->query("
+            SELECT * FROM payment 
+            WHERE booking_id = '$bookingId'
+            ORDER BY payment_date ASC
+        ");
+
+        $historyList = [];
+        if ($historyQuery && $historyQuery->num_rows > 0) {
+            while ($payment = $historyQuery->fetch_assoc()) {
+                $historyList[] = $payment;
+            }
+        }
+
+        // Store in associative array with booking_id as key
+        $paymentHistories[$bookingId] = $historyList;
+
+        // Optionally: you may store the booking rows as well for looping later
+        $bookings[] = $row;
+    }
+}
 ?>
+
 </head>
 <body>
 <style>
@@ -630,70 +666,104 @@ if ($bookingData && $bookingData->num_rows > 0) {
 ?>
 </tbody>
 
-                        <div id="viewDetailsModal" class="overlay" style="display: none;">
-                            <div class="popup medium">
-                                <span class="close" onclick="closeModal();">&times;</span>
-                                <div class="modal-header">
-                                    <h2>Booking Details</h2>
+                <div id="viewDetailsModal" class="overlay" style="display: none;">
+                    <div class="popup medium">
+                        <span class="close" onclick="closeModal();">&times;</span>
+                        <div class="modal-header">
+                            <h2>Booking Details</h2>
+                        </div>
+                        <div class="modal-content">
+                            
+                            <!-- Payment Info -->
+                            <div class="section">
+                                <h3>Payment Information</h3>
+                                <div class="info-row">
+                                    <span>Receipt No.:</span> 
+                                    <span id="modal-receipt-no"></span>
                                 </div>
-                                <div class="modal-content">
-                                    <div class="section">
-                                        <h3>Payment Information</h3>
-                                        <div class="info-row">
-                                            <span>Receipt No.:</span> 
-                                            <span id="modal-receipt-no"></span>
-                                        </div>
-                                        <div class="info-row">
-                                            <span>Amount Paid:</span> 
-                                            <span id="modal-amt-payment"></span>
-                                        </div>
-                                        <div class="info-row">
-                                            <span>Payment Status:</span> 
-                                            <span id="modal-payment-status"></span>
-                                        </div>
-                                        <div class="info-row">
-                                            <span>Reference Number:</span> 
-                                            <span id="modal-reference-no"></span>
-                                        </div>
-                                        <div class="info-row" id="balance-row" style="display: none;">
-                                            <span>Balance:</span> 
-                                            <span id="modal-balance"></span>
-                                        </div>
-
-                                    </div>
-                                    <hr>
-                                    <div class="section">
-                                        <h3>Booking Information</h3>
-                                        <div class="info-row">
-                                            <span>Package:</span> 
-                                            <span id="modal-package"></span>
-                                        </div>
-                                        <div class="info-row">
-                                            <span>Price:</span> 
-                                            <span id="modal-price"></span>
-                                        </div>
-                                        <div class="info-row">
-                                            <span>Event:</span> 
-                                            <span id="modal-event"></span>
-                                        </div>
-                                        <div class="info-row">
-                                            <span>Event Date:</span> 
-                                            <span id="modal-event-date"></span>
-                                        </div>
-                                        <div class="info-row">
-                                            <span>Event Address:</span> 
-                                            <span id="modal-event-address"></span>
-                                        </div>
-                                        <!-- Update Payment Button (Initially Hidden) -->
-                                            <button id="update-payment-btn" style="display: none; margin-top: 10px;" onclick="updatePayment()">
-                                                Update Payment
-                                            </button>
-
-                                    </div>
+                                <div class="info-row">
+                                    <span>Amount Paid:</span> 
+                                    <span id="modal-amt-payment"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span>Payment Status:</span> 
+                                    <span id="modal-payment-status"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span>Reference Number:</span> 
+                                    <span id="modal-reference-no"></span>
+                                </div>
+                                <div class="info-row" id="balance-row" style="display: none;">
+                                    <span>Balance:</span> 
+                                    <span id="modal-balance"></span>
                                 </div>
                             </div>
-                        </div>
 
+                            <!-- 🔥 NEW: Kasaysayan ng Bayad Section -->
+                            <?php if (isset($paymentHistories[$row['booking_id']]) && count($paymentHistories[$row['booking_id']]) >= 1): ?>
+                                <div class="section">
+                                    <h3>Kasaysayan ng Bayad</h3>
+                                    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 6px;">
+                                        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                            <thead>
+                                                <tr style="background-color: #f4f4f4;">
+                                                    <th style="padding: 8px; border: 1px solid #ccc;">Resibo No.</th>
+                                                    <th style="padding: 8px; border: 1px solid #ccc;">Halaga</th>
+                                                    <th style="padding: 8px; border: 1px solid #ccc;">Reference No.</th>
+                                                    <th style="padding: 8px; border: 1px solid #ccc;">Status</th>
+                                                    <th style="padding: 8px; border: 1px solid #ccc;">Petsa ng Bayad</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($paymentHistories[$row['booking_id']] as $history): ?>
+                                                    <tr>
+                                                        <td style="padding: 8px; border: 1px solid #ccc;"><?php echo htmlspecialchars($history['receipt_no']); ?></td>
+                                                        <td style="padding: 8px; border: 1px solid #ccc;">₱<?php echo number_format($history['amt_payment'], 2); ?></td>
+                                                        <td style="padding: 8px; border: 1px solid #ccc;"><?php echo htmlspecialchars($history['reference_no']); ?></td>
+                                                        <td style="padding: 8px; border: 1px solid #ccc;"><?php echo htmlspecialchars($history['payment_status']); ?></td>
+                                                        <td style="padding: 8px; border: 1px solid #ccc;"><?php echo date('F j, Y', strtotime($history['payment_date'])); ?></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <hr>
+
+                            <!-- Booking Info -->
+                            <div class="section">
+                                <h3>Booking Information</h3>
+                                <div class="info-row">
+                                    <span>Package:</span> 
+                                    <span id="modal-package"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span>Price:</span> 
+                                    <span id="modal-price"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span>Event:</span> 
+                                    <span id="modal-event"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span>Event Date:</span> 
+                                    <span id="modal-event-date"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span>Event Address:</span> 
+                                    <span id="modal-event-address"></span>
+                                </div>
+
+                                <!-- Update Payment Button -->
+                                <button id="update-payment-btn" style="display: none; margin-top: 10px;" onclick="updatePayment()">
+                                    Update Payment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                         <div id="confirmationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
                             <div id="modalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
                                 <p id="modalMessage" style="font-size: 18px; margin-bottom: 20px;"></p>
