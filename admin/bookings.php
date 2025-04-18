@@ -807,88 +807,48 @@ function updateBookingStatus(bookingId, status) {
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
 
-function printBooking(
-  bookingId, receiptNo, amtPayment, paymentStatus, referenceNo,
-  packageName, price, event, eventDate, eventAddress
-) {
-  const modal = document.getElementById("viewReceiptModal");
-  modal.style.display = "block";
+function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress){
+    var modal = document.getElementById("viewReceiptModal");
+    modal.style.display = "block";
 
-  // Set Booking Info
-  document.getElementById("modal-event").innerText = event;
-  document.getElementById("modal-event-date").innerText = eventDate;
-  document.getElementById("modal-event-address").innerText = eventAddress;
-  document.getElementById("modal-package").innerText = packageName;
-  document.getElementById("modal-price").innerText = "₱" + parseFloat(price).toLocaleString();
+    if (paymentStatus === "No Payment") {
+    const italicMsg = "<i>No payment has been made yet</i>";
+    document.getElementById("modal-receipt-num").innerHTML = italicMsg;
+    document.getElementById("modal-amt-payment").innerHTML = italicMsg;
+    document.getElementById("modal-payment-status").innerHTML = italicMsg;
+    document.getElementById("modal-reference-no").innerHTML = italicMsg;
+} else if (paymentStatus === "processing payment") {
+    document.getElementById("modal-receipt-num").innerText = receiptNo;
+    document.getElementById("modal-amt-payment").innerText = "₱" + amtPayment;
+    document.getElementById("modal-reference-no").innerText = referenceNo;
 
-  // Clear existing payment info
-  document.getElementById("modal-receipt-num").innerText = "";
-  document.getElementById("modal-amt-payment").innerText = "";
-  document.getElementById("modal-reference-no").innerText = "";
-  document.getElementById("modal-payment-status").innerText = "";
+    // Inject dropdown
+    document.getElementById("modal-payment-status").innerHTML = `
+        <select id="paymentType" name="paymentType" style="padding: 5px;">
+            <option value="">-- Choose Payment Type --</option>
+            <option value="Partial Payment">Partial Payment</option>
+            <option value="Full Payment">Full Payment</option>
+        </select>
+    `;
 
-  const balanceRow = document.getElementById("balance-row");
-  const balanceElement = document.getElementById("modal-balance");
-  const updateSection = document.getElementById("update-section");
-  const paymentTypeDropdown = document.getElementById("paymentType");
-  const tbody = document.querySelector("#payment-history-table tbody");
+    // Show submit button
+    document.getElementById("submit-btn-container").style.display = "block";
 
-  tbody.innerHTML = ""; // clear history table
+    // Save current booking_id in a global variable for submission
+    window.selectedBookingId = bookingId;
+} else {
+    document.getElementById("modal-receipt-num").innerText = receiptNo;
+    document.getElementById("modal-amt-payment").innerText = "₱" + amtPayment  + ".00";
+    document.getElementById("modal-reference-no").innerText = referenceNo;
+    document.getElementById("modal-payment-status").innerText = paymentStatus;
+}
 
-  fetch(`get_payment_history.php?booking_id=${bookingId}`)
-    .then(res => res.json())
-    .then(data => {
-      let totalPaid = 0;
-
-      if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">No payment records found.</td></tr>`;
-        updateSection.style.display = "none";
-        balanceRow.style.display = "none";
-        return;
-      }
-
-      data.forEach((payment) => {
-        const dateFormatted = new Date(payment.date_created).toLocaleDateString('en-US', {
-          month: 'short', day: 'numeric', year: '2-digit'
-        }).replace(',', '');
-
-        totalPaid += parseFloat(payment.amt_payment);
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td style="padding: 8px; border: 1px solid #ddd;">${dateFormatted}</td>
-          <td style="padding: 8px; border: 1px solid #ddd;">₱${parseFloat(payment.amt_payment).toLocaleString()}</td>
-          <td style="padding: 8px; border: 1px solid #ddd;">${payment.payment_status}</td>
-          <td style="padding: 8px; border: 1px solid #ddd;">${payment.reference_no || 'N/A'}</td>
-        `;
-        tbody.appendChild(row);
-      });
-
-      // Show latest payment details
-      const latest = data[data.length - 1];
-      document.getElementById("modal-receipt-num").innerText = latest.receipt_no || receiptNo || 'N/A';
-      document.getElementById("modal-amt-payment").innerText = `₱${parseFloat(latest.amt_payment).toLocaleString()}`;
-      document.getElementById("modal-reference-no").innerText = latest.reference_no || referenceNo || 'N/A';
-      document.getElementById("modal-payment-status").innerText = latest.payment_status;
-
-      // Compute balance
-      const balance = parseFloat(price) - totalPaid;
-      if (balance > 0) {
-        balanceElement.innerText = `₱${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-        balanceRow.style.display = "flex";
-        updateSection.style.display = "block";
-      } else {
-        balanceRow.style.display = "none";
-        updateSection.style.display = "none";
-      }
-
-      // Save context for update
-      window.selectedBookingId = bookingId;
-    })
-    .catch(err => {
-      console.error("Error loading payment history:", err);
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Error loading history.</td></tr>`;
-    });
+ // Set the rest of the booking information
+    document.getElementById("modal-package").innerText = packageName;
+    document.getElementById("modal-price").innerText = "₱" + price;
+    document.getElementById("modal-event").innerText = event;
+    document.getElementById("modal-event-date").innerText = eventDate;
+    document.getElementById("modal-event-address").innerText = eventAddress;
 }
 
 function closeModal() {
