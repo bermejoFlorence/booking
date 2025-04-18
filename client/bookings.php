@@ -270,6 +270,39 @@ ORDER BY b.booking_id DESC
         font-size: 20px;
     }
 
+    .section-title {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .info-pair {
+        display: flex;
+        margin-bottom: 6px;
+        font-size: 15px;
+    }
+
+    .info-pair .label {
+        font-weight: bold;
+        width: 160px;
+        min-width: 160px;
+    }
+
+    .info-pair .value {
+        flex: 1;
+    }
+
+    .update-payment-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-start;
+    }
 /* Divider */
 hr {
     border: 0;
@@ -741,54 +774,48 @@ if ($bookingData && $bookingData->num_rows > 0) {
 
             <!-- Payment Information -->
             <div class="section" style="margin-bottom: 10px;">
-                <div class="info-title">💰 Payment Information</div>
-                <div class="info-group">
-                    <div>Receipt No.:</div><div id="modal-receipt-no"></div>
-                    <div>Amount Paid:</div><div id="modal-amt-payment"></div>
-                    <div>Payment Status:</div><div id="modal-payment-status"></div>
-                    <div>Reference Number:</div><div id="modal-reference-no"></div>
-                    <div id="balance-row" style="display: contents;">
-                        <div>Balance:</div><div id="modal-balance"></div>
-                    </div>
+                <div class="section-title">💰 Payment Information</div>
+                <div class="info-pair"><div class="label">Receipt No.:</div><div class="value" id="modal-receipt-no"></div></div>
+                <div class="info-pair"><div class="label">Amount Paid:</div><div class="value" id="modal-amt-payment"></div></div>
+                <div class="info-pair"><div class="label">Payment Status:</div><div class="value" id="modal-payment-status"></div></div>
+                <div class="info-pair"><div class="label">Reference Number:</div><div class="value" id="modal-reference-no"></div></div>
+                <div class="info-pair" id="balance-row" style="display: none;">
+                    <div class="label">Balance:</div><div class="value" id="modal-balance"></div>
                 </div>
             </div>
 
-
             <!-- Booking Information -->
             <div class="section" style="margin-bottom: 10px;">
-    <div class="info-title">📸 Booking Information</div>
-    <div class="info-group">
-        <div>Package:</div><div id="modal-package"></div>
-        <div>Price:</div><div id="modal-price"></div>
-        <div>Event:</div><div id="modal-event"></div>
-        <div>Event Date:</div><div id="modal-event-date"></div>
-        <div>Event Address:</div><div id="modal-event-address"></div>
-    </div>
+                <div class="section-title">📸 Booking Information</div>
+                <div class="info-pair"><div class="label">Package:</div><div class="value" id="modal-package"></div></div>
+                <div class="info-pair"><div class="label">Price:</div><div class="value" id="modal-price"></div></div>
+                <div class="info-pair"><div class="label">Event:</div><div class="value" id="modal-event"></div></div>
+                <div class="info-pair"><div class="label">Event Date:</div><div class="value" id="modal-event-date"></div></div>
+                <div class="info-pair"><div class="label">Event Address:</div><div class="value" id="modal-event-address"></div></div>
 
-    <div style="text-align: center;">
-        <button id="update-payment-btn" style="display: none; background-color: #0dcaf0; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
-            Update Payment
-        </button>
-    </div>
-</div>
-
+                <div class="update-payment-container">
+                    <button id="update-payment-btn" style="display: none; background-color: #0dcaf0; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
+                        Update Payment
+                    </button>
+                </div>
+            </div>
 
             <!-- Payment History -->
-            <div id="payment-history-section" class="info-row" style="flex-direction: column; margin-top: 10x; display: none;">
+            <div id="payment-history-section" style="flex-direction: column; margin-top: 10px; display: none;">
                 <h3 style="text-align: center;">📜 Payment History</h3>
                 <div style="overflow-x: auto;">
                     <table id="payment-history-table" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; border: 1px solid #ccc; border-radius: 8px; overflow: hidden;">
                         <thead>
                             <tr style="background: #f5f5f5;">
-                                <th style="padding: 10px; border-bottom: 1px solid #ccc;">Date</th>
-                                <th style="padding: 10px; border-bottom: 1px solid #ccc; text-align: right;">Amount</th>
-                                <th style="padding: 10px; border-bottom: 1px solid #ccc; text-align: center;">Status</th>
-                                <th style="padding: 10px; border-bottom: 1px solid #ccc;">Reference #</th>
+                                <th style="padding: 10px;">Date</th>
+                                <th style="padding: 10px; text-align: right;">Amount</th>
+                                <th style="padding: 10px; text-align: center;">Status</th>
+                                <th style="padding: 10px;">Reference #</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td colspan="5" style="text-align: center; padding: 12px;">No payment records found.</td>
+                                <td colspan="4" style="text-align: center; padding: 12px;">No payment records found.</td>
                             </tr>
                         </tbody>
                     </table>
