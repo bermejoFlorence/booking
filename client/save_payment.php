@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($stmt) {
             $payment_status = "processing payment";
-            $receipt_no = "processing payment";
+            $receipt_no = "null";
 
             $stmt->bind_param("isssss", $booking_id, $amt_payment, $reference_no, $payment_status, $receipt_no, $current_datetime);
 
