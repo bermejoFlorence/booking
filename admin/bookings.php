@@ -1081,7 +1081,7 @@ function submitPaymentUpdate() {
     const paymentType = document.getElementById("paymentType").value;
 
     if (paymentType === "") {
-        closeModal(); // ✅ Close modal before showing alert
+        closeModal();
         Swal.fire({
             title: 'Warning!',
             text: 'Please select a payment type before submitting.',
@@ -1093,12 +1093,36 @@ function submitPaymentUpdate() {
     }
 
     const bookingId = window.selectedBookingId;
-    const receiptNo = Math.floor(100000 + Math.random() * 900000); // 6-digit
+    const receiptNo = Math.floor(100000 + Math.random() * 900000);
     const amtPaymentRaw = document.getElementById("modal-amt-payment").innerText;
-    const amtPaymentClean = amtPaymentRaw.replace(/₱|,/g, '').trim();
-    const amtPayment = parseFloat(amtPaymentClean);
+    const amtPayment = parseFloat(amtPaymentRaw.replace(/₱|,/g, '').trim());
 
-    // Disable button to prevent double click
+    const balanceRaw = document.getElementById("modal-balance").innerText;
+    const balance = parseFloat(balanceRaw.replace(/₱|,/g, '').trim() || 0);
+
+    // ❌ Validate logic mismatch
+    if (paymentType === "Partial Payment" && balance <= 0) {
+        Swal.fire({
+            title: 'Invalid Entry!',
+            text: 'Customer has no remaining balance. Please mark as Full Payment instead.',
+            icon: 'error',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+
+    if (paymentType === "Full Payment" && balance > 0) {
+        Swal.fire({
+            title: 'Invalid Entry!',
+            text: 'Balance is not yet fully paid. Cannot mark as Full Payment.',
+            icon: 'error',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+
     document.querySelector("#submit-btn-container button").disabled = true;
 
     const xhr = new XMLHttpRequest();
@@ -1106,14 +1130,12 @@ function submitPaymentUpdate() {
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
     xhr.onload = function () {
-        closeModal(); // ✅ Hide modal first
+        closeModal();
 
         if (xhr.status === 200) {
-            const responseMessage = xhr.responseText.trim();
-
             Swal.fire({
                 title: 'Success!',
-                text: responseMessage,
+                text: xhr.responseText.trim(),
                 icon: 'success',
                 confirmButtonColor: '#3085d6',
                 confirmButtonText: 'OK'
@@ -1125,13 +1147,12 @@ function submitPaymentUpdate() {
         } else {
             Swal.fire({
                 title: 'Error!',
-                text: xhr.responseText.trim() || 'An error occurred. Please try again.', // ✅ Show PHP error
+                text: xhr.responseText.trim() || 'An error occurred. Please try again.',
                 icon: 'error',
                 confirmButtonColor: '#d33',
                 confirmButtonText: 'OK'
             });
 
-            // Re-enable button in case of error
             document.querySelector("#submit-btn-container button").disabled = false;
         }
     };
@@ -1139,6 +1160,7 @@ function submitPaymentUpdate() {
     const data = `booking_id=${bookingId}&payment_status=${encodeURIComponent(paymentType)}&receipt_no=${receiptNo}&amt_payment=${amtPayment}`;
     xhr.send(data);
 }
+
 
 
 
