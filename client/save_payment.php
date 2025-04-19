@@ -25,15 +25,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     try {
         // ✅ 1. INSERT into payment table
-        $query = "INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status, receipt_no, date_created) 
-                  VALUES (?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status, date_created) 
+                  VALUES (?, ?, ?, ?, ?)";
         $stmt = $database->prepare($query);
 
         if ($stmt) {
             $payment_status = "processing payment";
-            $receipt_no = "null";
 
-            $stmt->bind_param("isssss", $booking_id, $amt_payment, $reference_no, $payment_status, $receipt_no, $current_datetime);
+            $stmt->bind_param("issss", $booking_id, $amt_payment, $reference_no, $payment_status, $current_datetime);
 
             if (!$stmt->execute()) {
                 throw new Exception("Error inserting payment: " . $stmt->error);
