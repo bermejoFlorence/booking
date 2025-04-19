@@ -903,6 +903,12 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             balanceRow.style.display = "none";
             updateBtn.style.display = "none";
         }
+        sessionStorage.setItem("payment_data", JSON.stringify({
+    booking_id: bookingId,
+    price: priceClean,
+    paid: totalPaid,
+    balance: balance
+}));
     })
     .catch(err => {
         console.error("Payment history fetch error:", err);
