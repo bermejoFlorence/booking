@@ -692,8 +692,12 @@ if ($result->num_rows > 0) {
                     Submit Payment Update
                 </button>
             </div>
-
-            
+            <!-- Print Button -->
+            <div id="print-button-container" style="text-align: center; margin-top: 25px; display: none;">
+                <button class="print-invoice" style="padding: 10px 20px; background-color: #0d6efd; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    Print Invoice
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -822,19 +826,22 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     const paymentDropdown = document.getElementById("modal-payment-status");
     const historySection = document.getElementById("payment-history-section");
     const historyBody = document.querySelector("#payment-history-table tbody");
+    const printBtnContainer = document.getElementById("print-button-container");
+    const printBtn = printBtnContainer.querySelector("button.print-invoice");
 
     // Reset UI
     balanceRow.style.display = "none";
     updateBtn.style.display = "none";
     historySection.style.display = "none";
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
+    printBtnContainer.style.display = "none";
 
-    // Always populate static payment info
+    // Always populate payment info
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
     document.getElementById("modal-amt-payment").innerText = amtClean > 0 ? "₱" + amtClean.toLocaleString() : "₱0.00";
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-    // Show dropdown ONLY if status is 'processing payment'
+    // Dropdown for processing payment
     if (status === "processing payment") {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
@@ -848,6 +855,12 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     } else {
         paymentDropdown.innerText = paymentStatus || "N/A";
         document.getElementById("submit-btn-container").style.display = "none";
+    }
+
+    // Show Print Invoice button if status is partial or full payment
+    if (["partial payment", "full payment"].includes(status)) {
+        printBtnContainer.style.display = "block";
+        printBtn.onclick = () => printInvoiceFromBooking(bookingId);
     }
 
     // Fetch payment history
