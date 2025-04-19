@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $payment = $result->fetch_assoc();
-        $payment_id = $payment['id'];
+        $payment_id = $payment['payment_id'];
         $amt_payment = floatval($payment['amt_payment']);
         $query->close();
 
