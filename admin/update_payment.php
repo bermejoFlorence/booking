@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         // 1. Hanapin ang payment record na 'processing payment' + walang resibo
-        $query = $database->prepare("SELECT id, amt_payment FROM payment WHERE booking_id = ? AND payment_status = 'processing payment' AND (receipt_no IS NULL OR receipt_no = '') ORDER BY date_created DESC LIMIT 1");
+        $query = $database->prepare("SELECT payment_id, amt_payment FROM payment WHERE booking_id = ? AND payment_status = 'processing payment' AND (receipt_no IS NULL OR receipt_no = '') ORDER BY date_created DESC LIMIT 1");
         $query->bind_param("i", $booking_id);
         $query->execute();
         $result = $query->get_result();
