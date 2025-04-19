@@ -4,10 +4,16 @@ include("../connection.php");
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+date_default_timezone_set('Asia/Manila');
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $booking_id = $_POST['booking_id'] ?? null;
-    $amt_payment = $_POST['amt_payment'] ?? null;
+    $amt_payment_raw = $_POST['amt_payment'] ?? null;
     $reference_no = $_POST['reference_no'] ?? null;
+
+    // Strip commas and convert to float
+    $amt_payment = floatval(str_replace(',', '', $amt_payment_raw));
+    $current_datetime = date('Y-m-d H:i:s');
 
     // Validate required fields
     if (empty($booking_id) || empty($amt_payment) || empty($reference_no)) {
@@ -18,43 +24,63 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    date_default_timezone_set('Asia/Manila');
-    $current_datetime = date('Y-m-d H:i:s');
-
     $database->begin_transaction();
 
     try {
-        // ✅ 1. INSERT into payment table
-        $query = "INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status, date_created) 
-                  VALUES (?, ?, ?, ?, ?)";
-        $stmt = $database->prepare($query);
+        // 1. Check latest approved payment for current balance
+        $balanceQuery = $database->prepare("
+            SELECT b.price - IFNULL(p.amt_payment, 0) as current_balance
+            FROM booking b
+            LEFT JOIN (
+                SELECT booking_id, amt_payment
+                FROM payment
+                WHERE booking_id = ?
+                AND LOWER(payment_status) IN ('partial payment', 'full payment')
+                ORDER BY date_created DESC
+                LIMIT 1
+            ) p ON b.booking_id = p.booking_id
+            WHERE b.booking_id = ?
+        ");
+        $balanceQuery->bind_param("ii", $booking_id, $booking_id);
+        $balanceQuery->execute();
+        $balanceResult = $balanceQuery->get_result();
 
-        if ($stmt) {
-            $payment_status = "processing payment";
+        $current_balance = 0;
+        if ($row = $balanceResult->fetch_assoc()) {
+            $current_balance = (float)$row['current_balance'];
+        }
+        $balanceQuery->close();
 
-            $stmt->bind_param("issss", $booking_id, $amt_payment, $reference_no, $payment_status, $current_datetime);
-
-            if (!$stmt->execute()) {
-                throw new Exception("Error inserting payment: " . $stmt->error);
-            }
-            $stmt->close();
-        } else {
-            throw new Exception("Error preparing payment query: " . $database->error);
+        if ($amt_payment > $current_balance) {
+            echo "<script>
+                alert('Error: Payment exceeds remaining balance (₱" . number_format($current_balance, 2) . ").');
+                window.history.back();
+            </script>";
+            exit();
         }
 
-        // ✅ 2. UPDATE booking.stat = 'processing'
-        $updateBooking = $database->prepare("UPDATE booking SET stat = ? WHERE booking_id = ?");
-        $processingStat = "processing";
-        $updateBooking->bind_param("si", $processingStat, $booking_id);
+        // 2. Insert payment row with 'processing payment'
+        $payment_status = "processing payment";
+        $insertQuery = $database->prepare("
+            INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status, date_created)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+        $insertQuery->bind_param("idsss", $booking_id, $amt_payment, $reference_no, $payment_status, $current_datetime);
+        if (!$insertQuery->execute()) {
+            throw new Exception("Error inserting payment: " . $insertQuery->error);
+        }
+        $insertQuery->close();
+
+        // 3. Update booking status to 'processing'
+        $updateBooking = $database->prepare("UPDATE booking SET stat = 'processing' WHERE booking_id = ?");
+        $updateBooking->bind_param("i", $booking_id);
         if (!$updateBooking->execute()) {
             throw new Exception("Error updating booking status: " . $updateBooking->error);
         }
         $updateBooking->close();
 
-        // ✅ 3. Commit changes
+        // 4. Commit and alert success
         $database->commit();
-
-        // ✅ 4. SweetAlert success
         echo "
         <!DOCTYPE html>
         <html lang='en'>

@@ -59,19 +59,22 @@ if (isset($_GET['booking_id'])) {
         $package = $booking['package'];
         $price = (float)$booking['price'];
 
+        // Get the latest approved payment (partial/full)
         $paidQuery = $database->prepare("
-        SELECT SUM(amt_payment) as total_paid 
-        FROM payment 
-        WHERE booking_id = ? 
-        AND LOWER(payment_status) IN ('partial payment', 'full payment')
-    ");
-    $paidQuery->bind_param("i", $booking_id);
+            SELECT amt_payment 
+            FROM payment 
+            WHERE booking_id = ? 
+            AND LOWER(payment_status) IN ('partial payment', 'full payment')
+            ORDER BY date_created DESC 
+            LIMIT 1
+        ");
+        $paidQuery->bind_param("i", $booking_id);
         $paidQuery->execute();
         $paidResult = $paidQuery->get_result();
-        $totalPaid = 0;
 
+        $totalPaid = 0;
         if ($row = $paidResult->fetch_assoc()) {
-            $totalPaid = (float)$row['total_paid'];
+            $totalPaid = (float)$row['amt_payment'];
         }
         $balance = $price - $totalPaid;
         if ($balance < 0) $balance = 0;
@@ -92,6 +95,7 @@ echo "<script>
     console.log('DEBUG | Balance: $balance');
 </script>";
 ?>
+
 
 </head>
 <body>
