@@ -476,19 +476,20 @@ if (stored) {
     }
 
     document.getElementById("paymentForm")?.addEventListener("submit", function (e) {
-        const balance = parseFloat("<?php echo $balance; ?>") || 0;
-        const inputAmt = parseFloat(document.getElementById("amt_payment").value.replace(/,/g, '')) || 0;
+    const balance = parseFloat(document.getElementById("balance").textContent.replace(/,/g, '')) || 0;
+    const inputAmt = parseFloat(document.getElementById("amt_payment").value.replace(/,/g, '')) || 0;
 
-        if (inputAmt > balance) {
-            e.preventDefault();
-            Swal.fire({
-                icon: 'warning',
-                title: 'Overpayment Detected',
-                text: `You entered ₱${inputAmt.toLocaleString()} but your balance is only ₱${balance.toLocaleString()}.`,
-                confirmButtonColor: '#dc3545'
-            });
-        }
-    });
+    if (inputAmt > balance) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'warning',
+            title: 'Overpayment Detected',
+            text: `You entered ₱${inputAmt.toLocaleString()} but your balance is only ₱${balance.toLocaleString()}.`,
+            confirmButtonColor: '#dc3545'
+        });
+    }
+});
+
 
 
 
