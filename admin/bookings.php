@@ -876,7 +876,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             return;
         }
 
-        const showHistory = history.length > 1 || (history.length === 1 && history[0].payment_status.toLowerCase() !== 'full payment');
+        const showHistory = history.length > 1 || (history.length === 1 && !["full payment", "processing payment"].includes(history[0].payment_status.toLowerCase()));
 
         if (showHistory) {
             historySection.style.display = "flex";
@@ -1102,6 +1102,7 @@ function submitPaymentUpdate() {
 
     // ❌ Validate logic mismatch
     if (paymentType === "Partial Payment" && balance <= 0) {
+        closeModal();
         Swal.fire({
             title: 'Invalid Entry!',
             text: 'Customer has no remaining balance. Please mark as Full Payment instead.',
@@ -1113,6 +1114,7 @@ function submitPaymentUpdate() {
     }
 
     if (paymentType === "Full Payment" && balance > 0) {
+        closeModal();
         Swal.fire({
             title: 'Invalid Entry!',
             text: 'Balance is not yet fully paid. Cannot mark as Full Payment.',
