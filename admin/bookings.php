@@ -828,12 +828,13 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     historySection.style.display = "none";
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
 
-    // Show payment dropdown if status is "processing payment"
-    if (status === "processing payment") {
-        document.getElementById("modal-receipt-num").innerText = receiptNo;
-        document.getElementById("modal-amt-payment").innerText = "₱" + amtClean.toLocaleString();
-        document.getElementById("modal-reference-no").innerText = referenceNo;
+    // Always populate static payment info
+    document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
+    document.getElementById("modal-amt-payment").innerText = amtClean > 0 ? "₱" + amtClean.toLocaleString() : "₱0.00";
+    document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
+    // Show dropdown ONLY if status is 'processing payment'
+    if (status === "processing payment") {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
                 <option value="">-- Choose Payment Type --</option>
@@ -843,58 +844,56 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
         `;
         document.getElementById("submit-btn-container").style.display = "block";
         window.selectedBookingId = bookingId;
-
-        // Fetch payment history
-        fetch(`get_payment_history.php?booking_id=${bookingId}`)
-        .then(res => res.json())
-        .then(history => {
-            historyBody.innerHTML = '';
-            let totalPaid = 0;
-
-            if (history.length === 0) {
-                historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
-                historySection.style.display = "none";
-                return;
-            }
-
-            const showHistory = history.length > 1 || (history.length === 1 && history[0].payment_status.toLowerCase() !== 'full payment');
-
-            if (showHistory) {
-                historySection.style.display = "flex";
-                history.forEach(p => {
-                    totalPaid += parseFloat(p.amt_payment || 0);
-                    historyBody.innerHTML += `
-                        <tr>
-                            <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
-                            <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
-                            <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
-                            <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
-                        </tr>
-                    `;
-                });
-            }
-
-            // Compute Balance
-            const balance = priceClean - totalPaid;
-            if (balance > 0) {
-                balanceElem.textContent = `₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-                balanceRow.style.display = "flex";
-                updateBtn.style.display = "inline-block";
-            } else {
-                balanceRow.style.display = "none";
-                updateBtn.style.display = "none";
-            }
-        });
     } else {
-        const italicMsg = "<i>No payment has been made yet</i>";
-        document.getElementById("modal-receipt-num").innerHTML = italicMsg;
-        document.getElementById("modal-amt-payment").innerHTML = italicMsg;
-        document.getElementById("modal-reference-no").innerHTML = italicMsg;
-        document.getElementById("modal-payment-status").innerHTML = italicMsg;
+        paymentDropdown.innerText = paymentStatus || "N/A";
         document.getElementById("submit-btn-container").style.display = "none";
-        historySection.style.display = "none";
-        balanceRow.style.display = "none";
     }
+
+    // Fetch payment history
+    fetch(`get_payment_history.php?booking_id=${bookingId}`)
+    .then(res => res.json())
+    .then(history => {
+        historyBody.innerHTML = '';
+        let totalPaid = 0;
+
+        if (history.length === 0) {
+            historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
+            historySection.style.display = "none";
+            return;
+        }
+
+        const showHistory = history.length > 1 || (history.length === 1 && history[0].payment_status.toLowerCase() !== 'full payment');
+
+        if (showHistory) {
+            historySection.style.display = "flex";
+            history.forEach(p => {
+                totalPaid += parseFloat(p.amt_payment || 0);
+                historyBody.innerHTML += `
+                    <tr>
+                        <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
+                        <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
+                        <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
+                        <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Compute Balance
+        const balance = priceClean - totalPaid;
+        if (balance > 0) {
+            balanceElem.textContent = `₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            balanceRow.style.display = "flex";
+            updateBtn.style.display = "inline-block";
+        } else {
+            balanceRow.style.display = "none";
+            updateBtn.style.display = "none";
+        }
+    })
+    .catch(err => {
+        console.error("Payment history fetch error:", err);
+        historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
+    });
 
     // Booking Info
     document.getElementById("modal-package").innerText = packageName;
