@@ -822,21 +822,19 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     const paymentDropdown = document.getElementById("modal-payment-status");
     const historySection = document.getElementById("payment-history-section");
     const historyBody = document.querySelector("#payment-history-table tbody");
-    const printBtn = document.getElementById("print-invoice-btn");
 
     // Reset UI
     balanceRow.style.display = "none";
     updateBtn.style.display = "none";
     historySection.style.display = "none";
-    printBtn.style.display = "none";
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
 
-    // Populate static payment info
+    // Always populate static payment info
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
     document.getElementById("modal-amt-payment").innerText = amtClean > 0 ? "₱" + amtClean.toLocaleString() : "₱0.00";
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-    // Dropdown only if "processing payment"
+    // Show dropdown ONLY if status is 'processing payment'
     if (status === "processing payment") {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
@@ -862,7 +860,6 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
         if (history.length === 0) {
             historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
             historySection.style.display = "none";
-            printBtn.style.display = "none";
             return;
         }
 
@@ -883,6 +880,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             });
         }
 
+        // Compute Balance
         const balance = priceClean - totalPaid;
         if (balance > 0) {
             balanceElem.textContent = `₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
@@ -892,15 +890,10 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             balanceRow.style.display = "none";
             updateBtn.style.display = "none";
         }
-
-        // ✅ Show print button
-        printBtn.style.display = "inline-block";
-        printBtn.onclick = () => printInvoiceFromBooking(bookingId);
     })
     .catch(err => {
         console.error("Payment history fetch error:", err);
         historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
-        printBtn.style.display = "none";
     });
 
     // Booking Info
