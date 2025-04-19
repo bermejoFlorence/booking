@@ -85,6 +85,12 @@ if (isset($_GET['booking_id'])) {
     echo "No booking ID provided!";
     exit();
 }
+
+echo "<script>
+    console.log('DEBUG | Price: $price');
+    console.log('DEBUG | Total Paid: $totalPaid');
+    console.log('DEBUG | Balance: $balance');
+</script>";
 ?>
 
 </head>
