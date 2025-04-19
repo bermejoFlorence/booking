@@ -13,7 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <?php
-    echo "<script>console.log('Received booking_id: " . $booking_id . "');</script>";
+// --- SESSION & DATA FETCHING LOGIC ---
+echo "<script>console.log('Received booking_id: " . $_GET['booking_id'] . "');</script>";
 session_start();
 
 if (isset($_SESSION["user"])) {
@@ -44,24 +45,33 @@ if ($userrow && $userrow->num_rows > 0) {
     exit();
 }
 
-// Check if booking_id is set in the URL
 if (isset($_GET['booking_id'])) {
     $booking_id = $_GET['booking_id'];
 
-    // Fetch booking details
     $query = "SELECT package, price FROM booking WHERE booking_id = ? AND client_id = ?";
     $stmt = $database->prepare($query);
-    $stmt->bind_param("ii", $booking_id, $userid); // Bind client ID to ensure security
+    $stmt->bind_param("ii", $booking_id, $userid);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $booking = $result->fetch_assoc();
         $package = $booking['package'];
-        $price = $booking['price'];
+        $price = (float)$booking['price'];
 
-        echo "<script>console.log('Package: " . $package . " | Price: " . $price . "');</script>";
+        $paidQuery = $database->prepare("SELECT SUM(amt_payment) as total_paid FROM payment WHERE booking_id = ?");
+        $paidQuery->bind_param("i", $booking_id);
+        $paidQuery->execute();
+        $paidResult = $paidQuery->get_result();
+        $totalPaid = 0;
 
+        if ($row = $paidResult->fetch_assoc()) {
+            $totalPaid = (float)$row['total_paid'];
+        }
+        $balance = $price - $totalPaid;
+        if ($balance < 0) $balance = 0;
+
+        $paidQuery->close();
     } else {
         echo "Booking not found or unauthorized access!";
         exit();
@@ -71,6 +81,7 @@ if (isset($_GET['booking_id'])) {
     exit();
 }
 ?>
+
 </head>
 <body>
 <style>
@@ -305,49 +316,52 @@ if (isset($_GET['booking_id'])) {
                 </tr> -->
             </table>
         </div>
-        <div class="dash-body" style="margin-top: 15px">
+       
+<div class="dash-body" style="margin-top: 15px">
     <table border="0" width="100%" style="border-spacing: 0; margin: 0; padding: 0; margin-top: 25px;">
         <div class="form-container">
             <h2>Payment Details</h2>
 
-            <!-- Transaction Details -->
             <div class="details-container">
                 <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
-                <span><strong>Price:</strong><?php echo htmlspecialchars($price); ?></span>
+                <span><strong>Total Price:</strong> ₱<?php echo number_format($price, 2); ?></span>
+                <span><strong>Paid So Far:</strong> ₱<?php echo number_format($totalPaid, 2); ?></span>
+                <span><strong>Current Balance:</strong> ₱<?php echo number_format($balance, 2); ?></span>
             </div>
 
-            <form method="POST" action="save_payment.php" id="paymentForm">
-                <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
+            <?php if ($balance <= 0): ?>
+                <p style="color: green; font-weight: bold;">You are fully paid! No further payment is needed.</p>
+            <?php else: ?>
+                <form method="POST" action="save_payment.php" id="paymentForm">
+                    <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
 
-                <!-- GCash Payment Fields -->
-                <div id="gcash-fields">
-                    <div class="form-group">
-                        <label for="gcash_qr">Scan QR Code</label>
-                        <div>
-                            <img src="gcash.jpg" alt="GCash QR Code" style="width: 200px; height: auto;">
+                    <div id="gcash-fields">
+                        <div class="form-group">
+                            <label for="gcash_qr">Scan QR Code</label>
+                            <div>
+                                <img src="gcash.jpg" alt="GCash QR Code" style="width: 200px; height: auto;">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reference_no">Reference Number</label>
+                            <input type="text" name="reference_no" id="reference_no" maxlength="13" pattern="\d{13}" required placeholder="Enter 13-digit GCash Ref No" onkeypress="return event.charCode>=48 && event.charCode<=57">
+                            <small id="error-message" style="color: red; display: none;">Reference number must be 13 digits.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="amt_payment">Amount to Pay</label>
+                            <input type="text" name="amt_payment" id="amt_payment" required placeholder="Max: <?php echo number_format($balance); ?>" onkeypress="return event.charCode>=48 && event.charCode<=57">
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="reference_no">Reference Number</label>
-                        <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number"
-                            maxlength="13" pattern="\d{13}" required onkeypress="return event.charCode>=48 && event.charCode<=57">
-                        <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="amt_payment">Amount to Pay</label>
-                        <input type="text" name="amt_payment" id="amt_payment" required
-                            onkeypress="return event.charCode>=48 && event.charCode<=57"
-                            placeholder="Enter amount ex 1000, 100, 10, 1">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-primary">Submit Payment</button>
-            </form>
+                    <button type="submit" class="btn-primary">Submit Payment</button>
+                </form>
+            <?php endif; ?>
         </div>
     </table>
 </div>
+
 
     </div>
 
@@ -382,15 +396,10 @@ if (isset($_GET['booking_id'])) {
 }
 
 document.getElementById("reference_no").addEventListener("input", function () {
-    var referenceNo = this.value;
-    var errorMessage = document.getElementById("error-message");
-
-    if (/^\d{13}$/.test(referenceNo)) {
-        errorMessage.style.display = "none";
-    } else {
-        errorMessage.style.display = "block";
-    }
-});
+        var referenceNo = this.value;
+        var errorMessage = document.getElementById("error-message");
+        errorMessage.style.display = /^\d{13}$/.test(referenceNo) ? "none" : "block";
+    });
 
 function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
@@ -413,23 +422,20 @@ function showLogoutModal() {
         window.location.href = "../logout.php"; // Redirect to logout page
     }
 
-    document.getElementById("paymentForm").addEventListener("submit", function (e) {
-    const priceStr = "<?php echo str_replace(',', '', $price); ?>"; // raw price
-    const inputAmtStr = document.getElementById("amt_payment").value;
+    document.getElementById("paymentForm")?.addEventListener("submit", function (e) {
+        const balance = parseFloat("<?php echo $balance; ?>") || 0;
+        const inputAmt = parseFloat(document.getElementById("amt_payment").value.replace(/,/g, '')) || 0;
 
-    const cleanedPrice = parseFloat(priceStr) || 0;
-    const cleanedInput = parseFloat(inputAmtStr.replace(/,/g, '')) || 0;
-
-    if (cleanedInput > cleanedPrice) {
-        e.preventDefault(); // Block submission
-        Swal.fire({
-            icon: 'warning',
-            title: 'Overpayment Detected',
-            text: `You entered ₱${cleanedInput.toLocaleString()} but the required amount is only ₱${cleanedPrice.toLocaleString()}.`,
-            confirmButtonColor: '#dc3545',
-        });
-    }
-});
+        if (inputAmt > balance) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Overpayment Detected',
+                text: `You entered ₱${inputAmt.toLocaleString()} but your balance is only ₱${balance.toLocaleString()}.`,
+                confirmButtonColor: '#dc3545'
+            });
+        }
+    });
 
 
 
