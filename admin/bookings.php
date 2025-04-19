@@ -980,7 +980,6 @@ function submitPaymentUpdate() {
 
 
 
-
 function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
         let modalContent = document.getElementById("logoutModalContent");
