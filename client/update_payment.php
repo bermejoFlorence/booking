@@ -13,70 +13,75 @@
     <title>Payment</title>
 
     <?php
-    echo "<script>console.log('Received booking_id: " . $booking_id . "');</script>";
 session_start();
+include("../connection.php");
 
-if (isset($_SESSION["user"])) {
-    if (empty($_SESSION["user"]) || $_SESSION['usertype'] != 'p') {
-        header("location: ../login.php");
-        exit();
-    } else {
-        $useremail = $_SESSION["user"];
-    }
-} else {
+if (!isset($_SESSION["user"]) || $_SESSION["usertype"] !== "p") {
     header("location: ../login.php");
     exit();
 }
 
-include("../connection.php");
+$useremail = $_SESSION["user"];
 
-// Fetch client details
+// Fetch client
 $userrow = $database->query("SELECT * FROM client WHERE c_email='$useremail'");
-
-if ($userrow && $userrow->num_rows > 0) {
-    $userfetch = $userrow->fetch_assoc();
-    $userid = $userfetch["client_id"];
-    $username = $userfetch["c_fullname"];
-} else {
+if (!$userrow || $userrow->num_rows === 0) {
     session_unset();
     session_destroy();
     header("location: ../login.php");
     exit();
 }
 
-// Check if booking_id is set in the URL
-if (isset($_GET['booking_id'])) {
-    $booking_id = $_GET['booking_id'];
-    $booking_id = $_GET['booking_id'];
-$transactionNumber = $_GET['transac_num'] ?? 'N/A';
-$package = $_GET['package'] ?? 'N/A';
-$balance = $_GET['balance'] ?? '0';
+$userfetch = $userrow->fetch_assoc();
+$userid = $userfetch["client_id"];
+$username = $userfetch["c_fullname"];
 
-    // Fetch booking details
-    $query = "SELECT package, price FROM booking WHERE booking_id = ? AND client_id = ?";
-    $stmt = $database->prepare($query);
-    $stmt->bind_param("ii", $booking_id, $userid); // Bind client ID to ensure security
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $booking = $result->fetch_assoc();
-        $package = $booking['package'];
-        $price = $booking['price'];
-
-        echo "<script>console.log('Package: " . $package . " | Price: " . $price . "');</script>";
-
-        // Generate a random 10-digit transaction number
-        $transactionNumber = random_int(1000000000, 9999999999);
-    } else {
-        echo "Booking not found or unauthorized access!";
-        exit();
-    }
-} else {
+// Check booking_id
+if (!isset($_GET['booking_id'])) {
     echo "No booking ID provided!";
     exit();
 }
+
+$booking_id = $_GET['booking_id'];
+
+// Fetch booking info
+$stmt = $database->prepare("SELECT package, price FROM booking WHERE booking_id = ? AND client_id = ?");
+$stmt->bind_param("ii", $booking_id, $userid);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    echo "Booking not found or unauthorized access!";
+    exit();
+}
+
+$booking = $result->fetch_assoc();
+$package = $booking['package'];
+$price = (float)$booking['price'];
+
+// Fetch payment history and compute total paid
+$paidQuery = $database->prepare("
+    SELECT SUM(amt_payment) AS total_paid 
+    FROM payment 
+    WHERE booking_id = ? 
+    AND LOWER(payment_status) IN ('partial payment', 'full payment')
+");
+$paidQuery->bind_param("i", $booking_id);
+$paidQuery->execute();
+$paidResult = $paidQuery->get_result();
+
+$totalPaid = 0;
+if ($row = $paidResult->fetch_assoc()) {
+    $totalPaid = (float)$row['total_paid'];
+}
+$balance = $price - $totalPaid;
+if ($balance < 0) $balance = 0;
+
+$paidQuery->close();
+
+echo "<script>console.log('Package: $package | Price: $price | Total Paid: $totalPaid | Balance: $balance');</script>";
 ?>
+
 </head>
 <body>
 <style>
@@ -317,74 +322,76 @@ $balance = $_GET['balance'] ?? '0';
             <!-- Transaction Details -->
             <div class="details-container" style="margin-bottom: 15px;">
                 <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
-                <span><strong>Price:</strong> ₱<?php echo htmlspecialchars($price); ?>.00</span>
-                <span><strong>Balance:</strong> ₱<?php echo htmlspecialchars($balance); ?>.00</span>
+                <span><strong>Total Price:</strong> ₱<?php echo number_format($price, 2); ?></span>
+                <span><strong>Paid So Far:</strong> ₱<?php echo number_format($totalPaid, 2); ?></span>
+                <span><strong>Balance:</strong> ₱<?php echo number_format($balance, 2); ?></span>
             </div>
 
-            <form method="POST" action="update_save_payment.php" id="paymentForm">
-                <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
+            <?php if ($balance <= 0): ?>
+                <p style="color: green; font-weight: bold;">You are fully paid! No further payment is needed.</p>
+            <?php else: ?>
+                <form method="POST" action="update_save_payment.php" id="paymentForm">
+                    <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
 
-                <!-- GCash Payment Fields -->
-                <div id="gcash-fields">
-                    <div class="form-group">
-                        <label for="gcash_qr">Scan QR Code</label>
-                        <div>
-                            <img src="gcash.jpg" alt="GCash QR Code" style="width: 200px; height: auto;">
+                    <!-- GCash Payment Fields -->
+                    <div id="gcash-fields">
+                        <div class="form-group">
+                            <label for="gcash_qr">Scan QR Code</label>
+                            <div>
+                                <img src="gcash.jpg" alt="GCash QR Code" style="width: 200px; height: auto;">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reference_no">Reference Number</label>
+                            <input type="text" name="reference_no" id="reference_no"
+                                placeholder="Enter GCash reference number"
+                                maxlength="13" pattern="\d{13}" required
+                                onkeypress="return event.charCode>=48 && event.charCode<=57">
+                            <small id="error-message" style="color: red; display: none;">
+                                Reference number must be exactly 13 digits.
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="amt_payment">Amount to Pay</label>
+                            <input type="text" name="amt_payment" id="amt_payment" required
+                                onkeypress="return event.charCode>=48 && event.charCode<=57"
+                                placeholder="Enter amount (₱<?php echo number_format($balance); ?> max)">
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="reference_no">Reference Number</label>
-                        <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number"
-                            maxlength="13" pattern="\d{13}" required onkeypress="return event.charCode>=48 && event.charCode<=57">
-                        <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="amt_payment">Amount to Pay</label>
-                        <input type="text" name="amt_payment" id="amt_payment" required
-                            onkeypress="return event.charCode>=48 && event.charCode<=57"
-                            placeholder="Enter amount ex 1000, 100, 10, 1">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-primary">Submit Payment</button>
-            </form>
+                    <button type="submit" class="btn-primary">Submit Payment</button>
+                </form>
+            <?php endif; ?>
         </div>
     </table>
 </div>
     </div>
 
     <script>
-             function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            menu.classList.toggle('open');
-        }
+    function toggleMenu() {
+        const menu = document.querySelector('.menu');
+        menu.classList.toggle('open');
+    }
 
-        document.getElementById("reference_no").addEventListener("input", function () {
-        var referenceNo = this.value;
-        var errorMessage = document.getElementById("error-message");
+    document.getElementById("reference_no").addEventListener("input", function () {
+        const referenceNo = this.value;
+        const errorMessage = document.getElementById("error-message");
 
-        if (/^\d{13}$/.test(referenceNo)) {
-            errorMessage.style.display = "none";
-        } else {
-            errorMessage.style.display = "block";
-        }
+        errorMessage.style.display = /^\d{13}$/.test(referenceNo) ? "none" : "block";
     });
 
-    document.getElementById("paymentForm").addEventListener("submit", function (e) {
-        const balanceStr = "<?php echo str_replace(',', '', $balance); ?>";
-        const inputAmtStr = document.getElementById("amt_payment").value;
+    document.getElementById("paymentForm")?.addEventListener("submit", function (e) {
+        const balance = parseFloat("<?php echo $balance; ?>") || 0;
+        const inputAmt = parseFloat(document.getElementById("amt_payment").value.replace(/,/g, '')) || 0;
 
-        const cleanedBalance = parseFloat(balanceStr) || 0;
-        const cleanedInput = parseFloat(inputAmtStr.replace(/,/g, '')) || 0;
-
-        if (cleanedInput > cleanedBalance) {
+        if (inputAmt > balance) {
             e.preventDefault();
             Swal.fire({
                 icon: 'warning',
                 title: 'Overpayment Detected',
-                text: `You entered ₱${cleanedInput.toLocaleString()} but your remaining balance is only ₱${cleanedBalance.toLocaleString()}.`,
+                text: `You entered ₱${inputAmt.toLocaleString()} but your remaining balance is only ₱${balance.toLocaleString()}.`,
                 confirmButtonColor: '#dc3545',
             });
         }
@@ -410,7 +417,7 @@ $balance = $_GET['balance'] ?? '0';
     function logoutUser() {
         window.location.href = "../logout.php";
     }
-    </script>
+</script>
 
 </body>
 </html>
