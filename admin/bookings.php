@@ -982,6 +982,39 @@ function submitPaymentUpdate() {
     xhr.send(data);
 }
 
+function printInvoiceFromBooking(bookingId) {
+    fetch(`generate_invoice.php?booking_id=${bookingId}`)
+        .then(response => response.json())
+        .then(data => {
+            const {
+                receipt_no, price, package, event, date_event, address_event,
+                c_fullname, c_contactnum, c_address, payment_history
+            } = data;
+
+            const totalPaid = payment_history.reduce((sum, p) => sum + parseFloat(p.amt_payment), 0);
+            const balance = parseFloat(price) - totalPaid;
+
+            const phDate = new Date().toLocaleDateString('en-US', {
+                timeZone: 'Asia/Manila', day: 'numeric', month: 'short', year: '2-digit'
+            }).replace(',', '');
+
+            const printDiv = document.createElement("div");
+            printDiv.id = "print-container";
+            printDiv.innerHTML = `...` // Use same HTML template as in your working customer version
+
+            document.body.appendChild(printDiv);
+            window.print();
+
+            setTimeout(() => {
+                document.getElementById("print-container")?.remove();
+            }, 1000);
+        })
+        .catch(err => {
+            console.error('Error fetching invoice:', err);
+            alert('Failed to generate invoice.');
+        });
+}
+
 
 
 function showLogoutModal() {
