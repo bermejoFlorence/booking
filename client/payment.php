@@ -59,7 +59,7 @@ if (isset($_GET['booking_id'])) {
         $package = $booking['package'];
         $price = (float)$booking['price'];
 
-        $paidQuery = $database->prepare("SELECT SUM(amt_payment) as total_paid FROM payment WHERE booking_id = ?");
+        $paidQuery = $database->prepare("SELECT SUM(amt_payment) as total_paid FROM payment WHERE booking_id = ? AND payment_status IN ('Partial Payment', 'Full Payment')");
         $paidQuery->bind_param("i", $booking_id);
         $paidQuery->execute();
         $paidResult = $paidQuery->get_result();
