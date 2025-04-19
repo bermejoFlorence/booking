@@ -9,7 +9,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $amt_payment = $_POST['amt_payment'] ?? 0;
     $reference_no = $_POST['reference_no'] ?? null;
 
-    // Validate essential fields
     if (empty($booking_id) || empty($reference_no) || $amt_payment <= 0) {
         echo "<script>
                 alert('Error: Missing required fields or invalid amount.');
@@ -23,35 +22,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $database->begin_transaction();
 
     try {
-        // Insert payment record with status
-        $query = "INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status) VALUES (?, ?, ?, ?)";
-        $stmt = $database->prepare($query);
+        // ✅ Insert new payment linked to the same booking_id
+        $insert = $database->prepare("
+            INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status)
+            VALUES (?, ?, ?, ?)
+        ");
 
-        if ($stmt) {
-            $stmt->bind_param("idss", $booking_id, $amt_payment, $reference_no, $payment_status);
-
-            if (!$stmt->execute()) {
-                throw new Exception("Error inserting payment: " . $stmt->error);
-            }
-            $stmt->close();
-        } else {
-            throw new Exception("Error preparing payment query: " . $database->error);
+        if (!$insert) {
+            throw new Exception("Prepare failed: " . $database->error);
         }
 
-        // Update booking status to 'processing'
-        $update_query = "UPDATE booking SET stat = 'processing' WHERE booking_id = ?";
-        $update_stmt = $database->prepare($update_query);
+        $insert->bind_param("idss", $booking_id, $amt_payment, $reference_no, $payment_status);
 
-        if ($update_stmt) {
-            $update_stmt->bind_param("i", $booking_id);
-
-            if (!$update_stmt->execute()) {
-                throw new Exception("Error updating booking status: " . $update_stmt->error);
-            }
-            $update_stmt->close();
-        } else {
-            throw new Exception("Error preparing booking update query: " . $database->error);
+        if (!$insert->execute()) {
+            throw new Exception("Insert failed: " . $insert->error);
         }
+        $insert->close();
+
+        // ✅ Ensure booking stat reflects in-process status
+        $update = $database->prepare("UPDATE booking SET stat = 'processing' WHERE booking_id = ?");
+        if (!$update) {
+            throw new Exception("Booking update prepare failed: " . $database->error);
+        }
+
+        $update->bind_param("i", $booking_id);
+
+        if (!$update->execute()) {
+            throw new Exception("Booking update failed: " . $update->error);
+        }
+        $update->close();
 
         $database->commit();
 
@@ -66,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <script>
                 Swal.fire({
                     title: 'Payment Successful!',
-                    text: 'Your payment has been recorded successfully.',
+                    text: 'Your second payment has been recorded.',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(() => {
@@ -79,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     } catch (Exception $e) {
         $database->rollback();
-        error_log("Transaction Failed: " . $e->getMessage());
+        error_log("Payment update error: " . $e->getMessage());
 
         echo "
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
