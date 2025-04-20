@@ -818,7 +818,6 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     modal.style.display = "block";
 
     const priceClean = parseFloat(price.toString().replace(/,/g, ''));
-    const latestAmt = parseFloat(amtPayment.toString().replace(/,/g, '') || 0);
     const status = paymentStatus.toLowerCase();
 
     const balanceElem = document.getElementById("modal-balance");
@@ -837,12 +836,11 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
     printBtnContainer.style.display = "none";
 
-    // Set fixed display values
+    // Static display
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
-    document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, {minimumFractionDigits: 2});
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-    // Payment status dropdown or text
+    // Dropdown if still processing
     if (status === "processing payment") {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
@@ -864,12 +862,13 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
         }
     }
 
-    // Fetch payment history and compute balance
+    // Fetch payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
     .then(res => res.json())
     .then(history => {
         historyBody.innerHTML = '';
         let totalPaid = 0;
+        let latestAmt = 0;
 
         const confirmedPayments = history.filter(p => p.payment_status.toLowerCase() !== "processing payment");
 
@@ -878,9 +877,16 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             historySection.style.display = "none";
         } else {
             historySection.style.display = "flex";
-            confirmedPayments.forEach(p => {
+
+            confirmedPayments.forEach((p, i) => {
                 const amt = parseFloat(p.amt_payment || 0);
                 totalPaid += amt;
+
+                // Get last one
+                if (i === confirmedPayments.length - 1) {
+                    latestAmt = amt;
+                }
+
                 historyBody.innerHTML += `
                     <tr>
                         <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
@@ -894,15 +900,13 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
 
         const balance = priceClean - totalPaid;
 
-        // Show balance only
+        // 👇 FINAL DISPLAY AS PER YOUR LOGIC
+        document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, {minimumFractionDigits: 2});
         balanceElem.textContent = "₱" + balance.toLocaleString(undefined, {minimumFractionDigits: 2});
 
         if (balance > 0 && status === "processing payment") {
             balanceRow.style.display = "flex";
             updateBtn.style.display = "inline-block";
-        } else {
-            balanceRow.style.display = "none";
-            updateBtn.style.display = "none";
         }
 
         sessionStorage.setItem("payment_data", JSON.stringify({
@@ -924,6 +928,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     document.getElementById("modal-event-date").innerText = eventDate;
     document.getElementById("modal-event-address").innerText = eventAddress;
 }
+
 
 
 function printInvoiceFromBooking(bookingId) {
