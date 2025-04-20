@@ -877,30 +877,29 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             } else {
                 historySection.style.display = "flex";
 
-                historySection.style.display = "flex";
+if (displayHistory.length === 0) {
+    historyBody.innerHTML = `
+        <tr>
+            <td colspan="4" style="text-align: center; padding: 12px; font-style: italic; color: #999;">
+                No confirmed payments yet.
+            </td>
+        </tr>
+    `;
+} else {
+    historyBody.innerHTML = ''; // Clear existing
+    displayHistory.forEach((p) => {
+        const amt = parseFloat(p.amt_payment || 0);
+        historyBody.innerHTML += `
+            <tr>
+                <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
+                <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${amt.toLocaleString()}</td>
+                <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
+                <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
+            </tr>
+        `;
+    });
+}
 
-                    if (displayHistory.length === 0) {
-                        historyBody.innerHTML = `
-                            <tr>
-                                <td colspan="4" style="text-align: center; padding: 12px; font-style: italic; color: #999;">
-                                    No confirmed payments yet.
-                                </td>
-                            </tr>
-                        `;
-                    } else {
-                        historyBody.innerHTML = ''; // Clear existing
-                        displayHistory.forEach((p) => {
-                            const amt = parseFloat(p.amt_payment || 0);
-                            historyBody.innerHTML += `
-                                <tr>
-                                    <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
-                                    <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${amt.toLocaleString()}</td>
-                                    <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
-                                    <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
-                                </tr>
-                            `;
-                        });
-                    }
             }
 
             const balance = priceClean - totalPaid;
