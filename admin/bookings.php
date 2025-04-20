@@ -812,12 +812,12 @@ function updateBookingStatus(bookingId, status) {
     };
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
-
-function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress) {
+function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress){
     const modal = document.getElementById("viewReceiptModal");
     modal.style.display = "block";
 
     const priceClean = parseFloat(price.toString().replace(/,/g, ''));
+    const amtClean = parseFloat(amtPayment.toString().replace(/,/g, '') || 0);
     const status = paymentStatus.toLowerCase();
 
     const balanceElem = document.getElementById("modal-balance");
@@ -836,95 +836,94 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
     printBtnContainer.style.display = "none";
 
-    // Populate booking info
+    // Always populate payment info
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
+    document.getElementById("modal-amt-payment").innerText = amtClean > 0 ? "₱" + amtClean.toLocaleString() : "₱0.00";
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
+
+  // Payment status conditions
+if (status === "processing payment") {
+    // Show dropdown to classify payment
+    paymentDropdown.innerHTML = `
+        <select id="paymentType" name="paymentType" style="padding: 5px;">
+            <option value="">-- Choose Payment Type --</option>
+            <option value="Partial Payment">Partial Payment</option>
+            <option value="Full Payment">Full Payment</option>
+        </select>
+    `;
+    document.getElementById("submit-btn-container").style.display = "block";
+    document.getElementById("print-button-container").style.display = "none";
+    window.selectedBookingId = bookingId;
+} else {
+    // Just show status as text
+    paymentDropdown.innerText = paymentStatus || "N/A";
+    document.getElementById("submit-btn-container").style.display = "none";
+
+    // Only show print if status is already confirmed
+    if (["partial payment", "full payment"].includes(status)) {
+        printBtnContainer.style.display = "block";
+        printBtn.onclick = () => printInvoiceFromBooking(bookingId);
+    }
+}
+
+    // Fetch payment history
+    fetch(`get_payment_history.php?booking_id=${bookingId}`)
+    .then(res => res.json())
+    .then(history => {
+        historyBody.innerHTML = '';
+        let totalPaid = 0;
+
+        // Filter out any payments still in "processing"
+        const confirmedPayments = history.filter(p => p.payment_status.toLowerCase() !== "processing payment");
+
+        if (confirmedPayments.length === 0) {
+            historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
+            historySection.style.display = "none";
+        } else {
+            historySection.style.display = "flex";
+            confirmedPayments.forEach(p => {
+                totalPaid += parseFloat(p.amt_payment || 0);
+                historyBody.innerHTML += `
+                    <tr>
+                        <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
+                        <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
+                        <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
+                        <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        const balance = priceClean - totalPaid;
+        if (balance > 0 && status === "processing payment") {
+            balanceElem.textContent = `₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            balanceRow.style.display = "flex";
+            updateBtn.style.display = "inline-block";
+        } else {
+            balanceRow.style.display = "none";
+            updateBtn.style.display = "none";
+        }
+
+        sessionStorage.setItem("payment_data", JSON.stringify({
+            booking_id: bookingId,
+            price: priceClean,
+            paid: totalPaid,
+            balance: balance
+        }));
+    })
+    .catch(err => {
+        console.error("Payment history fetch error:", err);
+        historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
+    });
+
+    // Booking Info
     document.getElementById("modal-package").innerText = packageName;
-    document.getElementById("modal-price").innerText = "₱" + priceClean.toLocaleString();
+    document.getElementById("modal-price").innerText = "₱" + parseFloat(price).toLocaleString();
     document.getElementById("modal-event").innerText = event;
     document.getElementById("modal-event-date").innerText = eventDate;
     document.getElementById("modal-event-address").innerText = eventAddress;
-
-    // Dropdown if status is processing
-    if (status === "processing payment") {
-        paymentDropdown.innerHTML = `
-            <select id="paymentType" name="paymentType" style="padding: 5px;">
-                <option value="">-- Choose Payment Type --</option>
-                <option value="Partial Payment">Partial Payment</option>
-                <option value="Full Payment">Full Payment</option>
-            </select>
-        `;
-        document.getElementById("submit-btn-container").style.display = "block";
-        window.selectedBookingId = bookingId;
-    } else {
-        paymentDropdown.innerText = paymentStatus || "N/A";
-        document.getElementById("submit-btn-container").style.display = "none";
-    }
-
-    // Fetch and filter payment history
-    fetch(`get_payment_history.php?booking_id=${bookingId}`)
-        .then(res => res.json())
-        .then(history => {
-            historyBody.innerHTML = '';
-            let confirmedPayments = history.filter(p => p.payment_status.toLowerCase() !== "processing payment");
-            let latestPayment = history.length ? history[history.length - 1] : null;
-
-            let totalConfirmed = confirmedPayments.reduce((sum, p) => sum + parseFloat(p.amt_payment), 0);
-            let displayAmt = latestPayment && latestPayment.payment_status.toLowerCase() === 'processing payment'
-                            ? parseFloat(latestPayment.amt_payment)
-                            : totalConfirmed;
-
-            // Set modal amount
-            document.getElementById("modal-amt-payment").innerText = "₱" + displayAmt.toLocaleString();
-
-            // Display confirmed only in table
-            if (confirmedPayments.length > 0) {
-                confirmedPayments.forEach(p => {
-                    historyBody.innerHTML += `
-                        <tr>
-                            <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
-                            <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
-                            <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
-                            <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
-                        </tr>
-                    `;
-                });
-                historySection.style.display = "flex";
-            } else {
-                historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No confirmed payments yet.</td></tr>";
-                historySection.style.display = "none";
-            }
-
-            // Compute accurate balance based on total confirmed
-            const balance = priceClean - totalConfirmed;
-            if (balance > 0) {
-                balanceElem.textContent = `₱${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
-                balanceRow.style.display = "flex";
-                updateBtn.style.display = "inline-block";
-            } else {
-                balanceRow.style.display = "none";
-                updateBtn.style.display = "none";
-            }
-
-            // Show print button if status is full or partial
-            const latestStatus = latestPayment?.payment_status?.toLowerCase();
-            if (["partial payment", "full payment"].includes(latestStatus)) {
-                printBtnContainer.style.display = "block";
-                printBtn.onclick = () => printInvoiceFromBooking(bookingId);
-            }
-
-            sessionStorage.setItem("payment_data", JSON.stringify({
-                booking_id: bookingId,
-                price: priceClean,
-                paid: totalConfirmed,
-                balance: balance
-            }));
-        })
-        .catch(err => {
-            console.error("Payment history fetch error:", err);
-            historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
-        });
 }
+
 
 function printInvoiceFromBooking(bookingId) {
     fetch(`generate_invoice.php?booking_id=${bookingId}`)
