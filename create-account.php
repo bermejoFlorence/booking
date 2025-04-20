@@ -192,6 +192,21 @@ fieldset.address-section legend {
     flex: 1;
     min-width: calc(50% - 10px);
 }
+.form-section {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    background-color: #fafafa;
+}
+
+.form-section legend {
+    font-weight: bold;
+    font-size: 16px;
+    color: #007BFF;
+    padding: 0 10px;
+}
+
 
 
       
@@ -356,6 +371,9 @@ function sendVerificationEmail($email, $verification_code) {
 <p class="header-text">Let’s Get Started</p>
 
 <form action="" method="POST">
+    <!-- Personal Information -->
+<fieldset class="form-section">
+    <legend>Personal Information</legend>
     <div class="form-group">
         <div class="form-group-half">
             <label for="fname">First Name:</label>
@@ -366,7 +384,6 @@ function sendVerificationEmail($email, $verification_code) {
             <input type="text" name="lname" class="form-control" placeholder="Last Name" required>
         </div>
     </div>
-
     <div class="form-group">
         <div class="form-group-half">
             <label for="newemail">Email:</label>
@@ -374,37 +391,41 @@ function sendVerificationEmail($email, $verification_code) {
         </div>
         <div class="form-group-half">
             <label for="tele">Mobile Number:</label>
-            <input type="tel" name="tele" class="form-control" placeholder="ex: 09123456789" 
+            <input type="tel" name="tele" class="form-control" placeholder="ex: 09123456789"
                 pattern="^09[0-9]{9}$" maxlength="11" required
                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         </div>
     </div>
+</fieldset>
 
-    <!-- Address Group -->
-    <fieldset class="address-section">
-        <legend>Address</legend>
-        <div class="form-group">
-            <div class="form-group-half">
-                <label for="zone">Zone:</label>
-                <input type="text" name="zone" class="form-control" placeholder="Zone" required>
-            </div>
-            <div class="form-group-half">
-                <label for="barangay">Barangay:</label>
-                <input type="text" name="barangay" class="form-control" placeholder="Barangay" required>
-            </div>
+<!-- Address Information -->
+<fieldset class="form-section">
+    <legend>Address</legend>
+    <div class="form-group">
+        <div class="form-group-half">
+            <label for="zone">Zone:</label>
+            <input type="text" name="zone" class="form-control" placeholder="Zone" required>
         </div>
-        <div class="form-group">
-            <div class="form-group-half">
-                <label for="municipality">Municipality:</label>
-                <input type="text" name="municipality" class="form-control" placeholder="Municipality" required>
-            </div>
-            <div class="form-group-half">
-                <label for="province">Province:</label>
-                <input type="text" name="province" class="form-control" placeholder="Province" required>
-            </div>
+        <div class="form-group-half">
+            <label for="barangay">Barangay:</label>
+            <input type="text" name="barangay" class="form-control" placeholder="Barangay" required>
         </div>
-    </fieldset>
+    </div>
+    <div class="form-group">
+        <div class="form-group-half">
+            <label for="municipality">Municipality:</label>
+            <input type="text" name="municipality" class="form-control" placeholder="Municipality" required>
+        </div>
+        <div class="form-group-half">
+            <label for="province">Province:</label>
+            <input type="text" name="province" class="form-control" placeholder="Province" required>
+        </div>
+    </div>
+</fieldset>
 
+<!-- Account Security -->
+<fieldset class="form-section">
+    <legend>Account Security</legend>
     <div class="form-group">
         <label for="newpassword">Create New Password:</label>
         <div class="password-wrapper">
@@ -419,6 +440,8 @@ function sendVerificationEmail($email, $verification_code) {
             <i class="fas fa-eye password-toggle" onclick="togglePassword('cpassword', this)"></i>
         </div>
     </div>
+</fieldset>
+
 
     <?php echo $error; ?>
 
