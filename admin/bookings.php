@@ -818,6 +818,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     modal.style.display = "block";
 
     const priceClean = parseFloat(price.toString().replace(/,/g, ''));
+    const latestAmt = parseFloat(amtPayment.toString().replace(/,/g, '') || 0);
     const status = paymentStatus.toLowerCase();
 
     const balanceElem = document.getElementById("modal-balance");
@@ -836,10 +837,12 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
     printBtnContainer.style.display = "none";
 
-    // Reference No still shown directly
+    // Set fixed display values
+    document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
+    document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, {minimumFractionDigits: 2});
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-    // Payment status conditions
+    // Payment status dropdown or text
     if (status === "processing payment") {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
@@ -849,7 +852,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             </select>
         `;
         document.getElementById("submit-btn-container").style.display = "block";
-        document.getElementById("print-button-container").style.display = "none";
+        printBtnContainer.style.display = "none";
         window.selectedBookingId = bookingId;
     } else {
         paymentDropdown.innerText = paymentStatus || "N/A";
@@ -861,14 +864,13 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
         }
     }
 
-    // Fetch payment history
+    // Fetch payment history and compute balance
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
     .then(res => res.json())
     .then(history => {
         historyBody.innerHTML = '';
         let totalPaid = 0;
 
-        // Filter out "processing payment" entries
         const confirmedPayments = history.filter(p => p.payment_status.toLowerCase() !== "processing payment");
 
         if (confirmedPayments.length === 0) {
@@ -892,8 +894,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
 
         const balance = priceClean - totalPaid;
 
-        // Update displayed total paid and balance
-        document.getElementById("modal-amt-payment").innerText = "₱" + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2});
+        // Show balance only
         balanceElem.textContent = "₱" + balance.toLocaleString(undefined, {minimumFractionDigits: 2});
 
         if (balance > 0 && status === "processing payment") {
@@ -904,7 +905,6 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             updateBtn.style.display = "none";
         }
 
-        // Store data for further use
         sessionStorage.setItem("payment_data", JSON.stringify({
             booking_id: bookingId,
             price: priceClean,
@@ -923,9 +923,6 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     document.getElementById("modal-event").innerText = event;
     document.getElementById("modal-event-date").innerText = eventDate;
     document.getElementById("modal-event-address").innerText = eventAddress;
-
-    // Receipt number at top (for visual continuity)
-    document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
 }
 
 
