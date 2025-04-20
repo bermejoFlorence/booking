@@ -931,159 +931,120 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
 
 
 
-function printInvoiceFromBooking(bookingId) {
-    fetch(`generate_invoice.php?booking_id=${bookingId}`)
-        .then(response => response.json())
-        .then(data => {
-            const {
-                receipt_no,
-                price,
-                package,
-                event,
-                date_event,
-                address_event,
-                c_fullname,
-                c_contactnum,
-                c_address,
-                payment_history
-            } = data;
+function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress) {
+    const modal = document.getElementById("viewReceiptModal");
+    modal.style.display = "block";
 
-            const totalPaid = payment_history.reduce((sum, p) => sum + parseFloat(p.amt_payment), 0);
-            const balance = parseFloat(price) - totalPaid;
+    const priceClean = parseFloat(price.toString().replace(/,/g, ''));
+    const status = paymentStatus.toLowerCase();
 
-            const phDate = new Date().toLocaleDateString('en-US', {
-                timeZone: 'Asia/Manila',
-                day: 'numeric',
-                month: 'short',
-                year: '2-digit'
-            }).replace(',', '');
+    const balanceElem = document.getElementById("modal-balance");
+    const balanceRow = document.getElementById("balance-row");
+    const updateBtn = document.querySelector("#submit-btn-container button");
+    const paymentDropdown = document.getElementById("modal-payment-status");
+    const historySection = document.getElementById("payment-history-section");
+    const historyBody = document.querySelector("#payment-history-table tbody");
+    const printBtnContainer = document.getElementById("print-button-container");
+    const printBtn = printBtnContainer.querySelector("button.print-invoice");
 
-            const printDiv = document.createElement("div");
-            printDiv.id = "print-container";
-            printDiv.innerHTML = `
-                <style>
-                    @media print {
-                        body * { visibility: hidden; }
-                        #print-container, #print-container * { visibility: visible; }
-                        #print-container {
-                            position: absolute;
-                            left: 0;
-                            top: 0;
-                            width: 100%;
-                            padding: 30px;
-                            font-family: Arial, sans-serif;
-                            margin-top: 40px;
-                        }
-                    }
-                    .invoice-wrapper {
-                        max-width: 800px;
-                        margin: auto;
-                        border: 1px solid #ccc;
-                        padding: 30px;
-                        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                    }
-                    .header {
-                        display: flex;
-                        justify-content: space-between;
-                        font-size: 16px;
-                        font-weight: bold;
-                        margin-bottom: 20px;
-                    }
-                    .client-info {
-                        margin: 20px 0;
-                        font-size: 15px;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        font-size: 14px;
-                        margin-top: 10px;
-                    }
-                    th, td {
-                        border: 1px solid #ccc;
-                        padding: 10px;
-                        text-align: left;
-                    }
-                    th {
-                        background-color: #f5f5f5;
-                    }
-                    .totals {
-                        margin-top: 20px;
-                        font-size: 16px;
-                        text-align: right;
-                        font-weight: bold;
-                    }
-                    .footer {
-                        margin-top: 40px;
-                        text-align: center;
-                        font-size: 14px;
-                        color: #555;
-                    }
-                </style>
+    // Reset UI
+    balanceRow.style.display = "none";
+    updateBtn.style.display = "none";
+    historySection.style.display = "none";
+    historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
+    printBtnContainer.style.display = "none";
 
-                <div class="invoice-wrapper">
-                    <div class="header">
-                        <div>Receipt No.: ${receipt_no}</div>
-                        <div>Date: ${phDate}</div>
-                    </div>
-                    <div class="client-info">
-                        <strong>Client:</strong><br>
-                        ${c_fullname}<br>
-                        ${c_address}<br>
-                        ${c_contactnum}
-                    </div>
+    // Static display values
+    document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
+    document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Event</th>
-                                <th>Package</th>
-                                <th>Price</th>
-                                <th>Amount Paid</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${payment_history.map(payment => `
-                                <tr>
-                                    <td>${payment.date_created.split(" ")[0]}</td>
-                                    <td>${event}</td>
-                                    <td>${package}</td>
-                                    <td>₱${parseFloat(price).toLocaleString()}</td>
-                                    <td>₱${parseFloat(payment.amt_payment).toLocaleString()}</td>
-                                    <td>${payment.payment_status}</td>
-                                </tr>
-                            `).join("")}
-                        </tbody>
-                    </table>
+    // Dropdown if status is processing
+    if (status === "processing payment") {
+        paymentDropdown.innerHTML = `
+            <select id="paymentType" name="paymentType" style="padding: 5px;">
+                <option value="">-- Choose Payment Type --</option>
+                <option value="Partial Payment">Partial Payment</option>
+                <option value="Full Payment">Full Payment</option>
+            </select>
+        `;
+        document.getElementById("submit-btn-container").style.display = "block";
+        printBtnContainer.style.display = "none";
+        window.selectedBookingId = bookingId;
+    } else {
+        paymentDropdown.innerText = paymentStatus || "N/A";
+        document.getElementById("submit-btn-container").style.display = "none";
 
-                    <div class="totals">
-                        ${
-                            balance > 0
-                            ? `Balance: ₱${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
-                            : `<span style="color: green;">✔️ Fully Paid</span>`
-                        }
-                    </div>
+        if (["partial payment", "full payment"].includes(status)) {
+            printBtnContainer.style.display = "block";
+            printBtn.onclick = () => printInvoiceFromBooking(bookingId);
+        }
+    }
 
-                    <div class="footer">
-                        Thank you for your business!<br>
-                        EXZPHOTOGRAPHY STUDIO
-                    </div>
-                </div>
-            `;
+    // Fetch and process payment history
+    fetch(`get_payment_history.php?booking_id=${bookingId}`)
+        .then(res => res.json())
+        .then(history => {
+            historyBody.innerHTML = '';
+            let totalPaid = 0;
+            let latestAmt = 0;
+            let latestDate = null;
 
-            document.body.appendChild(printDiv);
-            window.print();
+            if (history.length === 0) {
+                historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
+                historySection.style.display = "none";
+            } else {
+                historySection.style.display = "flex";
 
-            setTimeout(() => {
-                document.getElementById("print-container")?.remove();
-            }, 1000);
+                history.forEach((p) => {
+                    const amt = parseFloat(p.amt_payment || 0);
+                    totalPaid += amt;
+
+                    // Pinakabagong bayad (kahit processing)
+                    if (!latestDate || new Date(p.date_created) > new Date(latestDate)) {
+                        latestAmt = amt;
+                        latestDate = p.date_created;
+                    }
+
+                    historyBody.innerHTML += `
+                        <tr>
+                            <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
+                            <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${amt.toLocaleString()}</td>
+                            <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
+                            <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const balance = priceClean - totalPaid;
+
+            // 👉 Display updated values
+            document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            balanceElem.textContent = "₱" + balance.toLocaleString(undefined, { minimumFractionDigits: 2 });
+
+            if (balance > 0 && status === "processing payment") {
+                balanceRow.style.display = "flex";
+                updateBtn.style.display = "inline-block";
+            }
+
+            sessionStorage.setItem("payment_data", JSON.stringify({
+                booking_id: bookingId,
+                price: priceClean,
+                paid: totalPaid,
+                balance: balance
+            }));
         })
         .catch(err => {
-            console.error('Error fetching invoice:', err);
-            alert('Failed to generate invoice.');
+            console.error("Payment history fetch error:", err);
+            historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
         });
+
+    // Booking Info
+    document.getElementById("modal-package").innerText = packageName;
+    document.getElementById("modal-price").innerText = "₱" + parseFloat(price).toLocaleString();
+    document.getElementById("modal-event").innerText = event;
+    document.getElementById("modal-event-date").innerText = eventDate;
+    document.getElementById("modal-event-address").innerText = eventAddress;
 }
 
 
