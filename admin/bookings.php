@@ -811,11 +811,13 @@ function updateBookingStatus(bookingId, status) {
     };
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
+
 function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress) {
     console.log("printBooking called with:", {
-    bookingId, receiptNo, amtPayment, paymentStatus, referenceNo,
-    packageName, price, event, eventDate, eventAddress
-});
+        bookingId, receiptNo, amtPayment, paymentStatus, referenceNo,
+        packageName, price, event, eventDate, eventAddress
+    });
+
     const modal = document.getElementById("viewReceiptModal");
     modal.style.display = "block";
 
@@ -841,30 +843,6 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-    // Dropdown or static payment status
-     // Dropdown or static payment status
-     if (hasProcessingPayment) {
-        paymentDropdown.innerHTML = `
-            <select id="paymentType" name="paymentType" style="padding: 5px;">
-                <option value="">-- Choose Payment Type --</option>
-                <option value="Partial Payment">Partial Payment</option>
-                <option value="Full Payment">Full Payment</option>
-            </select>
-        `;
-        document.getElementById("submit-btn-container").style.display = "block";
-        printBtnContainer.style.display = "none";
-        window.selectedBookingId = bookingId;
-    } else {
-        paymentDropdown.innerText = paymentStatus || "N/A";
-        document.getElementById("submit-btn-container").style.display = "none";
-
-        if (["partial payment", "full payment"].includes(status)) {
-            printBtnContainer.style.display = "block";
-            printBtn.onclick = () => printInvoiceFromBooking(bookingId);
-        }
-    }
-
-
     // Fetch and process payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
         .then(res => res.json())
@@ -873,8 +851,8 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             let totalPaid = 0;
             let latestAmt = 0;
             let latestDate = null;
-            const hasProcessingPayment = history.some(p => p.payment_status.toLowerCase() === "processing payment");
 
+            const hasProcessingPayment = history.some(p => p.payment_status.toLowerCase() === "processing payment");
 
             // Calculate total and get latest payment (any status)
             history.forEach(p => {
@@ -922,11 +900,34 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             const balance = priceClean - totalPaid;
             balanceElem.textContent = "₱" + balance.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
-            if (balance > 0 && status === "processing payment") {
+            if (balance > 0 && hasProcessingPayment) {
                 balanceRow.style.display = "flex";
                 updateBtn.style.display = "inline-block";
             }
 
+            // ✅ Move dropdown logic here based on processing payment
+            if (hasProcessingPayment) {
+                paymentDropdown.innerHTML = `
+                    <select id="paymentType" name="paymentType" style="padding: 5px;">
+                        <option value="">-- Choose Payment Type --</option>
+                        <option value="Partial Payment">Partial Payment</option>
+                        <option value="Full Payment">Full Payment</option>
+                    </select>
+                `;
+                document.getElementById("submit-btn-container").style.display = "block";
+                printBtnContainer.style.display = "none";
+                window.selectedBookingId = bookingId;
+            } else {
+                paymentDropdown.innerText = paymentStatus || "N/A";
+                document.getElementById("submit-btn-container").style.display = "none";
+
+                if (["partial payment", "full payment"].includes(status)) {
+                    printBtnContainer.style.display = "block";
+                    printBtn.onclick = () => printInvoiceFromBooking(bookingId);
+                }
+            }
+
+            // Save to session if needed later
             sessionStorage.setItem("payment_data", JSON.stringify({
                 booking_id: bookingId,
                 price: priceClean,
@@ -934,8 +935,6 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
                 balance: balance
             }));
         })
-
-        
         .catch(err => {
             console.error("Payment history fetch error:", err);
             historyBody.innerHTML = `
