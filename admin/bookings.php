@@ -812,119 +812,97 @@ function updateBookingStatus(bookingId, status) {
     };
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
+
 function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress){
     const modal = document.getElementById("viewReceiptModal");
     modal.style.display = "block";
 
     const priceClean = parseFloat(price.toString().replace(/,/g, ''));
-    const amtClean = parseFloat(amtPayment.toString().replace(/,/g, '') || 0);
     const status = paymentStatus.toLowerCase();
 
     const balanceElem = document.getElementById("modal-balance");
     const balanceRow = document.getElementById("balance-row");
-    const updateBtn = document.querySelector("#submit-btn-container button");
+    const updateBtnContainer = document.getElementById("submit-btn-container");
+    const printBtnContainer = document.getElementById("print-button-container");
     const paymentDropdown = document.getElementById("modal-payment-status");
     const historySection = document.getElementById("payment-history-section");
     const historyBody = document.querySelector("#payment-history-table tbody");
-    const printBtnContainer = document.getElementById("print-button-container");
     const printBtn = printBtnContainer.querySelector("button.print-invoice");
 
     // Reset UI
     balanceRow.style.display = "none";
-    updateBtn.style.display = "none";
+    updateBtnContainer.style.display = "none";
     historySection.style.display = "none";
-    historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
+    historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Loading...</td></tr>";
     printBtnContainer.style.display = "none";
 
-    // Always populate payment info
+    // Always populate header
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
-    document.getElementById("modal-amt-payment").innerText = "₱" + totalPaid.toLocaleString();
-
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
-
-  // Payment status conditions
-if (status === "processing payment") {
-    // Show dropdown to classify payment
-    paymentDropdown.innerHTML = `
-        <select id="paymentType" name="paymentType" style="padding: 5px;">
-            <option value="">-- Choose Payment Type --</option>
-            <option value="Partial Payment">Partial Payment</option>
-            <option value="Full Payment">Full Payment</option>
-        </select>
-    `;
-    document.getElementById("submit-btn-container").style.display = "block";
-    document.getElementById("print-button-container").style.display = "none";
-    window.selectedBookingId = bookingId;
-} else {
-    // Just show status as text
-    paymentDropdown.innerText = paymentStatus || "N/A";
-    document.getElementById("submit-btn-container").style.display = "none";
-
-    // Only show print if status is already confirmed
-    if (["partial payment", "full payment"].includes(status)) {
-        printBtnContainer.style.display = "block";
-        printBtn.onclick = () => printInvoiceFromBooking(bookingId);
-    }
-}
+    document.getElementById("modal-package").innerText = packageName;
+    document.getElementById("modal-price").innerText = "₱" + priceClean.toLocaleString();
+    document.getElementById("modal-event").innerText = event;
+    document.getElementById("modal-event-date").innerText = eventDate;
+    document.getElementById("modal-event-address").innerText = eventAddress;
 
     // Fetch payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
     .then(res => res.json())
     .then(history => {
-        historyBody.innerHTML = '';
         let totalPaid = 0;
+        let filteredHistory = history.filter(p => p.payment_status.toLowerCase() !== 'processing payment');
 
-        // Filter out any payments still in "processing"
-        const confirmedPayments = history.filter(p => p.payment_status.toLowerCase() !== "processing payment");
-
-        if (confirmedPayments.length === 0) {
-            historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
-            historySection.style.display = "none";
+        if (filteredHistory.length === 0) {
+            historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No valid payment records.</td></tr>";
         } else {
             historySection.style.display = "flex";
-            confirmedPayments.forEach(p => {
+            historyBody.innerHTML = '';
+            filteredHistory.forEach(p => {
                 totalPaid += parseFloat(p.amt_payment || 0);
                 historyBody.innerHTML += `
                     <tr>
-                        <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
-                        <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
-                        <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
-                        <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
-                    </tr>
-                `;
+                        <td>${new Date(p.date_created).toLocaleDateString()}</td>
+                        <td style="text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
+                        <td style="text-align:center;">${p.payment_status}</td>
+                        <td>${p.reference_no || 'N/A'}</td>
+                    </tr>`;
             });
         }
 
         const balance = priceClean - totalPaid;
-        if (balance > 0 && status === "processing payment") {
-            balanceElem.textContent = `₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            balanceRow.style.display = "flex";
-            updateBtn.style.display = "inline-block";
-        } else {
-            balanceRow.style.display = "none";
-            updateBtn.style.display = "none";
-        }
+        document.getElementById("modal-amt-payment").innerText = "₱" + parseFloat(amtPayment).toLocaleString();
 
+        // Store values
+        window.selectedBookingId = bookingId;
         sessionStorage.setItem("payment_data", JSON.stringify({
             booking_id: bookingId,
             price: priceClean,
             paid: totalPaid,
             balance: balance
         }));
-    })
-    .catch(err => {
-        console.error("Payment history fetch error:", err);
-        historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
+
+        // Show or hide buttons
+        if (status === 'processing payment') {
+            paymentDropdown.innerHTML = `
+                <select id="paymentType" name="paymentType" style="padding: 5px;">
+                    <option value="">-- Choose Payment Type --</option>
+                    <option value="Partial Payment">Partial Payment</option>
+                    <option value="Full Payment">Full Payment</option>
+                </select>`;
+            updateBtnContainer.style.display = "block";
+            balanceElem.innerText = `₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            balanceRow.style.display = "flex";
+        } else {
+            paymentDropdown.innerText = paymentStatus;
+            printBtnContainer.style.display = "block";
+            printBtn.onclick = () => printInvoiceFromBooking(bookingId);
+        }
+
+    }).catch(err => {
+        console.error("Payment fetch failed:", err);
+        historyBody.innerHTML = "<tr><td colspan='4'>Error fetching history.</td></tr>";
     });
-
-    // Booking Info
-    document.getElementById("modal-package").innerText = packageName;
-    document.getElementById("modal-price").innerText = "₱" + parseFloat(price).toLocaleString();
-    document.getElementById("modal-event").innerText = event;
-    document.getElementById("modal-event-date").innerText = eventDate;
-    document.getElementById("modal-event-address").innerText = eventAddress;
 }
-
 
 function printInvoiceFromBooking(bookingId) {
     fetch(`generate_invoice.php?booking_id=${bookingId}`)
