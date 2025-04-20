@@ -838,7 +838,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
 
     // Always populate payment info
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
-    document.getElementById("modal-amt-payment").innerText = amtClean > 0 ? "₱" + amtClean.toLocaleString() : "₱0.00";
+    document.getElementById("modal-amt-payment").innerText = "₱" + totalPaid.toLocaleString();
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
   // Payment status conditions
