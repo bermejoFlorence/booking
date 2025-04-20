@@ -50,16 +50,14 @@ if ($result->num_rows > 0) {
 // Set timezone to Philippine Time
 date_default_timezone_set('Asia/Manila');
 
-$records_per_page = 10; // Number of records per page
-$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Get current page, default to 1
-$offset = ($current_page - 1) * $records_per_page; // Calculate the offset
+$records_per_page = 10;
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($current_page - 1) * $records_per_page;
 
-// ✅ Bagong Query para mabilang lahat ng bookings (kasama na ang pending)
+// Count all booking records
 $total_records_query = "SELECT COUNT(*) AS total FROM booking";
 $total_records_result = $database->query($total_records_query);
 $total_records = $total_records_result->fetch_assoc()['total'];
-
-// Calculate total pages
 $total_pages = ceil($total_records / $records_per_page);
 
 $sql = "
@@ -81,21 +79,23 @@ FROM
 LEFT JOIN 
     client c ON b.client_id = c.client_id
 LEFT JOIN (
-    SELECT *
-    FROM payment
-    WHERE (booking_id, date_created) IN (
-        SELECT booking_id, MAX(date_created)
+    SELECT p1.*
+    FROM payment p1
+    INNER JOIN (
+        SELECT booking_id, MAX(date_created) AS max_date
         FROM payment
         GROUP BY booking_id
-    )
+    ) p2 ON p1.booking_id = p2.booking_id AND p1.date_created = p2.max_date
 ) p ON b.booking_id = p.booking_id
 ORDER BY 
     FIELD(b.stat, 'pending', 'approved', 'rejected'),
     b.date_created DESC
 LIMIT $records_per_page OFFSET $offset
 ";
+
 $result = $database->query($sql);
 ?>
+
 
    <style>
            .dash-body {
