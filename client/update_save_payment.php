@@ -18,28 +18,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     $payment_status = "processing payment";
+    $date_created = date("Y-m-d H:i:s"); // ✅ get current PH time
 
     $database->begin_transaction();
 
     try {
-        // ✅ Insert new payment linked to the same booking_id
+        // ✅ Insert payment with manual date_created
         $insert = $database->prepare("
-            INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status, date_created)
+            VALUES (?, ?, ?, ?, ?)
         ");
 
         if (!$insert) {
             throw new Exception("Prepare failed: " . $database->error);
         }
 
-        $insert->bind_param("idss", $booking_id, $amt_payment, $reference_no, $payment_status);
+        $insert->bind_param("idsss", $booking_id, $amt_payment, $reference_no, $payment_status, $date_created);
 
         if (!$insert->execute()) {
             throw new Exception("Insert failed: " . $insert->error);
         }
         $insert->close();
 
-        // ✅ Ensure booking stat reflects in-process status
+        // ✅ Update booking to processing
         $update = $database->prepare("UPDATE booking SET stat = 'processing' WHERE booking_id = ?");
         if (!$update) {
             throw new Exception("Booking update prepare failed: " . $database->error);
