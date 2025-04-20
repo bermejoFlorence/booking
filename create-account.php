@@ -167,6 +167,19 @@
             text-decoration: underline;
         }
 
+        .form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.form-group-half {
+    flex: 1;
+    min-width: calc(50% - 10px);
+}
+
+
       
     </style>
 </head>
@@ -347,10 +360,29 @@ function sendVerificationEmail($email, $verification_code) {
             </div>
         </div>
 
-        <div class="form-group">
-            <label for="address">Address:</label>
-            <input type="text" name="address" class="form-control" placeholder="Address" required>
-        </div>
+       <!-- Address Section (Split into Zone, Barangay, Municipality, Province) -->
+<div class="form-group">
+    <div class="form-group-half">
+        <label for="zone">Zone:</label>
+        <input type="text" name="zone" class="form-control" placeholder="Zone" required>
+    </div>
+    <div class="form-group-half">
+        <label for="barangay">Barangay:</label>
+        <input type="text" name="barangay" class="form-control" placeholder="Barangay" required>
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="form-group-half">
+        <label for="municipality">Municipality:</label>
+        <input type="text" name="municipality" class="form-control" placeholder="Municipality" required>
+    </div>
+    <div class="form-group-half">
+        <label for="province">Province:</label>
+        <input type="text" name="province" class="form-control" placeholder="Province" required>
+    </div>
+</div>
+
 
         
             <div class="form-group">
