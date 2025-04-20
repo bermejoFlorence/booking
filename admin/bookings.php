@@ -852,7 +852,10 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             let latestAmt = 0;
             let latestDate = null;
 
-            const hasProcessingPayment = history.some(p => p.payment_status.toLowerCase() === "processing payment");
+            console.log("Fetched history:", history);
+
+const hasProcessingPayment = history.some(p => p.payment_status.toLowerCase() === "processing payment");
+console.log("hasProcessingPayment:", hasProcessingPayment);
 
             // Calculate total and get latest payment (any status)
             history.forEach(p => {
