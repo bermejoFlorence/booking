@@ -812,6 +812,7 @@ function updateBookingStatus(bookingId, status) {
     };
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
+
 function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress){
     const modal = document.getElementById("viewReceiptModal");
     modal.style.display = "block";
@@ -841,7 +842,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     document.getElementById("modal-amt-payment").innerText = amtClean > 0 ? "₱" + amtClean.toLocaleString() : "₱0.00";
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-    // ✅ Show dropdown + buttons if processing payment
+    // If current payment is "processing payment", allow dropdown to classify it
     if (status === "processing payment") {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
@@ -851,48 +852,48 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             </select>
         `;
         document.getElementById("submit-btn-container").style.display = "block";
-        printBtnContainer.style.display = "block";
-        printBtn.onclick = () => printInvoiceFromBooking(bookingId);
         window.selectedBookingId = bookingId;
     } else {
-        paymentDropdown.innerHTML = `<span>${paymentStatus || "N/A"}</span>`;
+        paymentDropdown.innerText = paymentStatus || "N/A";
         document.getElementById("submit-btn-container").style.display = "none";
-
-        if (["partial payment", "full payment"].includes(status)) {
-            printBtnContainer.style.display = "block";
-            printBtn.onclick = () => printInvoiceFromBooking(bookingId);
-        }
     }
 
-    // ✅ Fetch payment history
+    // Show Print Invoice button if status is not "processing payment"
+    if (["partial payment", "full payment"].includes(status)) {
+        printBtnContainer.style.display = "block";
+        printBtn.onclick = () => printInvoiceFromBooking(bookingId);
+    }
+
+    // Fetch payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
     .then(res => res.json())
     .then(history => {
         historyBody.innerHTML = '';
         let totalPaid = 0;
 
-        if (history.length === 0) {
+        // Filter out any payments still in "processing"
+        const confirmedPayments = history.filter(p => p.payment_status.toLowerCase() !== "processing payment");
+
+        if (confirmedPayments.length === 0) {
             historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
             historySection.style.display = "none";
-            return;
+        } else {
+            historySection.style.display = "flex";
+            confirmedPayments.forEach(p => {
+                totalPaid += parseFloat(p.amt_payment || 0);
+                historyBody.innerHTML += `
+                    <tr>
+                        <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
+                        <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
+                        <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
+                        <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
+                    </tr>
+                `;
+            });
         }
 
-        historySection.style.display = "flex";
-
-        history.forEach(p => {
-            totalPaid += parseFloat(p.amt_payment || 0);
-            historyBody.innerHTML += `
-                <tr>
-                    <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
-                    <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
-                    <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
-                    <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
-                </tr>
-            `;
-        });
-
         const balance = priceClean - totalPaid;
-        if (balance > 0) {
+        if (balance > 0 && status === "processing payment") {
             balanceElem.textContent = `₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
             balanceRow.style.display = "flex";
             updateBtn.style.display = "inline-block";
