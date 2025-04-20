@@ -812,6 +812,10 @@ function updateBookingStatus(bookingId, status) {
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
 function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress) {
+    console.log("printBooking called with:", {
+    bookingId, receiptNo, amtPayment, paymentStatus, referenceNo,
+    packageName, price, event, eventDate, eventAddress
+});
     const modal = document.getElementById("viewReceiptModal");
     modal.style.display = "block";
 
