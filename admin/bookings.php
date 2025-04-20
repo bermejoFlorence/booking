@@ -903,10 +903,6 @@ console.log("hasProcessingPayment:", hasProcessingPayment);
             const balance = priceClean - totalPaid;
             balanceElem.textContent = "₱" + balance.toLocaleString(undefined, { minimumFractionDigits: 2 });
             console.log("Balance Computed:", balance); 
-            if (balance > 0 && hasProcessingPayment) {
-                balanceRow.style.display = "flex";
-                updateBtn.style.display = "inline-block";
-            }
 
             // ✅ Move dropdown logic here based on processing payment
             if (hasProcessingPayment) {
