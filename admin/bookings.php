@@ -841,7 +841,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     document.getElementById("modal-amt-payment").innerText = amtClean > 0 ? "₱" + amtClean.toLocaleString() : "₱0.00";
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-    // Dropdown for processing payment
+    // ✅ Show dropdown + buttons if processing payment
     if (status === "processing payment") {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
@@ -851,19 +851,20 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             </select>
         `;
         document.getElementById("submit-btn-container").style.display = "block";
-        window.selectedBookingId = bookingId;
-    } else {
-        paymentDropdown.innerText = paymentStatus || "N/A";
-        document.getElementById("submit-btn-container").style.display = "none";
-    }
-
-    // Show Print Invoice button if status is partial or full payment
-    if (["partial payment", "full payment"].includes(status)) {
         printBtnContainer.style.display = "block";
         printBtn.onclick = () => printInvoiceFromBooking(bookingId);
+        window.selectedBookingId = bookingId;
+    } else {
+        paymentDropdown.innerHTML = `<span>${paymentStatus || "N/A"}</span>`;
+        document.getElementById("submit-btn-container").style.display = "none";
+
+        if (["partial payment", "full payment"].includes(status)) {
+            printBtnContainer.style.display = "block";
+            printBtn.onclick = () => printInvoiceFromBooking(bookingId);
+        }
     }
 
-    // Fetch payment history
+    // ✅ Fetch payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
     .then(res => res.json())
     .then(history => {
@@ -876,24 +877,20 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             return;
         }
 
-        const showHistory = history.length > 1 || (history.length === 1 && !["full payment", "processing payment"].includes(history[0].payment_status.toLowerCase()));
+        historySection.style.display = "flex";
 
-        if (showHistory) {
-            historySection.style.display = "flex";
-            history.forEach(p => {
-                totalPaid += parseFloat(p.amt_payment || 0);
-                historyBody.innerHTML += `
-                    <tr>
-                        <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
-                        <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
-                        <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
-                        <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
-                    </tr>
-                `;
-            });
-        }
+        history.forEach(p => {
+            totalPaid += parseFloat(p.amt_payment || 0);
+            historyBody.innerHTML += `
+                <tr>
+                    <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
+                    <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
+                    <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
+                    <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
+                </tr>
+            `;
+        });
 
-        // Compute Balance
         const balance = priceClean - totalPaid;
         if (balance > 0) {
             balanceElem.textContent = `₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
@@ -903,12 +900,13 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             balanceRow.style.display = "none";
             updateBtn.style.display = "none";
         }
+
         sessionStorage.setItem("payment_data", JSON.stringify({
-    booking_id: bookingId,
-    price: priceClean,
-    paid: totalPaid,
-    balance: balance
-}));
+            booking_id: bookingId,
+            price: priceClean,
+            paid: totalPaid,
+            balance: balance
+        }));
     })
     .catch(err => {
         console.error("Payment history fetch error:", err);
