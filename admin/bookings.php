@@ -843,26 +843,31 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
     // If current payment is "processing payment", allow dropdown to classify it
-    if (status === "processing payment") {
-        paymentDropdown.innerHTML = `
-            <select id="paymentType" name="paymentType" style="padding: 5px;">
-                <option value="">-- Choose Payment Type --</option>
-                <option value="Partial Payment">Partial Payment</option>
-                <option value="Full Payment">Full Payment</option>
-            </select>
-        `;
-        document.getElementById("submit-btn-container").style.display = "block";
-        window.selectedBookingId = bookingId;
-    } else {
-        paymentDropdown.innerText = paymentStatus || "N/A";
-        document.getElementById("submit-btn-container").style.display = "none";
-    }
+    // Payment status conditions
+if (status === "processing payment") {
+    // Show dropdown to classify payment
+    paymentDropdown.innerHTML = `
+        <select id="paymentType" name="paymentType" style="padding: 5px;">
+            <option value="">-- Choose Payment Type --</option>
+            <option value="Partial Payment">Partial Payment</option>
+            <option value="Full Payment">Full Payment</option>
+        </select>
+    `;
+    document.getElementById("submit-btn-container").style.display = "block";
+    document.getElementById("print-button-container").style.display = "none";
+    window.selectedBookingId = bookingId;
+} else {
+    // Just show status as text
+    paymentDropdown.innerText = paymentStatus || "N/A";
+    document.getElementById("submit-btn-container").style.display = "none";
 
-    // Show Print Invoice button if status is not "processing payment"
+    // Only show print if status is already confirmed
     if (["partial payment", "full payment"].includes(status)) {
         printBtnContainer.style.display = "block";
         printBtn.onclick = () => printInvoiceFromBooking(bookingId);
     }
+}
+
 
     // Fetch payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
