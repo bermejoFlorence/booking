@@ -901,9 +901,8 @@ console.log("hasProcessingPayment:", hasProcessingPayment);
             // Display calculated values
             document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, { minimumFractionDigits: 2 });
             const balance = priceClean - totalPaid;
-            console.log("Balance Computed:", balance); 
             balanceElem.textContent = "₱" + balance.toLocaleString(undefined, { minimumFractionDigits: 2 });
-
+            console.log("Balance Computed:", balance); 
             if (balance > 0 && hasProcessingPayment) {
                 balanceRow.style.display = "flex";
                 updateBtn.style.display = "inline-block";
