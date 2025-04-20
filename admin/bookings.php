@@ -836,7 +836,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
     printBtnContainer.style.display = "none";
 
-    // Always populate booking info
+    // Populate booking info
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
     document.getElementById("modal-package").innerText = packageName;
@@ -845,7 +845,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     document.getElementById("modal-event-date").innerText = eventDate;
     document.getElementById("modal-event-address").innerText = eventAddress;
 
-    // Dropdown for admin review
+    // Dropdown if status is processing
     if (status === "processing payment") {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
@@ -861,22 +861,25 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
         document.getElementById("submit-btn-container").style.display = "none";
     }
 
-    // Fetch payment history
+    // Fetch and filter payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
         .then(res => res.json())
         .then(history => {
             historyBody.innerHTML = '';
-            let totalPaid = 0;
+            let confirmedPayments = history.filter(p => p.payment_status.toLowerCase() !== "processing payment");
+            let latestPayment = history.length ? history[history.length - 1] : null;
 
-            // Only show confirmed (non-processing) entries in history
-            const filtered = history.filter(p => p.payment_status.toLowerCase() !== "processing payment");
+            let totalConfirmed = confirmedPayments.reduce((sum, p) => sum + parseFloat(p.amt_payment), 0);
+            let displayAmt = latestPayment && latestPayment.payment_status.toLowerCase() === 'processing payment'
+                            ? parseFloat(latestPayment.amt_payment)
+                            : totalConfirmed;
 
-            if (filtered.length === 0) {
-                historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No confirmed payments yet.</td></tr>";
-                historySection.style.display = "none";
-            } else {
-                filtered.forEach(p => {
-                    totalPaid += parseFloat(p.amt_payment || 0);
+            // Set modal amount
+            document.getElementById("modal-amt-payment").innerText = "₱" + displayAmt.toLocaleString();
+
+            // Display confirmed only in table
+            if (confirmedPayments.length > 0) {
+                confirmedPayments.forEach(p => {
                     historyBody.innerHTML += `
                         <tr>
                             <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
@@ -887,12 +890,13 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
                     `;
                 });
                 historySection.style.display = "flex";
+            } else {
+                historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No confirmed payments yet.</td></tr>";
+                historySection.style.display = "none";
             }
 
-            // Update amount paid and balance display
-            document.getElementById("modal-amt-payment").innerText = "₱" + totalPaid.toLocaleString();
-            const balance = priceClean - totalPaid;
-
+            // Compute accurate balance based on total confirmed
+            const balance = priceClean - totalConfirmed;
             if (balance > 0) {
                 balanceElem.textContent = `₱${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
                 balanceRow.style.display = "flex";
@@ -902,17 +906,17 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
                 updateBtn.style.display = "none";
             }
 
-            // Show print button if already confirmed
-            if (["partial payment", "full payment"].includes(status)) {
+            // Show print button if status is full or partial
+            const latestStatus = latestPayment?.payment_status?.toLowerCase();
+            if (["partial payment", "full payment"].includes(latestStatus)) {
                 printBtnContainer.style.display = "block";
                 printBtn.onclick = () => printInvoiceFromBooking(bookingId);
             }
 
-            // Optional: persist for external use
             sessionStorage.setItem("payment_data", JSON.stringify({
                 booking_id: bookingId,
                 price: priceClean,
-                paid: totalPaid,
+                paid: totalConfirmed,
                 balance: balance
             }));
         })
