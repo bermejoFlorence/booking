@@ -878,23 +878,27 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
                 historySection.style.display = "flex";
 
                 history.forEach((p) => {
+                    const status = p.payment_status.toLowerCase();
                     const amt = parseFloat(p.amt_payment || 0);
                     totalPaid += amt;
 
-                    // Pinakabagong bayad (kahit processing)
+                    // Pinakabagong kahit anong status pa yan (for "Amount Paid" display)
                     if (!latestDate || new Date(p.date_created) > new Date(latestDate)) {
                         latestAmt = amt;
                         latestDate = p.date_created;
                     }
 
-                    historyBody.innerHTML += `
-                        <tr>
-                            <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
-                            <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${amt.toLocaleString()}</td>
-                            <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
-                            <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
-                        </tr>
-                    `;
+                    // Display only if status is partial or full payment
+                    if (status === "partial payment" || status === "full payment") {
+                        historyBody.innerHTML += `
+                            <tr>
+                                <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
+                                <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${amt.toLocaleString()}</td>
+                                <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
+                                <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
+                            </tr>
+                        `;
+                    }
                 });
             }
 
