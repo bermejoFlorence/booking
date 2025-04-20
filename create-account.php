@@ -34,6 +34,20 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        fieldset.address-section {
+    border: 1px solid #ddd;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+fieldset.address-section legend {
+    font-weight: bold;
+    color: #007BFF;
+    padding: 0 10px;
+    font-size: 16px;
+}
+
 
         .form-group {
             display: flex;
@@ -339,95 +353,84 @@ function sendVerificationEmail($email, $verification_code) {
 
 <!-- form for creating account -->
 <div class="container">
-    <p class="header-text">Let’s Get Started</p>
+<p class="header-text">Let’s Get Started</p>
 
-    <form action="" method="POST">
+<form action="" method="POST">
+    <div class="form-group">
+        <div class="form-group-half">
+            <label for="fname">First Name:</label>
+            <input type="text" name="fname" class="form-control" placeholder="First Name" required>
+        </div>
+        <div class="form-group-half">
+            <label for="lname">Last Name:</label>
+            <input type="text" name="lname" class="form-control" placeholder="Last Name" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-group-half">
+            <label for="newemail">Email:</label>
+            <input type="email" name="newemail" class="form-control" placeholder="Email Address" required>
+        </div>
+        <div class="form-group-half">
+            <label for="tele">Mobile Number:</label>
+            <input type="tel" name="tele" class="form-control" placeholder="ex: 09123456789" 
+                pattern="^09[0-9]{9}$" maxlength="11" required
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        </div>
+    </div>
+
+    <!-- Address Group -->
+    <fieldset class="address-section">
+        <legend>Address</legend>
         <div class="form-group">
             <div class="form-group-half">
-                <label for="fname">First Name:</label>
-                <input type="text" name="fname" class="form-control" placeholder="First Name" required>
+                <label for="zone">Zone:</label>
+                <input type="text" name="zone" class="form-control" placeholder="Zone" required>
             </div>
             <div class="form-group-half">
-                <label for="lname">Last Name:</label>
-                <input type="text" name="lname" class="form-control" placeholder="Last Name" required>
+                <label for="barangay">Barangay:</label>
+                <input type="text" name="barangay" class="form-control" placeholder="Barangay" required>
             </div>
         </div>
-
         <div class="form-group">
             <div class="form-group-half">
-                <label for="newemail">Email:</label>
-                <input type="email" name="newemail" class="form-control" placeholder="Email Address" required>
+                <label for="municipality">Municipality:</label>
+                <input type="text" name="municipality" class="form-control" placeholder="Municipality" required>
             </div>
             <div class="form-group-half">
-                <label for="tele">Mobile Number:</label>
-                <input type="tel" name="tele" class="form-control" placeholder="ex: 09123456789" 
-                    pattern="^09[0-9]{9}$" maxlength="11" required
-                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <label for="province">Province:</label>
+                <input type="text" name="province" class="form-control" placeholder="Province" required>
             </div>
         </div>
+    </fieldset>
 
-       <!-- Address Section (Split into Zone, Barangay, Municipality, Province) -->
-<!-- Address Section with Title -->
-<div class="form-group">
-    <label style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">Address</label>
-    <div class="form-group-half">
-        <label for="zone">Zone:</label>
-        <input type="text" name="zone" class="form-control" placeholder="Zone" required>
-    </div>
-    <div class="form-group-half">
-        <label for="barangay">Barangay:</label>
-        <input type="text" name="barangay" class="form-control" placeholder="Barangay" required>
-    </div>
-</div>
-
-<div class="form-group">
-    <div class="form-group-half">
-        <label for="municipality">Municipality:</label>
-        <input type="text" name="municipality" class="form-control" placeholder="Municipality" required>
-    </div>
-    <div class="form-group-half">
-        <label for="province">Province:</label>
-        <input type="text" name="province" class="form-control" placeholder="Province" required>
-    </div>
-</div>
-
-
-<div class="form-group">
-    <div class="form-group-half">
-        <label for="municipality">Municipality:</label>
-        <input type="text" name="municipality" class="form-control" placeholder="Municipality" required>
-    </div>
-    <div class="form-group-half">
-        <label for="province">Province:</label>
-        <input type="text" name="province" class="form-control" placeholder="Province" required>
-    </div>
-</div>
-
-
-        
-            <div class="form-group">
-                <label for="newpassword">Create New Password:</label>
-                    <input type="password" name="newpassword" id="newpassword" class="form-control" placeholder="New Password" required>
-                    <i class="fas fa-eye password-toggle" onclick="togglePassword('newpassword', this)"></i>
-            </div>
-            <div class="form-group">
-                <label for="cpassword">Confirm Password:</label>
-                
-                    <input type="password" name="cpassword" id="cpassword" class="form-control" placeholder="Confirm Password" required>
-                    <i class="fas fa-eye password-toggle" onclick="togglePassword('cpassword', this)"></i>
-            </div>
-
-        <?php echo $error; ?>
-
-        <div class="btn-container">
-            <input type="reset" value="Reset" class="btn btn-secondary">
-            <input type="submit" value="Sign Up" class="btn btn-primary">
+    <div class="form-group">
+        <label for="newpassword">Create New Password:</label>
+        <div class="password-wrapper">
+            <input type="password" name="newpassword" id="newpassword" class="form-control" placeholder="New Password" required>
+            <i class="fas fa-eye password-toggle" onclick="togglePassword('newpassword', this)"></i>
         </div>
+    </div>
+    <div class="form-group">
+        <label for="cpassword">Confirm Password:</label>
+        <div class="password-wrapper">
+            <input type="password" name="cpassword" id="cpassword" class="form-control" placeholder="Confirm Password" required>
+            <i class="fas fa-eye password-toggle" onclick="togglePassword('cpassword', this)"></i>
+        </div>
+    </div>
 
-        <p class="sub-text">Already have an account? <a href="login.php">Login</a></p>
-        <a href="index.php" class="back-btn">← Back to Home</a>
-        
-    </form>
+    <?php echo $error; ?>
+
+    <div class="btn-container">
+        <input type="reset" value="Reset" class="btn btn-secondary">
+        <input type="submit" value="Sign Up" class="btn btn-primary">
+    </div>
+
+    <p class="sub-text">Already have an account? <a href="login.php">Login</a></p>
+    <a href="index.php" class="back-btn">← Back to Home</a>
+</form>
+
 </div>
 
 <script>
