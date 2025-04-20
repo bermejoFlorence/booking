@@ -812,12 +812,12 @@ function updateBookingStatus(bookingId, status) {
     };
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
+
 function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress){
     const modal = document.getElementById("viewReceiptModal");
     modal.style.display = "block";
 
     const priceClean = parseFloat(price.toString().replace(/,/g, ''));
-    const amtClean = parseFloat(amtPayment.toString().replace(/,/g, '') || 0);
     const status = paymentStatus.toLowerCase();
 
     const balanceElem = document.getElementById("modal-balance");
@@ -836,35 +836,30 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
     printBtnContainer.style.display = "none";
 
-    // Always populate payment info
-    document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
-    document.getElementById("modal-amt-payment").innerText = amtClean > 0 ? "₱" + amtClean.toLocaleString() : "₱0.00";
+    // Reference No still shown directly
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-  // Payment status conditions
-if (status === "processing payment") {
-    // Show dropdown to classify payment
-    paymentDropdown.innerHTML = `
-        <select id="paymentType" name="paymentType" style="padding: 5px;">
-            <option value="">-- Choose Payment Type --</option>
-            <option value="Partial Payment">Partial Payment</option>
-            <option value="Full Payment">Full Payment</option>
-        </select>
-    `;
-    document.getElementById("submit-btn-container").style.display = "block";
-    document.getElementById("print-button-container").style.display = "none";
-    window.selectedBookingId = bookingId;
-} else {
-    // Just show status as text
-    paymentDropdown.innerText = paymentStatus || "N/A";
-    document.getElementById("submit-btn-container").style.display = "none";
+    // Payment status conditions
+    if (status === "processing payment") {
+        paymentDropdown.innerHTML = `
+            <select id="paymentType" name="paymentType" style="padding: 5px;">
+                <option value="">-- Choose Payment Type --</option>
+                <option value="Partial Payment">Partial Payment</option>
+                <option value="Full Payment">Full Payment</option>
+            </select>
+        `;
+        document.getElementById("submit-btn-container").style.display = "block";
+        document.getElementById("print-button-container").style.display = "none";
+        window.selectedBookingId = bookingId;
+    } else {
+        paymentDropdown.innerText = paymentStatus || "N/A";
+        document.getElementById("submit-btn-container").style.display = "none";
 
-    // Only show print if status is already confirmed
-    if (["partial payment", "full payment"].includes(status)) {
-        printBtnContainer.style.display = "block";
-        printBtn.onclick = () => printInvoiceFromBooking(bookingId);
+        if (["partial payment", "full payment"].includes(status)) {
+            printBtnContainer.style.display = "block";
+            printBtn.onclick = () => printInvoiceFromBooking(bookingId);
+        }
     }
-}
 
     // Fetch payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
@@ -873,7 +868,7 @@ if (status === "processing payment") {
         historyBody.innerHTML = '';
         let totalPaid = 0;
 
-        // Filter out any payments still in "processing"
+        // Filter out "processing payment" entries
         const confirmedPayments = history.filter(p => p.payment_status.toLowerCase() !== "processing payment");
 
         if (confirmedPayments.length === 0) {
@@ -882,11 +877,12 @@ if (status === "processing payment") {
         } else {
             historySection.style.display = "flex";
             confirmedPayments.forEach(p => {
-                totalPaid += parseFloat(p.amt_payment || 0);
+                const amt = parseFloat(p.amt_payment || 0);
+                totalPaid += amt;
                 historyBody.innerHTML += `
                     <tr>
                         <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
-                        <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${parseFloat(p.amt_payment).toLocaleString()}</td>
+                        <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${amt.toLocaleString()}</td>
                         <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
                         <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
                     </tr>
@@ -895,8 +891,12 @@ if (status === "processing payment") {
         }
 
         const balance = priceClean - totalPaid;
+
+        // Update displayed total paid and balance
+        document.getElementById("modal-amt-payment").innerText = "₱" + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2});
+        balanceElem.textContent = "₱" + balance.toLocaleString(undefined, {minimumFractionDigits: 2});
+
         if (balance > 0 && status === "processing payment") {
-            balanceElem.textContent = `₱${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
             balanceRow.style.display = "flex";
             updateBtn.style.display = "inline-block";
         } else {
@@ -904,6 +904,7 @@ if (status === "processing payment") {
             updateBtn.style.display = "none";
         }
 
+        // Store data for further use
         sessionStorage.setItem("payment_data", JSON.stringify({
             booking_id: bookingId,
             price: priceClean,
@@ -922,6 +923,9 @@ if (status === "processing payment") {
     document.getElementById("modal-event").innerText = event;
     document.getElementById("modal-event-date").innerText = eventDate;
     document.getElementById("modal-event-address").innerText = eventAddress;
+
+    // Receipt number at top (for visual continuity)
+    document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
 }
 
 
