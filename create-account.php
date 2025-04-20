@@ -207,7 +207,13 @@ if ($_POST) {
     $fullname = $fname . " " . $lname;
     $email = $_POST['newemail'];
     $tele = $_POST['tele'];
-    $address = $_POST['address'];
+    $zone = $_POST['zone'];
+    $barangay = $_POST['barangay'];
+    $municipality = $_POST['municipality'];
+    $province = $_POST['province'];
+    
+    $address = "$zone, $barangay, $municipality, $province";
+    
     $newpassword = $_POST['newpassword'];
     $cpassword = $_POST['cpassword'];
 
@@ -361,7 +367,9 @@ function sendVerificationEmail($email, $verification_code) {
         </div>
 
        <!-- Address Section (Split into Zone, Barangay, Municipality, Province) -->
+<!-- Address Section with Title -->
 <div class="form-group">
+    <label style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">Address</label>
     <div class="form-group-half">
         <label for="zone">Zone:</label>
         <input type="text" name="zone" class="form-control" placeholder="Zone" required>
@@ -371,6 +379,18 @@ function sendVerificationEmail($email, $verification_code) {
         <input type="text" name="barangay" class="form-control" placeholder="Barangay" required>
     </div>
 </div>
+
+<div class="form-group">
+    <div class="form-group-half">
+        <label for="municipality">Municipality:</label>
+        <input type="text" name="municipality" class="form-control" placeholder="Municipality" required>
+    </div>
+    <div class="form-group-half">
+        <label for="province">Province:</label>
+        <input type="text" name="province" class="form-control" placeholder="Province" required>
+    </div>
+</div>
+
 
 <div class="form-group">
     <div class="form-group-half">
