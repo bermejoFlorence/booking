@@ -811,7 +811,6 @@ function updateBookingStatus(bookingId, status) {
     };
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
-
 function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress) {
     console.log("printBooking called with:", {
         bookingId, receiptNo, amtPayment, paymentStatus, referenceNo,
@@ -826,19 +825,22 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
 
     const balanceElem = document.getElementById("modal-balance");
     const balanceRow = document.getElementById("balance-row");
-    const updateBtn = document.querySelector("#submit-btn-container button");
     const paymentDropdown = document.getElementById("modal-payment-status");
     const historySection = document.getElementById("payment-history-section");
     const historyBody = document.querySelector("#payment-history-table tbody");
     const printBtnContainer = document.getElementById("print-button-container");
     const printBtn = printBtnContainer.querySelector("button.print-invoice");
+    const submitBtnContainer = document.getElementById("submit-btn-container");
+    const updateBtn = submitBtnContainer.querySelector("button");
 
     // Reset UI
     balanceRow.style.display = "none";
+    submitBtnContainer.style.display = "none";
     updateBtn.style.display = "none";
     historySection.style.display = "none";
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
     printBtnContainer.style.display = "none";
+
     document.getElementById("modal-amt-payment").innerText = "₱0.00";
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
@@ -854,10 +856,10 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
 
             console.log("Fetched history:", history);
 
-const hasProcessingPayment = history.some(p => p.payment_status.toLowerCase() === "processing payment");
-console.log("hasProcessingPayment:", hasProcessingPayment);
+            const hasProcessingPayment = history.some(p => p.payment_status.toLowerCase() === "processing payment");
+            console.log("hasProcessingPayment:", hasProcessingPayment);
 
-            // Calculate total and get latest payment (any status)
+            // Calculate total and get latest payment
             history.forEach(p => {
                 const amt = parseFloat(p.amt_payment || 0);
                 totalPaid += amt;
@@ -902,9 +904,9 @@ console.log("hasProcessingPayment:", hasProcessingPayment);
             document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, { minimumFractionDigits: 2 });
             const balance = priceClean - totalPaid;
             balanceElem.textContent = "₱" + balance.toLocaleString(undefined, { minimumFractionDigits: 2 });
-            console.log("Balance Computed:", balance); 
+            console.log("Balance Computed:", balance);
 
-            // ✅ Move dropdown logic here based on processing payment
+            // Show dropdown if there is a processing payment
             if (hasProcessingPayment) {
                 paymentDropdown.innerHTML = `
                     <select id="paymentType" name="paymentType" style="padding: 5px;">
@@ -913,12 +915,20 @@ console.log("hasProcessingPayment:", hasProcessingPayment);
                         <option value="Full Payment">Full Payment</option>
                     </select>
                 `;
-                document.getElementById("submit-btn-container").style.display = "block";
-                printBtnContainer.style.display = "none";
+                submitBtnContainer.style.display = "block";
+                updateBtn.style.display = "inline-block";
                 window.selectedBookingId = bookingId;
+
+                if (balance > 0) {
+                    balanceRow.style.display = "flex";
+                } else {
+                    balanceRow.style.display = "none";
+                }
+
+                printBtnContainer.style.display = "none";
             } else {
                 paymentDropdown.innerText = paymentStatus || "N/A";
-                document.getElementById("submit-btn-container").style.display = "none";
+                submitBtnContainer.style.display = "none";
 
                 if (["partial payment", "full payment"].includes(status)) {
                     printBtnContainer.style.display = "block";
@@ -926,7 +936,6 @@ console.log("hasProcessingPayment:", hasProcessingPayment);
                 }
             }
 
-            // Save to session if needed later
             sessionStorage.setItem("payment_data", JSON.stringify({
                 booking_id: bookingId,
                 price: priceClean,
