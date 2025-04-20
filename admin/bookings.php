@@ -813,7 +813,7 @@ function updateBookingStatus(bookingId, status) {
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
 
-function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress){
+function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress) {
     const modal = document.getElementById("viewReceiptModal");
     modal.style.display = "block";
 
@@ -836,11 +836,11 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
     printBtnContainer.style.display = "none";
 
-    // Static display
+    // Static display values
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-    // Dropdown if still processing
+    // Dropdown if status is processing
     if (status === "processing payment") {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
@@ -862,64 +862,64 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
         }
     }
 
-    // Fetch payment history
+    // Fetch and process payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
-    .then(res => res.json())
-    .then(history => {
-        historyBody.innerHTML = '';
-        let totalPaid = 0;
-        let latestAmt = 0;
+        .then(res => res.json())
+        .then(history => {
+            historyBody.innerHTML = '';
+            let totalPaid = 0;
+            let latestAmt = 0;
+            let latestDate = null;
 
-        const confirmedPayments = history.filter(p => p.payment_status.toLowerCase() !== "processing payment");
+            if (history.length === 0) {
+                historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
+                historySection.style.display = "none";
+            } else {
+                historySection.style.display = "flex";
 
-        if (confirmedPayments.length === 0) {
-            historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
-            historySection.style.display = "none";
-        } else {
-            historySection.style.display = "flex";
+                history.forEach((p) => {
+                    const amt = parseFloat(p.amt_payment || 0);
+                    totalPaid += amt;
 
-            confirmedPayments.forEach((p, i) => {
-                const amt = parseFloat(p.amt_payment || 0);
-                totalPaid += amt;
+                    // Pinakabagong bayad (kahit processing)
+                    if (!latestDate || new Date(p.date_created) > new Date(latestDate)) {
+                        latestAmt = amt;
+                        latestDate = p.date_created;
+                    }
 
-                // Get last one
-                if (i === confirmedPayments.length - 1) {
-                    latestAmt = amt;
-                }
+                    historyBody.innerHTML += `
+                        <tr>
+                            <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
+                            <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${amt.toLocaleString()}</td>
+                            <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
+                            <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+            }
 
-                historyBody.innerHTML += `
-                    <tr>
-                        <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
-                        <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${amt.toLocaleString()}</td>
-                        <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
-                        <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
-                    </tr>
-                `;
-            });
-        }
+            const balance = priceClean - totalPaid;
 
-        const balance = priceClean - totalPaid;
+            // 👉 Display updated values
+            document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            balanceElem.textContent = "₱" + balance.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
-        // 👇 FINAL DISPLAY AS PER YOUR LOGIC
-        document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, {minimumFractionDigits: 2});
-        balanceElem.textContent = "₱" + balance.toLocaleString(undefined, {minimumFractionDigits: 2});
+            if (balance > 0 && status === "processing payment") {
+                balanceRow.style.display = "flex";
+                updateBtn.style.display = "inline-block";
+            }
 
-        if (balance > 0 && status === "processing payment") {
-            balanceRow.style.display = "flex";
-            updateBtn.style.display = "inline-block";
-        }
-
-        sessionStorage.setItem("payment_data", JSON.stringify({
-            booking_id: bookingId,
-            price: priceClean,
-            paid: totalPaid,
-            balance: balance
-        }));
-    })
-    .catch(err => {
-        console.error("Payment history fetch error:", err);
-        historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
-    });
+            sessionStorage.setItem("payment_data", JSON.stringify({
+                booking_id: bookingId,
+                price: priceClean,
+                paid: totalPaid,
+                balance: balance
+            }));
+        })
+        .catch(err => {
+            console.error("Payment history fetch error:", err);
+            historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
+        });
 
     // Booking Info
     document.getElementById("modal-package").innerText = packageName;
