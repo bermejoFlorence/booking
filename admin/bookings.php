@@ -960,25 +960,25 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
 
     // Dropdown if status is processing
     if (status === "processing payment") {
-        paymentDropdown.innerHTML = `
-            <select id="paymentType" name="paymentType" style="padding: 5px;">
-                <option value="">-- Choose Payment Type --</option>
-                <option value="Partial Payment">Partial Payment</option>
-                <option value="Full Payment">Full Payment</option>
-            </select>
-        `;
-        document.getElementById("submit-btn-container").style.display = "block";
-        printBtnContainer.style.display = "none";
-        window.selectedBookingId = bookingId;
-    } else {
-        paymentDropdown.innerText = paymentStatus || "N/A";
-        document.getElementById("submit-btn-container").style.display = "none";
+    paymentDropdown.innerHTML = `
+        <select id="paymentType" name="paymentType" style="padding: 5px;">
+            <option value="">-- Choose Payment Type --</option>
+            <option value="Partial Payment">Partial Payment</option>
+            <option value="Full Payment">Full Payment</option>
+        </select>
+    `;
 
-        if (["partial payment", "full payment"].includes(status)) {
-            printBtnContainer.style.display = "block";
-            printBtn.onclick = () => printInvoiceFromBooking(bookingId);
-        }
-    }
+    const submitBtnContainer = document.getElementById("submit-btn-container");
+    const submitBtn = submitBtnContainer.querySelector("button");
+
+    submitBtn.disabled = false;
+    submitBtn.style.display = "inline-block";
+    submitBtnContainer.style.display = "block";
+
+    printBtnContainer.style.display = "none";
+    window.selectedBookingId = bookingId;
+}
+
 
     // Fetch and process payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
