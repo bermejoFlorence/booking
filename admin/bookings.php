@@ -779,7 +779,6 @@ function closeConfirmationModal() {
     }, 300);
 }
 
-updatedConfirmBtn.disabled = true;
 
 function updateBookingStatus(bookingId, status) {
     const xhr = new XMLHttpRequest();
@@ -812,7 +811,6 @@ function updateBookingStatus(bookingId, status) {
     };
     xhr.send(`booking_id=${bookingId}&status=${status}`);
 }
-
 function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, referenceNo, packageName, price, event, eventDate, eventAddress) {
     const modal = document.getElementById("viewReceiptModal");
     modal.style.display = "block";
@@ -835,12 +833,11 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     historySection.style.display = "none";
     historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Loading...</td></tr>";
     printBtnContainer.style.display = "none";
-
-    // Static display values
+    document.getElementById("modal-amt-payment").innerText = "₱0.00";
     document.getElementById("modal-receipt-num").innerText = receiptNo || "N/A";
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
-    // Dropdown if status is processing
+    // Dropdown or static payment status
     if (status === "processing payment") {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
@@ -871,42 +868,50 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             let latestAmt = 0;
             let latestDate = null;
 
-            if (history.length === 0) {
-                historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>No payment records found.</td></tr>";
-                historySection.style.display = "none";
+            // Calculate total and get latest payment (any status)
+            history.forEach(p => {
+                const amt = parseFloat(p.amt_payment || 0);
+                totalPaid += amt;
+
+                if (!latestDate || new Date(p.date_created) > new Date(latestDate)) {
+                    latestAmt = amt;
+                    latestDate = p.date_created;
+                }
+            });
+
+            // Filter confirmed only for display
+            const displayHistory = history.filter(p => {
+                const status = p.payment_status.toLowerCase();
+                return status === "partial payment" || status === "full payment";
+            });
+
+            historySection.style.display = "flex";
+
+            if (displayHistory.length === 0) {
+                historyBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 12px; font-style: italic; color: #999;">
+                            No confirmed payments yet.
+                        </td>
+                    </tr>
+                `;
             } else {
-                historySection.style.display = "flex";
-
-if (displayHistory.length === 0) {
-    historyBody.innerHTML = `
-        <tr>
-            <td colspan="4" style="text-align: center; padding: 12px; font-style: italic; color: #999;">
-                No confirmed payments yet.
-            </td>
-        </tr>
-    `;
-} else {
-    historyBody.innerHTML = ''; // Clear existing
-    displayHistory.forEach((p) => {
-        const amt = parseFloat(p.amt_payment || 0);
-        historyBody.innerHTML += `
-            <tr>
-                <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
-                <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${amt.toLocaleString()}</td>
-                <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
-                <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
-            </tr>
-        `;
-    });
-}
-
+                displayHistory.forEach(p => {
+                    const amt = parseFloat(p.amt_payment || 0);
+                    historyBody.innerHTML += `
+                        <tr>
+                            <td style="padding:6px; border:1px solid #ccc;">${new Date(p.date_created).toLocaleDateString()}</td>
+                            <td style="padding:6px; border:1px solid #ccc; text-align:right;">₱${amt.toLocaleString()}</td>
+                            <td style="padding:6px; border:1px solid #ccc; text-align:center;">${p.payment_status}</td>
+                            <td style="padding:6px; border:1px solid #ccc;">${p.reference_no || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
             }
 
-            const balance = priceClean - totalPaid;
-
-            // 👉 Display updated values
+            // Display calculated values
             document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, { minimumFractionDigits: 2 });
-            document.getElementById("modal-amt-payment").innerText = "₱0.00";
+            const balance = priceClean - totalPaid;
             balanceElem.textContent = "₱" + balance.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
             if (balance > 0 && status === "processing payment") {
@@ -922,9 +927,16 @@ if (displayHistory.length === 0) {
             }));
         })
         .catch(err => {
-    console.error("Payment history fetch error:", err);
-    historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
+            console.error("Payment history fetch error:", err);
+            historyBody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 12px; color: red;">
+                        Error loading payment history.
+                    </td>
+                </tr>
+            `;
         });
+
     // Booking Info
     document.getElementById("modal-package").innerText = packageName;
     document.getElementById("modal-price").innerText = "₱" + parseFloat(price).toLocaleString();
