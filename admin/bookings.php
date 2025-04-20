@@ -906,6 +906,7 @@ if (displayHistory.length === 0) {
 
             // 👉 Display updated values
             document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            document.getElementById("modal-amt-payment").innerText = "₱0.00";
             balanceElem.textContent = "₱" + balance.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
             if (balance > 0 && status === "processing payment") {
@@ -921,10 +922,9 @@ if (displayHistory.length === 0) {
             }));
         })
         .catch(err => {
-            console.error("Payment history fetch error:", err);
-            historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
+    console.error("Payment history fetch error:", err);
+    historyBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:12px;'>Error loading payment history.</td></tr>";
         });
-
     // Booking Info
     document.getElementById("modal-package").innerText = packageName;
     document.getElementById("modal-price").innerText = "₱" + parseFloat(price).toLocaleString();
