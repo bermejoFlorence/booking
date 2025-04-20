@@ -961,6 +961,160 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     document.getElementById("modal-event-date").innerText = eventDate;
     document.getElementById("modal-event-address").innerText = eventAddress;
 }
+function printInvoiceFromBooking(bookingId) {
+    fetch(`generate_invoice.php?booking_id=${bookingId}`)
+        .then(response => response.json())
+        .then(data => {
+            const {
+                receipt_no,
+                price,
+                package,
+                event,
+                date_event,
+                address_event,
+                c_fullname,
+                c_contactnum,
+                c_address,
+                payment_history
+            } = data;
+
+            const totalPaid = payment_history.reduce((sum, p) => sum + parseFloat(p.amt_payment), 0);
+            const balance = parseFloat(price) - totalPaid;
+
+            const phDate = new Date().toLocaleDateString('en-US', {
+                timeZone: 'Asia/Manila',
+                day: 'numeric',
+                month: 'short',
+                year: '2-digit'
+            }).replace(',', '');
+
+            const printDiv = document.createElement("div");
+            printDiv.id = "print-container";
+            printDiv.innerHTML = `
+                <style>
+                    @media print {
+                        body * { visibility: hidden; }
+                        #print-container, #print-container * { visibility: visible; }
+                        #print-container {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            padding: 30px;
+                            font-family: Arial, sans-serif;
+                            margin-top: 40px;
+                        }
+                    }
+                    .invoice-wrapper {
+                        max-width: 800px;
+                        margin: auto;
+                        border: 1px solid #ccc;
+                        padding: 30px;
+                        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                    }
+                    .header {
+                        display: flex;
+                        justify-content: space-between;
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin-bottom: 20px;
+                    }
+                    .client-info {
+                        margin: 20px 0;
+                        font-size: 15px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 14px;
+                        margin-top: 10px;
+                    }
+                    th, td {
+                        border: 1px solid #ccc;
+                        padding: 10px;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #f5f5f5;
+                    }
+                    .totals {
+                        margin-top: 20px;
+                        font-size: 16px;
+                        text-align: right;
+                        font-weight: bold;
+                    }
+                    .footer {
+                        margin-top: 40px;
+                        text-align: center;
+                        font-size: 14px;
+                        color: #555;
+                    }
+                </style>
+
+                <div class="invoice-wrapper">
+                    <div class="header">
+                        <div>Receipt No.: ${receipt_no}</div>
+                        <div>Date: ${phDate}</div>
+                    </div>
+                    <div class="client-info">
+                        <strong>Client:</strong><br>
+                        ${c_fullname}<br>
+                        ${c_address}<br>
+                        ${c_contactnum}
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Event</th>
+                                <th>Package</th>
+                                <th>Price</th>
+                                <th>Amount Paid</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${payment_history.map(payment => `
+                                <tr>
+                                    <td>${payment.date_created.split(" ")[0]}</td>
+                                    <td>${event}</td>
+                                    <td>${package}</td>
+                                    <td>₱${parseFloat(price).toLocaleString()}</td>
+                                    <td>₱${parseFloat(payment.amt_payment).toLocaleString()}</td>
+                                    <td>${payment.payment_status}</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+
+                    <div class="totals">
+                        ${
+                            balance > 0
+                            ? `Balance: ₱${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                            : `<span style="color: green;">✔️ Fully Paid</span>`
+                        }
+                    </div>
+
+                    <div class="footer">
+                        Thank you for your business!<br>
+                        EXZPHOTOGRAPHY STUDIO
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(printDiv);
+            window.print();
+
+            setTimeout(() => {
+                document.getElementById("print-container")?.remove();
+            }, 1000);
+        })
+        .catch(err => {
+            console.error('Error fetching invoice:', err);
+            alert('Failed to generate invoice.');
+        });
+}
 
 function closeModal() {
     document.getElementById("viewReceiptModal").style.display = "none";
