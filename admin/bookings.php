@@ -838,7 +838,8 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
     document.getElementById("modal-reference-no").innerText = referenceNo || "N/A";
 
     // Dropdown or static payment status
-    if (status === "processing payment") {
+     // Dropdown or static payment status
+     if (hasProcessingPayment) {
         paymentDropdown.innerHTML = `
             <select id="paymentType" name="paymentType" style="padding: 5px;">
                 <option value="">-- Choose Payment Type --</option>
@@ -859,6 +860,7 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
         }
     }
 
+
     // Fetch and process payment history
     fetch(`get_payment_history.php?booking_id=${bookingId}`)
         .then(res => res.json())
@@ -867,6 +869,8 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             let totalPaid = 0;
             let latestAmt = 0;
             let latestDate = null;
+            const hasProcessingPayment = history.some(p => p.payment_status.toLowerCase() === "processing payment");
+
 
             // Calculate total and get latest payment (any status)
             history.forEach(p => {
@@ -926,6 +930,8 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
                 balance: balance
             }));
         })
+
+        
         .catch(err => {
             console.error("Payment history fetch error:", err);
             historyBody.innerHTML = `
