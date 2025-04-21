@@ -100,7 +100,7 @@ for ($i = 0; $i < 12; $i++) {
 
     
 .dash-body {
-    margin-top: 100px; /* ✅ Pushes content below fixed header */
+    margin-top: 50%; /* ✅ Pushes content below fixed header */
     padding: 20px;
     width: calc(100% - 250px);
     margin-left: 250px;
