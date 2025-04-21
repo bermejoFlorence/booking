@@ -32,7 +32,6 @@ if (isset($_SESSION["user"])) {
     header("location: ../login.php");
 }
 
-// Import database
 include("../connection.php");
 
 $user_id = $_SESSION["user"];
@@ -48,11 +47,9 @@ if ($result->num_rows > 0) {
     $user_email = "Unknown Email";
 }
 
-// Set timezone to Philippine Time
 date_default_timezone_set('Asia/Manila');
-
-// Get total bookings for the current day
 $currentDate = date('Y-m-d');
+
 $queryBookings = $database->prepare("SELECT COUNT(*) AS total_bookings FROM booking WHERE DATE(date_created) = ?");
 $queryBookings->bind_param("s", $currentDate);
 $queryBookings->execute();
@@ -60,8 +57,6 @@ $resultBookings = $queryBookings->get_result();
 $rowBookings = $resultBookings->fetch_assoc();
 $totalBookings = $rowBookings['total_bookings'];
 
-
-// Get total messages received today
 $queryMessages = $database->prepare("SELECT COUNT(*) AS total_messages FROM contact_info WHERE DATE(date_created) = ?");
 $queryMessages->bind_param("s", $currentDate);
 $queryMessages->execute();
@@ -69,9 +64,6 @@ $resultMessages = $queryMessages->get_result();
 $rowMessages = $resultMessages->fetch_assoc();
 $totalMessages = $rowMessages['total_messages'];
 
-
-// Fetch booked dates and their events from the database
-// Fetch approved booked dates and their events from the database
 $queryEvents = $database->prepare("SELECT date_event, event FROM booking WHERE stat = 'approved'");
 $queryEvents->execute();
 $resultEvents = $queryEvents->get_result();
@@ -79,21 +71,12 @@ $resultEvents = $queryEvents->get_result();
 $bookedDates = [];
 while ($rowEvent = $resultEvents->fetch_assoc()) {
     $bookedDates[] = [
-        'title' => $rowEvent['event'], // Display the event name from the database
+        'title' => $rowEvent['event'],
         'start' => $rowEvent['date_event'],
-        'color' => '#4da0e0' // Make the date green
+        'color' => '#4da0e0'
     ];
 }
-
-// Convert approved booked dates to JSON for FullCalendar
 $bookedDatesJSON = json_encode($bookedDates);
-$queryPending = $database->prepare("SELECT COUNT(*) AS pending_count FROM booking WHERE stat = 'pending'");
-$queryPending->execute();
-$resultPending = $queryPending->get_result();
-$rowPending = $resultPending->fetch_assoc();
-
-// Store the count of pending bookings in a variable
-$pendingCount = $rowPending['pending_count'];
 
 $queryPending = $database->prepare("SELECT COUNT(*) AS total_pending FROM booking WHERE DATE(date_created) = ? AND stat = 'pending'");
 $queryPending->bind_param("s", $currentDate);
@@ -102,39 +85,44 @@ $resultPending = $queryPending->get_result();
 $rowPending = $resultPending->fetch_assoc();
 $pendingCount = $rowPending['total_pending'];
 
-// Get total in-process bookings for the current day
 $queryInProcess = $database->prepare("SELECT COUNT(*) AS total_in_process FROM booking WHERE stat = 'processing'");
 $queryInProcess->execute();
 $resultInProcess = $queryInProcess->get_result();
 $rowInProcess = $resultInProcess->fetch_assoc();
 $inProcessCount = $rowInProcess['total_in_process'];
 
-$queryFeedback = $database->prepare("SELECT rating FROM feedback");
-$queryFeedback->execute();
-$resultFeedback = $queryFeedback->get_result();
+$ratingCounts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+$queryRating = $database->prepare("SELECT rating FROM feedback");
+$queryRating->execute();
+$resultRating = $queryRating->get_result();
 
-// Initialize counters
-$goodCount = 0;
-$neutralCount = 0;
-$badCount = 0;
-
-while ($rowFeedback = $resultFeedback->fetch_assoc()) {
-    $rating = $rowFeedback['rating'];
-    
-    if ($rating === 'Very Satisfied' || $rating === 'Satisfied') {
-        $goodCount++;
-    } elseif ($rating === 'Neutral') {
-        $neutralCount++;
-    } elseif ($rating === 'Dissatisfied' || $rating === 'Very Dissatisfied') {
-        $badCount++;
+while ($row = $resultRating->fetch_assoc()) {
+    switch ($row['rating']) {
+        case 'Very Satisfied': $ratingCounts[5]++; break;
+        case 'Satisfied': $ratingCounts[4]++; break;
+        case 'Neutral': $ratingCounts[3]++; break;
+        case 'Dissatisfied': $ratingCounts[2]++; break;
+        case 'Very Dissatisfied': $ratingCounts[1]++; break;
     }
 }
-// Fetch data from the payment table
-$limit = 10; // Number of rows per page
+
+$querySentiment = $database->prepare("SELECT sentiment FROM feedback");
+$querySentiment->execute();
+$resultSentiment = $querySentiment->get_result();
+
+$sentimentCounts = ['good' => 0, 'neutral' => 0, 'bad' => 0];
+
+while ($row = $resultSentiment->fetch_assoc()) {
+    $sentiment = strtolower($row['sentiment']);
+    if (isset($sentimentCounts[$sentiment])) {
+        $sentimentCounts[$sentiment]++;
+    }
+}
+
+$limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page - 1) * $limit;
 
-// --- GET FILTER VALUE (from POST or GET for pagination support) ---
 $filter = '';
 if (isset($_POST['filter_option'])) {
     $filter = $_POST['filter_option'];
@@ -142,7 +130,6 @@ if (isset($_POST['filter_option'])) {
     $filter = $_GET['filter_option'];
 }
 
-// --- BUILD BASE QUERY BASED ON FILTER ---
 $baseQuery = "";
 if ($filter === "daily") {
     $today = date('Y-m-d');
@@ -156,22 +143,17 @@ if ($filter === "daily") {
     $currentMonth = date('m');
     $baseQuery = "WHERE MONTH(date) = '$currentMonth' AND YEAR(date) = '$currentYear'";
 } elseif ($filter === "yearly") {
-    // No base query — show all years
     $baseQuery = "";
 }
 
-// --- QUERY BASED ON FILTER TYPE ---
 if ($filter === "yearly") {
-    // Grouped by year
     $query = "SELECT YEAR(date) AS sales_date, SUM(total_sales) AS total_amount FROM sales $baseQuery GROUP BY YEAR(date) ORDER BY sales_date DESC LIMIT $start, $limit";
     $countQuery = "SELECT COUNT(DISTINCT YEAR(date)) as total FROM sales $baseQuery";
 } else {
-    // Grouped by date
     $query = "SELECT DATE(date) AS sales_date, SUM(total_sales) AS total_amount FROM sales $baseQuery GROUP BY DATE(date) ORDER BY sales_date DESC LIMIT $start, $limit";
     $countQuery = "SELECT COUNT(DISTINCT DATE(date)) as total FROM sales $baseQuery";
 }
 
-// --- RUN QUERIES ---
 $result = $database->query($query);
 $countResult = $database->query($countQuery);
 $totalRows = $countResult->fetch_assoc()['total'];
@@ -761,20 +743,25 @@ canvas {
         calendar.render();
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
     var ctx = document.getElementById('feedbackChart').getContext('2d');
 
     var feedbackChart = new Chart(ctx, {
-        type: 'bar', 
+        type: 'bar',
         data: {
-            labels: ['Good', 'Neutral', 'Bad'],
+            labels: ['5 Stars', '4 Stars', '3 Stars', '2 Stars', '1 Star'],
             datasets: [{
-                label: 'Feedback Ratings',
-                data: [<?php echo $goodCount; ?>, <?php echo $neutralCount; ?>, <?php echo $badCount; ?>],
-                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
-                borderColor: ['#218838', '#d39e00', '#c82333'],
-                borderWidth: 1,
-                borderRadius: 5
+                label: 'Number of Feedbacks per Rating',
+                data: [
+                    <?php echo $ratingCounts[5]; ?>,
+                    <?php echo $ratingCounts[4]; ?>,
+                    <?php echo $ratingCounts[3]; ?>,
+                    <?php echo $ratingCounts[2]; ?>,
+                    <?php echo $ratingCounts[1]; ?>
+                ],
+                backgroundColor: ['#4CAF50', '#8BC34A', '#FFC107', '#FF9800', '#F44336'],
+                borderRadius: 5,
+                borderWidth: 1
             }]
         },
         options: {
@@ -782,13 +769,15 @@ canvas {
             maintainAspectRatio: false,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
                 }
             },
             plugins: {
                 legend: {
-                    display: true,
-                    position: 'top'
+                    display: false
                 },
                 tooltip: {
                     enabled: true
@@ -797,6 +786,7 @@ canvas {
         }
     });
 });
+
 function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
         let modalContent = document.getElementById("logoutModalContent");
@@ -829,17 +819,19 @@ function showLogoutModal() {
     window.location.href = `?${params}#summary`;
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    // ... existing bar chart code ...
-
-    // Sentiment Pie Chart
+document.addEventListener('DOMContentLoaded', function () {
     var pieCtx = document.getElementById('sentimentPieChart').getContext('2d');
+
     var sentimentPieChart = new Chart(pieCtx, {
         type: 'pie',
         data: {
             labels: ['Good', 'Neutral', 'Bad'],
             datasets: [{
-                data: [<?php echo $goodCount; ?>, <?php echo $neutralCount; ?>, <?php echo $badCount; ?>],
+                data: [
+                    <?php echo $sentimentCounts['good']; ?>,
+                    <?php echo $sentimentCounts['neutral']; ?>,
+                    <?php echo $sentimentCounts['bad']; ?>
+                ],
                 backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
                 borderColor: ['#fff', '#fff', '#fff'],
                 borderWidth: 2
@@ -849,7 +841,6 @@ document.addEventListener('DOMContentLoaded', function() {
             responsive: true,
             plugins: {
                 legend: {
-                    display: true,
                     position: 'bottom'
                 },
                 tooltip: {
@@ -859,7 +850,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
 
     </script>
 </body>
