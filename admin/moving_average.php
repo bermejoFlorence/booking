@@ -219,15 +219,23 @@ h2 {
             </table>
         </div>
 
-        <div class="dash-body" style="margin-top: 15px; padding: 20px;">
-        <h2 style="text-align: center; margin-bottom: 10px; font-size: 18px; font-weight: bold; word-break: break-word;">
-    Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)
-</h2>
-
-
-
-    <canvas id="salesChart" style="max-width: 100%; height: 400px;"></canvas>
+        <div class="dash-body" style="margin-top: 15px;">
+    <table class="filter-container" style="border: none;" border="0">
+        <tr>
+            <td colspan="2" style="text-align: center;">
+                <h2 style="font-size: 20px; margin-bottom: 10px;">
+                    Sales Report (<?php echo $previous_year . ' & ' . $forecast_year; ?>)
+                </h2>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <canvas id="salesChart" style="max-width: 100%; height: 400px;"></canvas>
+            </td>
+        </tr>
+    </table>
 </div>
+
 
     </div>
     
