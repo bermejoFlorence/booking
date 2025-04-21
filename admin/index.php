@@ -495,6 +495,71 @@ $totalPages = ceil($totalRows / $limit);
 .btn:hover {
     background: #4da0e0 ;
 }
+
+.dashboard-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+/* Calendar Panel */
+.calendar-panel {
+    flex: 1 1 40%;
+    min-width: 300px;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 22px;
+    color: #4a4e69;
+    margin-bottom: 10px;
+}
+
+/* Chart Panel with stacked charts */
+.chart-panel {
+    flex: 1 1 55%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 320px;
+}
+
+.chart-wrapper {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 20px;
+}
+
+.chart-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #4a4e69;
+    text-align: center;
+}
+
+canvas {
+    width: 100% !important;
+    height: 300px !important;
+}
+
+/* Responsive stacking */
+@media screen and (max-width: 768px) {
+    .dashboard-layout {
+        flex-direction: column;
+    }
+
+    .chart-panel {
+        width: 100%;
+    }
+
+    .calendar-panel {
+        width: 100%;
+    }
+}
+
     </style>
 
     <div class="header">
@@ -606,27 +671,26 @@ $totalPages = ceil($totalRows / $limit);
             </a>
         </div>
 
-        <div class="dashboard-flex">
-            <div class="calendar-container">
-                <h2 style="text-align: center; font-size: 24px; margin-bottom: 20px; color: #4a4e69;">APPROVED SCHEDULE</h2>
-                <div id="calendar"></div>
-            </div>
+        <div class="dashboard-layout">
+    <!-- Left: Calendar -->
+    <div class="calendar-panel">
+        <h2 class="section-title">APPROVED SCHEDULE</h2>
+        <div id="calendar"></div>
+    </div>
 
-            <div class="chart-wrapper">
-                <h3 class="chart-title" style="color: #4a4e69;">User Feedback Overview</h3>
-                <div class="chart-container">
-                    <canvas id="feedbackChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-wrapper">
-                <h3 class="chart-title" style="color: #4a4e69;">Sentiment Analysis</h3>
-                <div class="chart-container">
-                    <canvas id="sentimentPieChart"></canvas>
-                </div>
-            </div>
-
-        </div>    
+    <!-- Right: Charts (stacked) -->
+    <div class="chart-panel">
+        <div class="chart-wrapper">
+            <h3 class="chart-title">User Feedback Overview</h3>
+            <canvas id="feedbackChart"></canvas>
+        </div>
+        <div class="chart-wrapper">
+            <h3 class="chart-title">Sentiment Analysis</h3>
+            <canvas id="sentimentPieChart"></canvas>
+        </div>
+    </div>
+</div>
+  
         </table>
         <div class="table-container">
         <div id="summary" class="table-responsive">
