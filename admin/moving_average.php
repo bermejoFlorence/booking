@@ -295,7 +295,7 @@ canvas { max-width: 100%; height: 400px; }
     text-align: left; /* Align text to the left */
 }
 .graph-section {
-    padding-top: 80px; /* 👈 Pushes content below the fixed header */
+    padding-top: 60px; /* 👈 Pushes content below the fixed header */
     text-align: center;
     width: 100%;
 }
