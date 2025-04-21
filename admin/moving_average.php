@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/animations.css">  
     <link rel="stylesheet" href="../css/main.css">  
-    <!-- <link rel="stylesheet" href="../css/admin.css">
-    <link rel="stylesheet" href="style.css"> -->
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="style.css">
     <!-- FullCalendar CSS -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 <!-- FullCalendar JS -->
@@ -106,6 +106,12 @@ for ($i = 0; $i < 12; $i++) {
   width: calc(100% - 250px); /* adjust if you have a sidebar */
   margin-left: 250px;
 }
+.graph-section {
+    padding-top: 80px; /* 👈 Pushes content below the fixed header */
+    text-align: center;
+    width: 100%;
+}
+
 
 
 
@@ -226,13 +232,11 @@ h2 {
         </div>
 
         <div class="dash-body" style="margin-top: 15px; padding: 20px;">
-        <h2 style="text-align: center; margin-bottom: 10px; font-size: 18px; font-weight: bold; word-break: break-word;">
-    Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)
-</h2>
+        <div class="graph-section">
+    <h2>Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)</h2>
+    <canvas id="salesChart"></canvas>
+</div>
 
-
-
-    <canvas id="salesChart" style="max-width: 100%; height: 400px;"></canvas>
 </div>
 
     </div>
