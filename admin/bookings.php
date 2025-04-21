@@ -88,12 +88,16 @@ LEFT JOIN (
     ) p2 ON p1.booking_id = p2.booking_id AND p1.date_created = p2.max_date
 ) p ON b.booking_id = p.booking_id
 ORDER BY 
-    FIELD(b.stat, 'pending', 'approved', 'rejected'),
+    FIELD(TRIM(b.stat), 'pending', 'approved', 'processing', 'rejected'),
     b.date_created DESC
-LIMIT $records_per_page OFFSET $offset
+LIMIT ? OFFSET ?
 ";
 
-$result = $database->query($sql);
+$stmt = $database->prepare($sql);
+$stmt->bind_param("ii", $records_per_page, $offset);
+$stmt->execute();
+$result = $stmt->get_result();
+
 ?>
 
 
