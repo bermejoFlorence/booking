@@ -443,19 +443,8 @@ $totalPages = ceil($totalRows / $limit);
     }
 }
 
-.chart-wrapper {
-    width: 90%;
-    max-width: 600px;
-    margin: auto;
-    text-align: center;
-    padding: 15px;
-}
 
-.chart-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
+
 
 .chart-container {
     position: relative;
@@ -476,12 +465,7 @@ $totalPages = ceil($totalRows / $limit);
     flex-wrap: wrap; /* Para mag-stack sa maliit na screen */
 }
 
-/* Default size (Large Screens) */
-.calendar-container,
-.chart-wrapper {
-    flex: 1;
-    max-width: 50%; /* Hinati ang space (50% bawat isa) */
-}
+
 .btn {
     padding: 10px 20px;
     margin-top: 20px;
@@ -495,7 +479,6 @@ $totalPages = ceil($totalRows / $limit);
 .btn:hover {
     background: #4da0e0 ;
 }
-
 .dashboard-layout {
     display: flex;
     flex-wrap: wrap;
@@ -559,6 +542,7 @@ canvas {
         width: 100%;
     }
 }
+
 
     </style>
 
