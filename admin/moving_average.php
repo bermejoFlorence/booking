@@ -97,13 +97,15 @@ for ($i = 0; $i < 12; $i++) {
 
 
 <style>
-    .dash-body {
+
+    
+.dash-body {
+    margin-top: 100px; /* ✅ Pushes content below fixed header */
     padding: 20px;
-    width: calc(100% - 250px); /* Para di masikip pag may sidebar */
+    width: calc(100% - 250px);
     margin-left: 250px;
-    margin-top: 80px;
-    font-size: 14px;
 }
+
 
 canvas {
     max-width: 100%;
@@ -137,39 +139,6 @@ h2 {
         font-size: 20px;
     }
 }
-.chart-section {
-    font-size: 14px; /* Reduce text inside chart section */
-    max-width: 90%;
-    margin: auto;
-}
-
-.chart-section h2 {
-    font-size: 16px;
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 10px;
-    word-break: break-word;
-    white-space: normal;
-}
-
-canvas {
-    max-width: 100%;
-    height: 350px; /* Slightly smaller height */
-}
-@media screen and (max-width: 768px) {
-    .chart-section {
-        font-size: 12px;
-    }
-
-    .chart-section h2 {
-        font-size: 14px;
-    }
-
-    canvas {
-        height: 300px;
-    }
-}
-
 
 </style>
 
@@ -253,13 +222,13 @@ canvas {
         </div>
 
         <div class="dash-body" style="margin-top: 15px; padding: 20px;">
-        <div class="chart-section">
-    <h2>
-        Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)
-    </h2>
-    <canvas id="salesChart"></canvas>
-</div>
+        <h2 style="text-align: center; margin-bottom: 10px; font-size: 18px; font-weight: bold; word-break: break-word;">
+    Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)
+</h2>
 
+
+
+    <canvas id="salesChart" style="max-width: 100%; height: 400px;"></canvas>
 </div>
 
     </div>
