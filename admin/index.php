@@ -481,63 +481,69 @@ $totalPages = ceil($totalRows / $limit);
 }
 .dashboard-layout {
     display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    align-items: flex-start;
-    margin-top: 20px;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
 }
-
-.calendar-panel {
-    flex: 1 1 40%;
-    min-width: 300px;
-}
-
 .chart-panel {
-    flex: 1 1 55%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    min-width: 320px;
+  flex: 1 1 55%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 320px;
 }
 
-.section-title, .chart-title {
-    font-size: 18px;
-    color: #4a4e69;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
+/* Chart box wrapper (applies to bar and pie) */
 .chart-wrapper {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    padding: 15px 20px;
-    max-height: 360px;
-    overflow: hidden;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 15px 20px;
+  max-height: 350px;
+  overflow: hidden;
+  width: 100%;
 }
 
+/* Canvas size control for both charts */
 .chart-container {
-    position: relative;
-    width: 100%;
-    height: 250px;
+  position: relative;
+  width: 100%;
+  height: 230px;
 }
 
+/* Specifically limit chart size */
 canvas {
-    width: 100% !important;
-    height: 100% !important;
-    max-height: 250px;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 220px;
 }
 
+/* Calendar left panel */
+.calendar-container {
+  flex: 1 1 45%;
+  min-width: 300px;
+}
+
+/* Feedback stats badge (optional) */
+.sentiment-badge {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 5px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Responsive adjustments */
 @media screen and (max-width: 768px) {
-    .dashboard-layout {
-        flex-direction: column;
-    }
-    .calendar-panel, .chart-panel {
-        width: 100%;
-    }
-    .chart-wrapper {
-        max-height: none;
-    }
+  .dashboard-flex {
+    flex-direction: column;
+    align-items: center;
+  }
+  .calendar-container,
+  .chart-panel {
+    width: 100%;
+  }
 }
 
 
@@ -680,6 +686,12 @@ canvas {
             <div class="chart-container">
                 <canvas id="sentimentPieChart"></canvas>
             </div>
+            <div class="sentiment-badge">
+  🟢 Good: <?php echo $goodCount; ?> &nbsp;
+  🟡 Neutral: <?php echo $neutralCount; ?> &nbsp;
+  🔴 Bad: <?php echo $badCount; ?>
+</div>
+
             <div style="text-align: center; font-size: 12px; margin-top: 5px; color: #888;">
                 Last feedback: <?php echo date('F j, Y', strtotime($lastFeedbackDate)); ?>
             </div>
