@@ -487,20 +487,11 @@ $totalPages = ceil($totalRows / $limit);
     margin-top: 20px;
 }
 
-/* Calendar Panel */
 .calendar-panel {
     flex: 1 1 40%;
     min-width: 300px;
 }
 
-.section-title {
-    text-align: center;
-    font-size: 22px;
-    color: #4a4e69;
-    margin-bottom: 10px;
-}
-
-/* Chart Panel with stacked charts */
 .chart-panel {
     flex: 1 1 55%;
     display: flex;
@@ -509,37 +500,43 @@ $totalPages = ceil($totalRows / $limit);
     min-width: 320px;
 }
 
-.chart-wrapper {
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    padding: 20px;
-}
-
-.chart-title {
+.section-title, .chart-title {
     font-size: 18px;
-    margin-bottom: 10px;
     color: #4a4e69;
     text-align: center;
+    margin-bottom: 10px;
+}
+
+.chart-wrapper {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 15px 20px;
+    max-height: 360px;
+    overflow: hidden;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
 }
 
 canvas {
     width: 100% !important;
-    height: 300px !important;
+    height: 100% !important;
+    max-height: 250px;
 }
 
-/* Responsive stacking */
 @media screen and (max-width: 768px) {
     .dashboard-layout {
         flex-direction: column;
     }
-
-    .chart-panel {
+    .calendar-panel, .chart-panel {
         width: 100%;
     }
-
-    .calendar-panel {
-        width: 100%;
+    .chart-wrapper {
+        max-height: none;
     }
 }
 
@@ -656,21 +653,36 @@ canvas {
         </div>
 
         <div class="dashboard-layout">
-    <!-- Left: Calendar -->
+    <!-- 📅 Calendar Section -->
     <div class="calendar-panel">
         <h2 class="section-title">APPROVED SCHEDULE</h2>
         <div id="calendar"></div>
     </div>
 
-    <!-- Right: Charts (stacked) -->
+    <!-- 📊 Charts Section (Bar + Pie) -->
     <div class="chart-panel">
+        <!-- Bar Chart: Feedback Rating -->
         <div class="chart-wrapper">
             <h3 class="chart-title">User Feedback Overview</h3>
-            <canvas id="feedbackChart"></canvas>
+            <div class="chart-container">
+                <canvas id="feedbackChart"></canvas>
+            </div>
         </div>
+
+        <!-- Sentiment Pie Chart -->
         <div class="chart-wrapper">
             <h3 class="chart-title">Sentiment Analysis</h3>
-            <canvas id="sentimentPieChart"></canvas>
+            <div style="text-align: center; margin-bottom: 10px;">
+                <span style="color: #28a745; font-weight: bold;">🟢 <?php echo $goodCount; ?> Positive</span> |
+                <span style="color: #ffc107; font-weight: bold;">🟡 <?php echo $neutralCount; ?> Neutral</span> |
+                <span style="color: #dc3545; font-weight: bold;">🔴 <?php echo $badCount; ?> Negative</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="sentimentPieChart"></canvas>
+            </div>
+            <div style="text-align: center; font-size: 12px; margin-top: 5px; color: #888;">
+                Last feedback: <?php echo date('F j, Y', strtotime($lastFeedbackDate)); ?>
+            </div>
         </div>
     </div>
 </div>
