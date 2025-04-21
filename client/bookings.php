@@ -46,24 +46,26 @@ if ($userrow && $userrow->num_rows > 0) {
 
 $bookingData = $database->query("
     SELECT 
-    b.*,
-    p.receipt_no,  
-    p.transac_num, 
-    p.amt_payment, 
-    p.payment_status, 
-    p.reference_no
-FROM booking AS b
-LEFT JOIN (
-    SELECT * FROM payment 
-    WHERE (booking_id, date_created) IN (
-        SELECT booking_id, MAX(date_created) 
-        FROM payment 
-        GROUP BY booking_id
-    )
-) AS p ON b.booking_id = p.booking_id
-WHERE b.client_id = '$userid' AND b.is_deleted = 0
-GROUP BY b.booking_id
-ORDER BY b.booking_id DESC
+        b.*,
+        p.receipt_no,  
+        p.transac_num, 
+        p.amt_payment, 
+        p.payment_status, 
+        p.reference_no
+    FROM booking AS b
+    LEFT JOIN (
+        SELECT * FROM payment 
+        WHERE (booking_id, date_created) IN (
+            SELECT booking_id, MAX(date_created) 
+            FROM payment 
+            GROUP BY booking_id
+        )
+    ) AS p ON b.booking_id = p.booking_id
+    WHERE b.client_id = '$userid' AND b.is_deleted = 0
+    GROUP BY b.booking_id
+    ORDER BY 
+        FIELD(b.stat, 'pending', 'approved', 'processing', 'rejected'),
+        b.date_created DESC
 ");
 
 
