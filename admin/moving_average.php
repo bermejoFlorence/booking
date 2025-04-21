@@ -96,205 +96,45 @@ for ($i = 0; $i < 12; $i++) {
 ?>
 
 
-    <style>
+<style>
     .dash-body {
-    margin: 30px auto; /* Adds top margin and centers horizontally */
-    padding: 0 20px; /* Adds inner padding */
-    width: 90%; /* Set width to allow centering with auto margin */
-    margin-top: 80px; /* I-adjust ayon sa taas ng header */
-    margin-left: 250px; /* I-adjust ayon sa lapad ng sidebar */
-    }
-        .dashboard-container {
-    display: flex;
-    justify-content: space-between; /* Distribute items evenly */
-    gap: 20px;
-    margin: 20px auto;
     padding: 20px;
-    max-width: 1200px;
-    flex-wrap: nowrap; /* Prevent stacking */
-}
-.dashboard-container {
-    display: flex;
-    justify-content: space-between; /* Distribute items evenly */
-    gap: 20px;
-    margin: 20px auto;
-    padding: 20px;
-    max-width: 1200px;
-    flex-wrap: nowrap; /* Prevent stacking */
-    margin-top: 4%;
+    width: calc(100% - 250px); /* Para di masikip pag may sidebar */
+    margin-left: 250px;
+    margin-top: 80px;
 }
 
-canvas { max-width: 100%; height: 400px; }
-
-.dashboard-items {
-    text-decoration: none; /* Remove underline */
-    color: inherit; /* Maintain text color */
-    display: flex;
-    align-items: center; /* Center-align vertically */
-    justify-content: space-between; /* Space between icon and content */
-    padding: 20px;
-    width: 30%; /* Ensure each item takes up 30% of the row */
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+canvas {
+    max-width: 100%;
+    height: 400px;
 }
 
-.dashboard-items:hover {
-    transform: scale(1.05);
-    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2);
-}
-
-.dashboard-items .content {
-    display: flex;
-    flex-direction: column; /* Align number and label vertically */
-    justify-content: center; /* Vertically center-align content */
-    text-align: left; /* Align text to the left */
-}
-
-.h1-dashboard {
-    font-size: 36px;
+h2 {
+    text-align: center;
+    font-size: 24px;
     font-weight: bold;
-    color: #333;
-    margin: 0;
+    margin-bottom: 20px;
 }
 
-.h3-dashboard {
-    font-size: 18px;
-    font-weight: bold;
-    color: #555;
-    margin: 5px 0 0 0;
-}
-
-.dashboard-icons {
-    width: 60px;
-    height: 60px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    margin-left: 20px; /* Add spacing between icon and content */
-}
-
-
-/* Responsive Design */
 @media screen and (max-width: 768px) {
-    .dashboard-container {
-        flex-wrap: wrap; /* Stack items on smaller screens */
-        gap: 10px;
-    }
-
-    .dashboard-items {
-        width: 100%; /* Full width on small screens */
+    .dash-body {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 80px;
         padding: 15px;
     }
 
-    .h1-dashboard {
-        font-size: 24px; /* Adjust font size for smaller screens */
-    }
-
-    .h3-dashboard {
-        font-size: 14px; /* Adjust font size for smaller screens */
-    }
     .header {
-        font-size: 5px;
+        font-size: 16px;
         padding: 10px;
     }
-}
-        /* Responsive Design */
-        @media screen and (max-width: 768px) {
-    .container {
-        flex-direction: column; /* Stack the menu and dashboard content vertically */
-        height: auto; /* Remove fixed height */
-    }
 
-    .menu {
-        width: 100%; /* Full width for the sidebar on small screens */
-        height: auto; /* Remove fixed height */
-        border-right: none; /* Remove border on small screens */
-        box-shadow: none; /* Remove shadow */
+    h2 {
+        font-size: 20px;
     }
-
-    .dash-body {
-        width: 100%; /* Full width to center dashboard items */
-        height: auto; /* Remove fixed height */
-        margin: auto;
-    }
-
-    .dashboard-container {
-        flex-wrap: wrap; /* Stack items on smaller screens */
-        gap: 10px;
-    }
-
-    .dashboard-items {
-        width: 100%; /* Full width on small screens */
-        padding: 15px;
-    }
-
-    .dashboard-items .content {
-        text-align: center; /* Center text for small screens */
-    }
-
-    .dashboard-icons {
-        margin-left: 0; /* Remove spacing on small screens */
-    }
-
-    .h1-dashboard {
-        font-size: 24px; /* Adjust font size for smaller screens */
-    }
-
-    .h3-dashboard {
-        font-size: 14px; /* Adjust font size for smaller screens */
-    }
-    
 }
 
-@media screen and (max-width: 480px) {
-    .header {
-        font-size: 3px;
-        padding: 8px;
-    }
-
-}
-.btn {
-    padding: 10px 20px;
-    margin-top: 20px;
-    background:#46B1C9; ;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
-}
-.btn:hover {
-    background: #4da0e0 ;
-}
-
-.dashboard-items {
-    text-decoration: none; /* Remove underline */
-    color: inherit; /* Maintain text color */
-    display: flex;
-    align-items: center; /* Center-align vertically */
-    justify-content: space-between; /* Space between icon and content */
-    padding: 20px;
-    width: 30%; /* Ensure each item takes up 30% of the row */
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.dashboard-items:hover {
-    transform: scale(1.05);
-    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2);
-}
-
-.dashboard-items .content {
-    display: flex;
-    flex-direction: column; /* Align number and label vertically */
-    justify-content: center; /* Vertically center-align content */
-    text-align: left; /* Align text to the left */
-}
-    </style>
+</style>
 
 <div class="header">
         <h1>EXZPHOTOGRAPHY STUDIO</h1>
