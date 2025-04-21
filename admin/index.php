@@ -481,69 +481,63 @@ $totalPages = ceil($totalRows / $limit);
 }
 .dashboard-layout {
     display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-  flex-wrap: wrap;
+    flex-wrap: wrap;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 20px;
 }
+
+.calendar-panel {
+    flex: 1 1 40%;
+    min-width: 300px;
+}
+
 .chart-panel {
-  flex: 1 1 55%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  min-width: 320px;
-}
-
-/* Chart box wrapper (applies to bar and pie) */
-.chart-wrapper {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  padding: 15px 20px;
-  max-height: 350px;
-  overflow: hidden;
-  width: 100%;
-}
-
-/* Canvas size control for both charts */
-.chart-container {
-  position: relative;
-  width: 100%;
-  height: 230px;
-}
-
-/* Specifically limit chart size */
-canvas {
-  width: 100% !important;
-  height: 100% !important;
-  max-height: 220px;
-}
-
-/* Calendar left panel */
-.calendar-container {
-  flex: 1 1 45%;
-  min-width: 300px;
-}
-
-/* Feedback stats badge (optional) */
-.sentiment-badge {
-  text-align: center;
-  font-weight: bold;
-  margin-top: 5px;
-  font-size: 14px;
-  color: #555;
-}
-
-/* Responsive adjustments */
-@media screen and (max-width: 768px) {
-  .dashboard-flex {
+    flex: 1 1 55%;
+    display: flex;
     flex-direction: column;
-    align-items: center;
-  }
-  .calendar-container,
-  .chart-panel {
+    gap: 20px;
+    min-width: 320px;
+}
+
+.section-title, .chart-title {
+    font-size: 18px;
+    color: #4a4e69;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.chart-wrapper {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 15px 20px;
+    max-height: 360px;
+    overflow: hidden;
+}
+
+.chart-container {
+    position: relative;
     width: 100%;
-  }
+    height: 250px;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 250px;
+}
+
+@media screen and (max-width: 768px) {
+    .dashboard-layout {
+        flex-direction: column;
+    }
+    .calendar-panel, .chart-panel {
+        width: 100%;
+    }
+    .chart-wrapper {
+        max-height: none;
+    }
 }
 
 
@@ -659,42 +653,21 @@ canvas {
         </div>
 
         <div class="dashboard-layout">
-    <!-- 📅 Calendar Section -->
+    <!-- Left: Calendar -->
     <div class="calendar-panel">
         <h2 class="section-title">APPROVED SCHEDULE</h2>
         <div id="calendar"></div>
     </div>
 
-    <!-- 📊 Charts Section (Bar + Pie) -->
+    <!-- Right: Charts (stacked) -->
     <div class="chart-panel">
-        <!-- Bar Chart: Feedback Rating -->
         <div class="chart-wrapper">
             <h3 class="chart-title">User Feedback Overview</h3>
-            <div class="chart-container">
-                <canvas id="feedbackChart"></canvas>
-            </div>
+            <canvas id="feedbackChart"></canvas>
         </div>
-
-        <!-- Sentiment Pie Chart -->
         <div class="chart-wrapper">
             <h3 class="chart-title">Sentiment Analysis</h3>
-            <div style="text-align: center; margin-bottom: 10px;">
-                <span style="color: #28a745; font-weight: bold;">🟢 <?php echo $goodCount; ?> Positive</span> |
-                <span style="color: #ffc107; font-weight: bold;">🟡 <?php echo $neutralCount; ?> Neutral</span> |
-                <span style="color: #dc3545; font-weight: bold;">🔴 <?php echo $badCount; ?> Negative</span>
-            </div>
-            <div class="chart-container">
-                <canvas id="sentimentPieChart"></canvas>
-            </div>
-            <div class="sentiment-badge">
-  🟢 Good: <?php echo $goodCount; ?> &nbsp;
-  🟡 Neutral: <?php echo $neutralCount; ?> &nbsp;
-  🔴 Bad: <?php echo $badCount; ?>
-</div>
-
-            <div style="text-align: center; font-size: 12px; margin-top: 5px; color: #888;">
-                Last feedback: <?php echo date('F j, Y', strtotime($lastFeedbackDate)); ?>
-            </div>
+            <canvas id="sentimentPieChart"></canvas>
         </div>
     </div>
 </div>
