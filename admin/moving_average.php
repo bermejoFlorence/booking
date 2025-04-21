@@ -33,21 +33,26 @@ if (isset($_SESSION["user"])) {
 // Import database
 include("../connection.php");
 
+// Get logged-in user details
 $user_id = $_SESSION["user"];
 $query = $database->prepare("SELECT emp_email FROM employee WHERE emp_id = ?");
 $query->bind_param("i", $user_id);
 $query->execute();
 $result = $query->get_result();
-
 $user_email = ($result->num_rows > 0) ? $result->fetch_assoc()["emp_email"] : "Unknown Email";
 
+// Set timezone and date variables
 date_default_timezone_set('Asia/Manila');
-
 $current_year = date('Y');
-$previous_year = $current_year - 1; // The latest actual sales year
-$forecast_year = $current_year; // The next predicted year
+$previous_year = $current_year - 1; // Last full year of actual sales
+$forecast_year = $current_year + 3; // Predicting 3 years ahead
+$business_start_year = 2019;
 
-// Query to get sales data only for the previous year
+// Historical years to use: current - 8 up to current - 4 (5 years before the 3-year gap)
+$start_year = max($business_start_year, $current_year - 8); // Not earlier than business start
+$end_year = $current_year - 4; // End before 3-year gap
+
+// Fetch actual sales for the previous year (used for plotting)
 $query = "SELECT DATE_FORMAT(date, '%M') AS month, SUM(total_sales) AS total_sales 
           FROM sales 
           WHERE YEAR(date) = $previous_year 
@@ -55,38 +60,41 @@ $query = "SELECT DATE_FORMAT(date, '%M') AS month, SUM(total_sales) AS total_sal
           ORDER BY MONTH(date)";
 $result = $database->query($query);
 
-// Store actual sales for the previous year
+// Store actual sales in array
 $actual_sales = [];
 while ($row = $result->fetch_assoc()) {
     $actual_sales[$row['month']] = $row['total_sales'];
 }
 
-// Define months for consistency
+// Define months (for consistency)
 $months = ["January", "February", "March", "April", "May", "June", 
            "July", "August", "September", "October", "November", "December"];
 
-// Compute Moving Average for the Forecast Year (Using last 3 years of data)
+// Forecast calculation (Moving Average based on 5 years with 3-year gap)
 $predicted_sales = [];
-for ($i = 0; $i < 12; $i++) {
-    $sales_3_years = [];
 
-    for ($y = $current_year - 3; $y < $current_year; $y++) { // Last 3 years
+for ($i = 0; $i < 12; $i++) {
+    $sales_years = [];
+
+    for ($y = $start_year; $y <= $end_year; $y++) {
         $query = "SELECT SUM(total_sales) AS total_sales 
                   FROM sales 
                   WHERE YEAR(date) = $y AND DATE_FORMAT(date, '%M') = '{$months[$i]}'";
         $result = $database->query($query);
         $data = $result->fetch_assoc();
+
         if ($data['total_sales'] !== null) {
-            $sales_3_years[] = $data['total_sales'];
+            $sales_years[] = $data['total_sales'];
         }
     }
 
-    // Compute moving average
-    $predicted_sales[$months[$i]] = count($sales_3_years) > 0 ? array_sum($sales_3_years) / count($sales_3_years) : 0;
+    // Compute average for the forecast month
+    $predicted_sales[$months[$i]] = count($sales_years) > 0 
+        ? array_sum($sales_years) / count($sales_years) 
+        : 0;
 }
-
-
 ?>
+
 
     <style>
     .dash-body {
@@ -367,15 +375,32 @@ canvas { max-width: 100%; height: 400px; }
             </table>
         </div>
 
-        <div class="dash-body" style="margin-top: 15px;">
-        <table class="filter-container" style="border: none;" border="0">
-       
-        <h2>Sales Report (<?php echo $previous_year . ' & ' . $forecast_year; ?>)</h2>
-        <canvas id="salesChart"></canvas>
-        
-        </table>
-        </div>
+        <div class="dash-body" style="margin-top: 15px; padding: 20px;">
+    <h2 style="text-align: center; margin-bottom: 10px;">
+        Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)
+    </h2>
+
+    <canvas id="salesChart" style="max-width: 100%; height: 400px;"></canvas>
+
+    <!-- Explanation Section -->
+    <div style="margin-top: 30px; font-size: 16px; line-height: 1.6;">
+        <p><strong>Forecast Year:</strong> <?php echo $forecast_year; ?></p>
+        <p><strong>Historical Years Used (3-Year Gap Applied):</strong> 
+            <?php 
+                $used_years = [];
+                for ($y = $start_year; $y <= $end_year; $y++) {
+                    $used_years[] = $y;
+                }
+                echo implode(", ", $used_years);
+            ?>
+        </p>
+        <p><strong>Note:</strong> The forecast was generated using the Moving Average Method. 
+        This approach considers the average sales from available historical data while skipping the most recent 3 years to avoid short-term fluctuations or anomalies.</p>
     </div>
+</div>
+
+    </div>
+    
     <script>
         function toggleMenu() {
             const menu = document.querySelector('.menu');
@@ -383,73 +408,71 @@ canvas { max-width: 100%; height: 400px; }
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            const months = ["January", "February", "March", "April", "May", "June",
-                            "July", "August", "September", "October", "November", "December"];
+        const months = ["January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"];
 
-            const actualSales = <?php echo json_encode($actual_sales); ?>;
-            const predictedSales = <?php echo json_encode($predicted_sales); ?>;
-            const prevYear = <?php echo $previous_year; ?>;
-            const forecastYear = <?php echo $forecast_year; ?>;
+        const actualSales = <?php echo json_encode($actual_sales); ?>;
+        const predictedSales = <?php echo json_encode($predicted_sales); ?>;
+        const prevYear = <?php echo $previous_year; ?>;
+        const forecastYear = <?php echo $forecast_year; ?>;
 
-            const datasets = [
-                {
-                    label: `Actual Sales (${prevYear})`,
-                    data: months.map(month => actualSales[month] || 0),
-                    borderColor: "blue",
-                    fill: false,
-                    tension: 0.4
-                },
-                {
-                    label: `Predicted Sales (${forecastYear})`,
-                    data: months.map(month => predictedSales[month] || 0),
-                    borderColor: "red",
-                    borderDash: [5, 5], // Dashed line for forecast
-                    fill: false,
-                    tension: 0.4
-                }
-            ];
+        const ctx = document.getElementById("salesChart").getContext("2d");
 
-            // Generate Chart
-            new Chart(document.getElementById("salesChart").getContext("2d"), {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: { display: true, text: 'Sales Data & Forecast' },
-                        legend: { display: true, position: 'top' }
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: `Actual Sales (${prevYear})`,
+                        data: months.map(month => actualSales[month] || 0),
+                        borderColor: "blue",
+                        backgroundColor: "transparent",
+                        tension: 0.4
                     },
-                    scales: {
-                        x: { title: { display: true, text: 'Months' } },
-                        y: { title: { display: true, text: 'Sales Amount' } }
+                    {
+                        label: `Forecasted Sales (${forecastYear})`,
+                        data: months.map(month => predictedSales[month] || 0),
+                        borderColor: "red",
+                        borderDash: [5, 5],
+                        backgroundColor: "transparent",
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Sales Forecast vs Actual',
+                        font: {
+                            size: 20
+                        }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Months'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Sales Amount'
+                        },
+                        beginAtZero: true
                     }
                 }
-            });
+            }
         });
-        function showLogoutModal() {
-        let modal = document.getElementById("logoutModal");
-        let modalContent = document.getElementById("logoutModalContent");
-        modal.style.display = "flex";
-        setTimeout(() => {
-            modalContent.style.transform = "scale(1)";
-        }, 50);
-    }
-
-    function closeLogoutModal() {
-        let modalContent = document.getElementById("logoutModalContent");
-        modalContent.style.transform = "scale(0)";
-        setTimeout(() => {
-            document.getElementById("logoutModal").style.display = "none";
-        }, 300);
-    }
-
-    function logoutUser() {
-        window.location.href = "../logout.php"; // Redirect to logout page
-    }
-
+    });
     </script>
 </body>
 </html>
