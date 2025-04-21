@@ -88,7 +88,7 @@ LEFT JOIN (
     ) p2 ON p1.booking_id = p2.booking_id AND p1.date_created = p2.max_date
 ) p ON b.booking_id = p.booking_id
 ORDER BY 
-    FIELD(TRIM(b.stat), 'pending', 'approved', 'processing', 'rejected'),
+    FIELD(TRIM(b.stat), 'pending', 'approved', 'processing', 'completed', 'rejected'),
     b.date_created DESC
 LIMIT ? OFFSET ?
 ";
