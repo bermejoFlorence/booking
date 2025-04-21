@@ -111,9 +111,12 @@ canvas {
 
 h2 {
     text-align: center;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: bold;
     margin-bottom: 20px;
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
 }
 
 @media screen and (max-width: 768px) {
@@ -216,9 +219,10 @@ h2 {
         </div>
 
         <div class="dash-body" style="margin-top: 15px; padding: 20px;">
-        <h2 style="text-align: center; margin-bottom: 10px; font-size: 24px; font-weight: bold;">
+        <h2 style="text-align: center; margin-bottom: 10px; font-size: 18px; font-weight: bold; word-break: break-word;">
     Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)
 </h2>
+
 
 
     <canvas id="salesChart" style="max-width: 100%; height: 400px;"></canvas>
