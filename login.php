@@ -176,14 +176,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['useremail']);
     $password = trim($_POST['userpassword']);
 
-    $result = $database->prepare("SELECT * FROM webuser WHERE email = ?");
+    // Only allow login if verified = 1
+    $result = $database->prepare("SELECT * FROM webuser WHERE email = ? AND verified = 1");
     $result->bind_param("s", $email);
     $result->execute();
     $userResult = $result->get_result();
 
     if ($userResult->num_rows === 1) {
         $user = $userResult->fetch_assoc(); 
-        $utype = $user['usertype'];//comment nito kjung saan
+        $utype = $user['usertype'];
 
         if ($utype === 'p') { // Client Login
             $checker = $database->prepare("SELECT * FROM client WHERE c_email = ?");
@@ -197,14 +198,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (password_verify($password, $client['c_password'])) {
                     $_SESSION['user'] = $client['c_email'];
                     $_SESSION['usertype'] = 'p';
-                    $success = "client/index.php"; // Redirect path for JS
+                    $success = "client/index.php";
                 } else {
                     $error = '<label class="form-label" style="color:red;text-align:center;">Invalid email or password</label>';
                 }
             } else {
-                $error = '<label class="form-label" style="color:red;text-align:center;">Invalid email or password</label>';
+                $error = '<label class="form-label" style="color:red;text-align:center;">Account not found</label>';
             }
-        } elseif ($utype === 'a') { // Admin/Employee Login
+        } elseif ($utype === 'a') {
             $checker = $database->prepare("SELECT * FROM employee WHERE emp_email = ?");
             $checker->bind_param("s", $email);
             $checker->execute();
@@ -213,24 +214,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($employeeResult->num_rows === 1) {
                 $employee = $employeeResult->fetch_assoc();
         
-                // Ginamit ang password_verify para ma-check ang hashed password
                 if (password_verify($password, $employee['emp_password'])) {
                     $_SESSION['user'] = $employee['emp_id'];
                     $_SESSION['usertype'] = 'a';
-                    $success = "admin/index.php"; // Redirect path for JS
+                    $success = "admin/index.php";
                 } else {
                     $error = '<label class="form-label" style="color:red;text-align:center;">Invalid email or password</label>';
                 }
             } else {
-                $error = '<label class="form-label" style="color:red;text-align:center;">Invalid email or password</label>';
+                $error = '<label class="form-label" style="color:red;text-align:center;">Account not found</label>';
             }
         } else {
             $error = '<label class="form-label" style="color:red;text-align:center;">User type not recognized</label>';
         }
     } else {
-        $error = '<label class="form-label" style="color:red;text-align:center;">Email not found</label>';
+        $error = '<label class="form-label" style="color:red;text-align:center;">Your email is not verified. Please check your inbox.</label>';
     }
 }
+
 ?>
 
 <div class="container">
