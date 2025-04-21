@@ -100,11 +100,13 @@ for ($i = 0; $i < 12; $i++) {
 
     
 .dash-body {
-  margin-top: 70px; /* ✅ adjust based on your fixed header's real height */
-  padding: 20px;
+  padding-top: 100px; /* instead of margin-top */
+  padding-left: 20px;
+  padding-right: 20px;
   width: calc(100% - 250px);
   margin-left: 250px;
 }
+
 
 
 
@@ -305,6 +307,10 @@ h2 {
                 }
             }
         });
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        const headerHeight = document.querySelector('.header').offsetHeight;
+        console.log("Actual Header Height:", headerHeight + "px");
     });
     </script>
 </body>
