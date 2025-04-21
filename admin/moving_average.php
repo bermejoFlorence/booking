@@ -102,6 +102,7 @@ for ($i = 0; $i < 12; $i++) {
     width: calc(100% - 250px); /* Para di masikip pag may sidebar */
     margin-left: 250px;
     margin-top: 80px;
+    font-size: 14px;
 }
 
 canvas {
