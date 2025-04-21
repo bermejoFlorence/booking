@@ -394,8 +394,6 @@ canvas { max-width: 100%; height: 400px; }
                 echo implode(", ", $used_years);
             ?>
         </p>
-        <p><strong>Note:</strong> The forecast was generated using the Moving Average Method. 
-        This approach considers the average sales from available historical data while skipping the most recent 3 years to avoid short-term fluctuations or anomalies.</p>
     </div>
 </div>
 
