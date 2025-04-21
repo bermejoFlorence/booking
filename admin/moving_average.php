@@ -381,20 +381,6 @@ canvas { max-width: 100%; height: 400px; }
     </h2>
 
     <canvas id="salesChart" style="max-width: 100%; height: 400px;"></canvas>
-
-    <!-- Explanation Section -->
-    <div style="margin-top: 30px; font-size: 16px; line-height: 1.6;">
-        <p><strong>Forecast Year:</strong> <?php echo $forecast_year; ?></p>
-        <p><strong>Historical Years Used (3-Year Gap Applied):</strong> 
-            <?php 
-                $used_years = [];
-                for ($y = $start_year; $y <= $end_year; $y++) {
-                    $used_years[] = $y;
-                }
-                echo implode(", ", $used_years);
-            ?>
-        </p>
-    </div>
 </div>
 
     </div>
