@@ -100,11 +100,12 @@ for ($i = 0; $i < 12; $i++) {
 
     
 .dash-body {
-    margin-top: 50%; /* ✅ Pushes content below fixed header */
+    margin-top: 60px; /* ✅ Pushes content down below the fixed header */
     padding: 20px;
     width: calc(100% - 250px);
     margin-left: 250px;
 }
+
 
 
 canvas {
