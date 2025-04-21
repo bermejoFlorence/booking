@@ -618,6 +618,14 @@ $totalPages = ceil($totalRows / $limit);
                     <canvas id="feedbackChart"></canvas>
                 </div>
             </div>
+
+            <div class="chart-wrapper">
+                <h3 class="chart-title" style="color: #4a4e69;">Sentiment Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="sentimentPieChart"></canvas>
+                </div>
+            </div>
+
         </div>    
         </table>
         <div class="table-container">
@@ -775,6 +783,38 @@ function showLogoutModal() {
     // Redirect with filter param and scroll to summary
     window.location.href = `?${params}#summary`;
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing bar chart code ...
+
+    // Sentiment Pie Chart
+    var pieCtx = document.getElementById('sentimentPieChart').getContext('2d');
+    var sentimentPieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Good', 'Neutral', 'Bad'],
+            datasets: [{
+                data: [<?php echo $goodCount; ?>, <?php echo $neutralCount; ?>, <?php echo $badCount; ?>],
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                borderColor: ['#fff', '#fff', '#fff'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                },
+                tooltip: {
+                    enabled: true
+                }
+            }
+        }
+    });
+});
+
 
     </script>
 </body>

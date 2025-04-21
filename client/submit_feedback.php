@@ -30,73 +30,81 @@ $rating_words = [
 ];
 
 $positive_words = [
-    "stunning", "breathtaking", "beautiful", "artistic", "vibrant", "creative", "professional", 
-    "high-quality", "sharp", "impressive", "amazing", "well-composed", "aesthetic", "eye-catching", 
-    "perfect lighting", "crystal clear", "expressive", "masterpiece", "flawless", "captivating", 
-    "inspiring", "lively", "elegant", "natural", "picture-perfect", "detailed", "unique", "spectacular", 
-    "mesmerizing", "outstanding", "gorgeous", "striking", "majestic", "realistic", "extraordinary", 
-    "vivid", "timeless", "sophisticated", "radiant", "charismatic", "graceful", "exquisite", "sublime", 
-    "polished", "refined", "heartwarming", "dramatic", "bold", "dreamy", "whimsical", "serene", 
-    "harmonious", "poetic", "glowing", "natural light", "dynamic", "depth", "crisp", "engaging", 
-    "emotional", "iconic", "powerful", "unforgettable", "magical", "storytelling", "silky", "cinematic", 
-    "glamorous", "luxurious", "classy", "energetic", "soulful", "rich", "euphoric", "legendary", 
-    "ethereal", "dazzling", "glossy", "sleek", "romantic", "moody", "epic", "peaceful", "sharp focus", 
-    "well-lit", "high-resolution", "contrast", "panoramic", "pristine", "immaculate", "superb", 
-    "mind-blowing", "phenomenal", "expressive eyes", "perfect angle", "artistic vision", "masterful", 
-    "genius composition", "astounding", "unreal", "flattering", "natural expression"
+    "amazing", "awesome", "beautiful", "breathtaking", "brilliant", "captivating", "charismatic", "classy", 
+    "clean", "colorful", "creative", "crisp", "dazzling", "delightful", "detailed", "dreamy", "elegant", 
+    "emotional", "engaging", "enjoyable", "epic", "ethereal", "excellent", "exceptional", "exquisite", 
+    "eye-catching", "fascinating", "flawless", "fresh", "genius", "genuine", "glamorous", "glowing", 
+    "gorgeous", "graceful", "heartwarming", "high-quality", "iconic", "impactful", "impressive", "incredible", 
+    "inspired", "inspiring", "joyful", "legendary", "lively", "lovely", "luxurious", "magnificent", 
+    "majestic", "masterpiece", "mesmerizing", "mind-blowing", "modern", "natural", "neat", "perfect", 
+    "phenomenal", "picture-perfect", "polished", "positive", "powerful", "pretty", "pristine", "professional", 
+    "radiant", "refined", "remarkable", "rich", "romantic", "satisfying", "serene", "sharp", "sleek", 
+    "smooth", "sophisticated", "spectacular", "stunning", "stylish", "sublime", "superb", "supportive", 
+    "tasteful", "timeless", "top-notch", "unique", "unreal", "unforgettable", "vibrant", "vivid", 
+    "well-balanced", "well-composed", "well-crafted", "well-lit", "well-made", "wonderful", "wow", "yes", 
+    "youthful", "zen", "zestful"
 ];
+
 
 $negative_words = [
-    "blurry", "dull", "grainy", "pixelated", "overexposed", "underexposed", "washed out",
-    "poor lighting", "noisy", "unsharp", "faded", "low-quality", "out of focus", "harsh shadows",
-    "distorted", "flat", "uninspired", "boring", "unbalanced", "bad composition", "awkward angle",
-    "too dark", "too bright", "unrealistic", "lack of contrast", "lifeless", "unflattering", "overedited",
-    "unnatural", "forced", "shaky", "over-processed", "muddy", "cheap-looking", "lack of detail",
-    "unprofessional", "too much filter", "washed-out colors", "distracting background", "inconsistent lighting",
-    "poor framing", "lack of creativity", "fake-looking", "too much saturation", "bland", "distracting elements",
-    "harsh lighting", "uneven focus", "low resolution", "unfocused subject", "awkward cropping", "no depth",
-    "flat colors", "jagged edges", "loss of detail", "too much noise", "motion blur", "ghosting effect",
-    "lacks emotion", "overexposed highlights", "bad shadows", "overuse of effects", "weak contrast",
-    "wrong white balance", "too much vignette", "poor subject placement", "off-center subject",
-    "lacks storytelling", "unnatural expressions", "weak composition", "not engaging", "random clutter",
-    "too many distractions", "overexaggerated editing", "misaligned horizon", "overexposed background",
-    "distracting reflections", "artificial colors", "harsh contrasts", "wrong focus point", "washed-out highlights",
-    "inconsistent tones", "underwhelming", "no focal point", "bad proportions", "poor perspective",
-    "awkward shadows", "low sharpness", "too static", "lacks originality", "overcomplicated", "excessive blur",
-    "overpowering background", "wrong lens choice", "too symmetrical", "confusing composition",
-    "no leading lines", "lack of visual impact", "unnecessary elements"
+    "blurry", "boring", "bad", "poor", "grainy", "dull", "overexposed", "underexposed", "noisy", "washed out",
+    "flat", "dark", "harsh", "unbalanced", "awkward", "distorted", "fake", "cheap", "low-quality", "oversaturated",
+    "undersaturated", "colorless", "unsharp", "lifeless", "forced", "rushed", "flawed", "shaky", "distracting",
+    "inconsistent", "overedited", "muddy", "cluttered", "off-center", "bad framing", "wrong focus", "random",
+    "unfocused", "motion blur", "pixelated", "underwhelming", "ghosting", "weak", "low-resolution", "unoriginal",
+    "redundant", "misaligned", "awkward shadows", "poor lighting", "too bright", "too dark", "bad angle",
+    "too soft", "too sharp", "overprocessed", "overdone", "incomplete", "monotonous", "cheap-looking", 
+    "amateur", "inappropriate", "awkward crop", "jagged", "distracting elements", "unprofessional", "unpleasant", 
+    "pointless", "unflattering", "wrong colors", "color mismatch", "bad exposure", "overexposed highlights",
+    "underexposed shadows", "ghosting effect", "washed out colors", "too much vignette", "confusing", 
+    "flat lighting", "bad composition", "unreadable", "unclear", "no depth", "not engaging", "stiff", 
+    "uninteresting", "chaotic", "disorganized", "off tone", "overkill", "unwanted glare", "unfocused subject",
+    "no story", "no emotion", "visual noise", "messy", "plain", "outdated", "out of focus", "meaningless"
 ];
 
+
+
 $positive_words_tl = [
-    "maganda", "kamangha-mangha", "malinaw", "malikhain", "propesyonal", "matingkad", 
-    "kahanga-hanga", "detalyado", "perpektong ilaw", "kamangha-manghang kulay", "maliwanag",
-    "malinaw ang subject", "malalim", "kamangha-manghang komposisyon", "perpektong anggulo", 
-    "makulay", "hindi malabo", "matalino", "artistiko", "kahit anong anggulo ay maganda", 
-    "hindi pilit", "magandang storytelling", "napaka-elegante", "malambot ang dating", 
-    "buhay na buhay", "hindi matapang ang kulay", "hindi sobrang contrast", "parang totoo", 
-    "perpektong focus", "maliwanag ang exposure", "dramatic", "romantic", "sobrang husay", 
-    "pantay ang ilaw", "napaka-detalyado", "hindi sobra ang pag-edit", "mala-sine", "classy", 
-    "hindi masakit sa mata", "perpektong saturation", "walang istorbo sa background", 
-    "nagsasalita ang larawan", "napakalinis", "napaka-organisado", "elegante ang dating", 
-    "parang obra maestra", "engaging", "swabe", "napaka-relaxing tingnan", "nagniningning", 
-    "tamang contrast", "hindi pilit ang posing", "very natural", "walang distracting elements", 
-    "hindi mukhang mura", "sobrang makatotohanan", "malakas ang dating", "astig", "bongga"
+    "maganda", "maayos", "malinaw", "masaya", "matalino", "mabait", "mahusay", "makulay", "matino", "maayos ang lighting",
+    "malambot ang kulay", "natural", "malikhain", "propesyonal", "perpekto", "kamangha-mangha", "masarap sa mata", 
+    "pantay ang kulay", "bongga", "swabe", "elegante", "maaliwalas", "relaxing", "detalyado", "malinis", "naka-engganyo", 
+    "makabuluhan", "artistiko", "kakaiba", "organisado", "maamo", "magiliw", "kaakit-akit", "tunay", "mabango", "sariwa", 
+    "kaaya-aya", "makisig", "matalas", "makinis", "makintab", "maaliwalas", "banayad", "pino", "kakaiba ang kuha", 
+    "tumpak ang framing", "magandang pagkakalagay", "mahusay ang composition", "creative ang anggulo", "hindi bastos", 
+    "mapagkakatiwalaan", "may dating", "mabenta", "palaban", "may class", "hindi boring", "nakakatuwa", "nagtatampok ng husay", 
+    "bihasa", "astig", "maabilidad", "ganda ng timing", "nakakabilib", "napapanahon", "pampamilya", "pambida", 
+    "hindi makakalimutan", "nagniningning", "mapaglarawan", "napaka-natural", "komportable", "light sa mata", 
+    "walang sablay", "hindi nakakasawa", "swak sa lahat", "ok sa lahat", "pangmalakasan", "panalo", "malamig sa mata", 
+    "magandang vibes", "good vibes", "siguradong babalik", "hindi bitin", "tamang-tama", "magaan ang loob", 
+    "may malasakit", "binigyan ng effort", "hindi tinipid", "mapagkalinga", "pantay-pantay", "may respeto", "maayos ang kuha", 
+    "malinis ang background", "maganda ang pagkaka-compose", "aesthetically pleasing", "may emotion", "solid", "ganado", 
+    "inspired", "motivating"
 ];
+
 $negative_words_tl = [
-    "malabo", "madilim", "hindi malinaw", "walang buhay", "sobrang edit", "sobrang contrast", 
-    "walang dating", "pilit", "hindi pantay ang ilaw", "hindi magandang anggulo", "napaka-dull", 
-    "hindi balanse", "masyadong saturated", "masakit sa mata", "hindi natural", "walang emosyon", 
-    "hindi nakaka-enganyo", "napakalamig ng kulay", "parang hindi totoo", "hindi propesyonal", 
-    "mukhang mura", "hindi pulido", "sobrang overexposed", "sobrang underexposed", 
-    "may nakakaistorbong background", "walang focus", "hindi maayos ang framing", "blurred", 
-    "hindi sharp", "masyadong madilim", "masyadong maliwanag", "may unwanted shadow", 
-    "hindi flattering", "mukhang low quality", "sobrang filter", "hindi clear ang subject", 
-    "hindi makuha ang tamang mood", "walang kwento", "random ang pagkaka-frame", 
-    "hindi maayos ang pagkaka-compose", "mukhang ordinaryo", "hindi nakakahatak ng atensyon", 
-    "masyadong flat", "sobrang soft", "sobrang harsh", "masyadong sharp", "hindi bagay ang kulay", 
-    "mukhang outdated", "hindi consistent ang lighting", "hindi proporsyonado", 
-    "nakakagulo ang background", "walang visual impact", "hindi mukhang creative"
+    "malabo", "madilim", "maingay ang background", "sobrang edit", "hindi malinaw", "walang contrast",
+    "mababa ang kalidad", "pilit", "pangit ang anggulo", "masakit sa mata", "sobrang saturated",
+    "napaka-dull", "hindi natural", "kulang sa detalye", "masyadong madilim", "masyadong maliwanag",
+    "hindi balanse", "masyadong matapang ang kulay", "matamlay", "walang emosyon", "walang dating",
+    "paulit-ulit", "kulang sa kwento", "sobrang plain", "mukhang minadali", "hindi pantay ang ilaw",
+    "bastos", "hindi flattering", "panget ang framing", "random", "hindi pulido", "mukhang mura",
+    "masyadong malambot", "masyadong matalas", "naka-disturb", "masyadong chaotic", "hindi kaaya-aya",
+    "nakakalito", "nakakapagod sa mata", "bad crop", "hindi malinaw ang subject", "parang walang saysay",
+    "napakalabo", "nakakasawa", "naka-bore", "masyadong filtered", "kulang sa buhay", "sobrang contrast",
+    "sobrang sharp", "blurred", "hindi center", "hindi klaro", "masyadong flat", "puro noise",
+    "panget ang kulay", "hindi maayos ang subject", "walang impact", "pangit ang framing",
+    "sobrang vignette", "mukhang generic", "too safe", "luma ang itsura", "hindi consistent",
+    "malabo ang message", "bad lighting", "sobrang lamig", "sobrang init", "hindi aligned",
+    "distracting", "mataas ang shadow", "masyadong bright", "masyadong dark", "hindi proporsyonado",
+    "walang direction", "masyadong curve", "overexposed", "walang identity", "masyadong busy",
+    "too minimal", "hindi tapos", "too messy", "hindi naayos", "may sabit", "kulang sa style",
+    "panget ang layout", "kulang sa kwento", "walang focus", "kulang sa galing", "di maganda ang concept",
+    "matigas ang dating", "hindi creative", "pa-cute pero fail", "pabigla-bigla", "inconsistent",
+    "nagdudulot ng confusion", "mukhang luma", "hindi kapanipaniwala", "di bagay", "nakakairita",
+    "masyadong technical", "walang artistry", "kulang sa visual appeal"
 ];
+
+
 $positive_words_bn = [
     "marhay", "magayon", "malinig", "maogma", "liwanag", "klaro", "matingkad", 
     "makusog an kulay", "tamang liwanag", "dakul an detalye", "mahamis", 
@@ -108,18 +116,51 @@ $positive_words_bn = [
     "mabuhay an emosyon", "payt", "dakulaon an impact", "hustong exposure", 
     "presko an dating", "inspirado", "hindi pilit", "may kwento", "swak an tono"
 ];
-$negative_words_bn = [
-    "dai marhay", "dai klaro", "maluya an kolor", "parang dai buhay", 
-    "parang burong", "sobra an filter", "madilim", "sobra an contrast", 
-    "dakul an shadow", "hustong overexposed", "hustong underexposed", 
-    "dai balance", "grabe an saturation", "sobrang matao an background", 
-    "dai propesyonal an dating", "maluya an dating", "dai impact", 
-    "dai klarado an subject", "dai kahulugan", "flat an composition", 
-    "dai magayon an frame", "dakul an istorbo", "parang ordinaryo", 
-    "dakul an noise", "parang mura an kuha", "hustong maitim", "parang lampag", 
-    "hustong makusog an highlights", "masyadong malabo", "sobrang edited", 
-    "dakul an distraction", "garo dai pulos", "dai creative", "walang emosyon"
+$positive_words_bn = [
+    "magayon", "marhay", "klaro", "makusog an kolor", "maogma", "mabisto", "matingkad", "malinig", "presko", 
+    "natural", "makusog an dating", "liwanag", "mainit na welcome", "magayunon an anggulo", "maayos an framing", 
+    "baga obra", "maugmang komposisyon", "kabighani", "maalwan sa mata", "malinaw an subject", "maayos an contrast", 
+    "basta payt", "madetalyado", "garong propesyonal", "maraot pero artistic", "malimpyo", "maaliwalas", 
+    "masaya an vibe", "tama an saturation", "natural an lighting", "mahirigos", "hustong tono", "perfecto", 
+    "payt an kulay", "hustong exposure", "hustong framing", "swak sa mood", "di pilit", "kaiba", "nagrerepresenta", 
+    "may emosyon", "may kasaysayan", "tama an moment", "malikhain", "bagay an lens", "suabe", "klarado an subject", 
+    "sakto an cropping", "naka-engganyo", "malinaw an texture", "tama an timing", "tama an angle", "parang sine", 
+    "hustong composition", "bongga", "maraot sa huna-huna", "inspirado", "matao an impact", "magayunon an background", 
+    "may kwento", "hustong shot", "marhay an pagka-frame", "magayon an lighting", "napaka-engaging", 
+    "garong pang-exhibit", "makisig an dating", "dakul an detalye", "natural an posing", "maayo an execution", 
+    "klaro an emotion", "malining pagkahuli", "maray sa mata", "nakakatuwa", "payt sa layout", "perfect sa color grading", 
+    "swak sa subject", "garong masterpiece", "swak sa detalye", "minimal pero powerful", "strong presence", 
+    "positive energy", "payt sa creativity", "payt an elements", "makasurprise", "pangsocial media", 
+    "klarado an highlights", "clean an shadows", "defined an lines", "tama an focus", "bagay sa feed", 
+    "clean aesthetics", "vibrant an dating", "professional an dating", "dakul an character", "alive an subject", 
+    "tama an layout", "refreshing", "nakaka-goodvibes"
 ];
+
+$negative_words_bn = [
+    "dai klaro", "dai marhay", "madulom", "maluya an kolor", "dai makusog", "dakul an noise",
+    "dakul an shadow", "sobra an filter", "hustong overexposed", "hustong underexposed", 
+    "garong di propesyonal", "dai kaaya-aya", "sobra an saturation", "dai balance", "dai emotion",
+    "dai focus", "layo an subject", "dai engaging", "maluya an impact", "baga lampag", 
+    "garong minadali", "di payt an angle", "garong sobra an contrast", "naglalangaw", "dakul an clutter",
+    "sobrang makusog", "sobrang maluya", "maraot an background", "garong bastos an tono",
+    "maluya an framing", "di bagay an tono", "dakul an disturbo", "di aesthetic", "dai klarado an image", 
+    "blurred", "garong mabangis an effect", "garong putok an light", "dai malinig", "dai na-sentro",
+    "dai aligned", "garong wala sa ayos", "maraot an layout", "bad framing", "matao an vignette",
+    "garong pirang klase an tono", "wala sa lugar", "garong daing direksyon", "sobrang dull", 
+    "dai consistent", "garong barat an lens", "barat an camera", "layo sa propesyonal", 
+    "hindi creative", "garong dai pulos", "masyado an blur", "masyado an sharp", 
+    "parang laog", "dai engaging", "mukhang cheap", "dai organized", "dakul an kabuang", 
+    "labo an message", "garong dai kwenta", "dakul an istorbo", "dai focus", "bad composition",
+    "maluya an storya", "di makua an point", "di klarado an subject", "masakit sa mata", 
+    "garong paukaw", "garong kulang an creativity", "sobra an detalye", "di bagay an effect", 
+    "mukhang robotic", "dakul an sabaw", "dakul an babaw", "dai visual appeal", "hustong bad lighting",
+    "sobra an glare", "masyado an reflection", "masyadong hilaw", "garong dai aesthetic", 
+    "sobra an edit", "dakul an shadow", "garong naiipit an subject", "layo an komposisyon", 
+    "garong kapos an framing", "panget an crop", "di sakto an exposure", "walang balance", 
+    "wala sa tono", "sobrang detalyado", "garong misleading", "masyadong malamig", "masyadong mainit",
+    "hustong mabangis an shadow", "matao an pagkaputok", "dakul an off-tone", "dakul an sablay"
+];
+
 
 
 // Function to determine sentiment
