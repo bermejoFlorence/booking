@@ -376,9 +376,10 @@ canvas { max-width: 100%; height: 400px; }
         </div>
 
         <div class="dash-body" style="margin-top: 15px; padding: 20px;">
-    <h2 style="text-align: center; margin-bottom: 10px;">
-        Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)
-    </h2>
+        <h2 style="text-align: center; margin-bottom: 10px; font-size: 24px; font-weight: bold;">
+    Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)
+</h2>
+
 
     <canvas id="salesChart" style="max-width: 100%; height: 400px;"></canvas>
 </div>
