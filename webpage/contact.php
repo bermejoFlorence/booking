@@ -113,8 +113,8 @@
         <div class="col-md-6">
           <div class="map_container">
             <div class="map">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1937.7488063292312!2d122.97366898786699!3d13.74883828368892!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a21be450a185d7%3A0x87f373fa3ec12639!2sFuel%20Save%20Gas%20Depot!5e0!3m2!1sen!2sph!4v1738505496307!5m2!1sen!2sph" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3547.4855632758677!2d122.9697367766905!3d13.749346162933605!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a21b004071031d%3A0x72c36ca23cf05d73!2sExzphotography%20Studio!5e1!3m2!1sen!2sph!4v1745222629208!5m2!1sen!2sph" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe> 
+          </div>
           </div>
         </div>
       </div>
