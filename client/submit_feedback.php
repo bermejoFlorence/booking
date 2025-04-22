@@ -104,18 +104,6 @@ $negative_words_tl = [
     "masyadong technical", "walang artistry", "kulang sa visual appeal"
 ];
 
-
-$positive_words_bn = [
-    "marhay", "magayon", "malinig", "maogma", "liwanag", "klaro", "matingkad", 
-    "makusog an kulay", "tamang liwanag", "dakul an detalye", "mahamis", 
-    "sakto an anggulo", "mabisto", "husto an focus", "masaya an dating", 
-    "tunay", "nakaengganyo", "hustong komposisyon", "swabe an contrast", 
-    "nagniningning", "matao an kahulugan", "relaxing", "natural", "artistiko", 
-    "kaayaaya", "klarado an background", "malinamnam an kulay", "mala-sine", 
-    "elegante", "misteryoso pero magayon", "husto an saturation", "balanse", 
-    "mabuhay an emosyon", "payt", "dakulaon an impact", "hustong exposure", 
-    "presko an dating", "inspirado", "hindi pilit", "may kwento", "swak an tono"
-];
 $positive_words_bn = [
     "magayon", "marhay", "klaro", "makusog an kolor", "maogma", "mabisto", "matingkad", "malinig", "presko", 
     "natural", "makusog an dating", "liwanag", "mainit na welcome", "magayunon an anggulo", "maayos an framing", 
