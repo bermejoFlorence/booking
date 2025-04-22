@@ -328,12 +328,12 @@ if (isset($_GET['booking_id'])) {
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="reference_no">Reference Number</label>
                         <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number"
                             maxlength="13" pattern="\d{13}" required onkeypress="return event.charCode>=48 && event.charCode<=57">
                         <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
-                    </div>
+                    </div> -->
                     
                     <div class="form-group">
                         <label for="amt_payment">Amount to Pay</label>
@@ -446,17 +446,28 @@ function generateGCash() {
         return;
     }
 
+    const parsedAmount = parseInt(amount);
+    if (parsedAmount < 100) {
+        Swal.fire("Minimum Amount", "GCash via PayMongo requires at least ₱100.", "info");
+        return;
+    }
+
     fetch("create_gcash_link.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             name: "Customer",
             email: "customer@example.com",
-            amount: parseInt(amount) * 100  // Convert to centavos
+            amount: parsedAmount * 100  // Convert to centavos
         })
     })
     .then(res => res.json())
     .then(data => {
+        if (data.error) {
+            Swal.fire("GCash Error", data.error, "error");
+            return;
+        }
+
         const url = data.data.attributes.redirect.checkout_url;
         document.getElementById("gcash-output").innerHTML = `
             <a href="${url}" target="_blank" class="btn-primary">Pay via GCash Now</a>
