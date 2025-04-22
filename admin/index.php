@@ -667,8 +667,8 @@ canvas {
             <option value="monthly" <?php if($filter == 'monthly') echo 'selected'; ?>>Monthly</option>
             <option value="yearly" <?php if($filter == 'yearly') echo 'selected'; ?>>Yearly</option>
         </select>
-        <button type="submit" class="login-btn btn-primary btn">Apply</button>
-        <a href="bookings.php" class="login-btn btn-secondary btn">Reset</a>
+        <button type="submit" class="login-btn btn-primary btn" style="background-color: #224D98;">Apply</button>
+        <a href="bookings.php" class="login-btn btn-secondary btn" style="background-color: #E5515B;">Reset</a>
     </div>
 </form>
 
