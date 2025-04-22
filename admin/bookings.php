@@ -93,7 +93,7 @@ LEFT JOIN (
     ) p2 ON p1.booking_id = p2.booking_id AND p1.date_created = p2.max_date
 ) p ON b.booking_id = p.booking_id
 ORDER BY 
-    FIELD(TRIM(b.stat), 'pending', 'approved', 'processing', 'completed', 'rejected'),
+    FIELD(TRIM(b.stat), 'pending', 'approved', 'processing', 'completed', 'rejected', 'cancelled'),
     b.date_created DESC
 LIMIT ? OFFSET ?
 ";
@@ -613,11 +613,12 @@ if ($result->num_rows > 0) {
                     </button>
                     </div>
                 </td>";
-        } elseif ($row['stat'] == 'rejected') {
+        } elseif ($row['stat'] == 'rejected' || $row['stat'] == 'cancelled') {
+            $label = $row['stat'] == 'rejected' ? 'Rejected' : 'Cancelled';
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
-                    <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Rejected</button>
+                    <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>$label</button>
                 </td>";
-        } else {
+        }else {
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
                     <button style='background-color: #224D98; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
                         onclick=\"openModal('accept', {$row['booking_id']});\">Accept</button>
