@@ -55,6 +55,13 @@ curl_close($ch);
 // Return raw response to frontend
 if ($httpCode === 201) {
     echo $response;
-} else {
-    echo json_encode(["error" => "Failed to create GCash link", "status" => $httpCode, "response" => $response]);
 }
+$responseDecoded = json_decode($response, true);
+$errorMessage = $responseDecoded['errors'][0]['detail'] ?? 'Unknown error';
+
+echo json_encode([
+    "error" => $errorMessage,
+    "status" => $httpCode,
+    "response" => $responseDecoded
+]);
+
