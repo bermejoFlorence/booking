@@ -341,7 +341,6 @@ if (isset($_GET['booking_id'])) {
                             onkeypress="return event.charCode>=48 && event.charCode<=57"
                             placeholder="Enter amount ex 1000, 100, 10, 1">
                     </div>
-
                 </div>
 
                 <button type="submit" class="btn-primary">Submit Payment</button>
@@ -352,6 +351,7 @@ if (isset($_GET['booking_id'])) {
 
     </div>
 
+  
     <script>
              function toggleMenu() {
             const menu = document.querySelector('.menu');
@@ -431,6 +431,7 @@ function showLogoutModal() {
         });
     }
 });
+
 
 
     </script>
