@@ -619,7 +619,7 @@ if ($result->num_rows > 0) {
                 </td>";
         } else {
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
-                    <button style='background-color: rgb(98, 54, 246); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                    <button style='background-color: #224D98; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
                         onclick=\"openModal('accept', {$row['booking_id']});\">Accept</button>
                     <button style='background-color: #E5515B; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
                         onclick=\"openModal('reject', {$row['booking_id']});\">Reject</button>
@@ -757,14 +757,14 @@ if ($result->num_rows > 0) {
     // Set modal content
     if (action === 'accept') {
         modalMessage.textContent = 'Are you sure you want to accept this booking?';
-        updatedConfirmBtn.style.backgroundColor = '#2EAF7D';
+        updatedConfirmBtn.style.backgroundColor = '#224D98';
         updatedConfirmBtn.onclick = function () {
             updateBookingStatus(bookingId, 'approved');
             closeConfirmationModal();
         };
     } else if (action === 'reject') {
         modalMessage.textContent = 'Are you sure you want to reject this booking?';
-        updatedConfirmBtn.style.backgroundColor = '#007bff';
+        updatedConfirmBtn.style.backgroundColor = '#E5515B';
         updatedConfirmBtn.onclick = function () {
             updateBookingStatus(bookingId, 'rejected');
             closeConfirmationModal();
