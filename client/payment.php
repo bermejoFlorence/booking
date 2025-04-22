@@ -341,6 +341,13 @@ if (isset($_GET['booking_id'])) {
                             onkeypress="return event.charCode>=48 && event.charCode<=57"
                             placeholder="Enter amount ex 1000, 100, 10, 1">
                     </div>
+
+                    <div class="form-group">
+                        <label>GCash Payment via PayMongo</label>
+                        <button type="button" onclick="generateGCash()">Generate GCash Link</button>
+                        <div id="gcash-output" style="margin-top: 10px;"></div>
+                    </div>
+
                 </div>
 
                 <button type="submit" class="btn-primary">Submit Payment</button>
@@ -430,6 +437,36 @@ function showLogoutModal() {
         });
     }
 });
+
+function generateGCash() {
+    const amount = document.getElementById("amt_payment").value;
+
+    if (!amount || isNaN(amount)) {
+        Swal.fire("Invalid Amount", "Please enter a valid amount first.", "warning");
+        return;
+    }
+
+    fetch("create_gcash_link.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: "Customer",
+            email: "customer@example.com",
+            amount: parseInt(amount) * 100  // Convert to centavos
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const url = data.data.attributes.redirect.checkout_url;
+        document.getElementById("gcash-output").innerHTML = `
+            <a href="${url}" target="_blank" class="btn-primary">Pay via GCash Now</a>
+        `;
+    })
+    .catch(err => {
+        console.error(err);
+        Swal.fire("Error", "Failed to generate GCash link.", "error");
+    });
+}
 
 
 
