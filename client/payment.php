@@ -341,12 +341,12 @@ if (isset($_GET['booking_id'])) {
                             onkeypress="return event.charCode>=48 && event.charCode<=57"
                             placeholder="Enter amount ex 1000, 100, 10, 1">
                     </div>
-
+<!-- 
                     <div class="form-group">
                         <label>GCash Payment via PayMongo</label>
                         <button type="button" onclick="generateGCash()">Generate GCash Link</button>
                         <div id="gcash-output" style="margin-top: 10px;"></div>
-                    </div>
+                    </div> -->
 
                 </div>
 
