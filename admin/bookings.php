@@ -697,13 +697,13 @@ if ($result->num_rows > 0) {
 
             <!-- Submit Button -->
             <div id="submit-btn-container" style="display: none; text-align: center; margin-top: 20px;">
-                <button onclick="submitPaymentUpdate()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer;">
+                <button onclick="submitPaymentUpdate()" style="background-color: #224D98; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer;">
                     Submit Payment Update
                 </button>
             </div>
             <!-- Print Button -->
             <div id="print-button-container" style="text-align: center; margin-top: 25px; display: none;">
-                <button class="print-invoice" style="padding: 10px 20px; background-color: #0d6efd; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                <button class="print-invoice" style="padding: 10px 20px; background-color: #224D98; color: white; border: none; border-radius: 6px; cursor: pointer;">
                     Print Invoice
                 </button>
             </div>
