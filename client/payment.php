@@ -234,27 +234,6 @@ if (isset($_GET['booking_id'])) {
    background: #4da0e0 ;
 }
 
-.form-group label {
-    font-weight: bold;
-  }
-  input, textarea {
-    width: 100%;
-    margin: 8px 0;
-    padding: 8px;
-  }
-  .btn-primary {
-    background: #46B1C9;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .btn-primary:hover {
-    background: #3ca4ba;
-  }
-
-
 
 
 </style>
@@ -326,39 +305,49 @@ if (isset($_GET['booking_id'])) {
                 </tr> -->
             </table>
         </div>
-        <div class="dash-body" style="margin-top: 25px; max-width: 600px; margin-left: auto; margin-right: auto;">
-  <h2 style="text-align: center;">Choose Your Payment Method</h2>
+        <div class="dash-body" style="margin-top: 15px">
+    <table border="0" width="100%" style="border-spacing: 0; margin: 0; padding: 0; margin-top: 25px;">
+        <div class="form-container">
+            <h2>Payment Details</h2>
 
-  <form method="POST" action="process_payment.php" id="paymentForm">
-    <div class="form-group">
-      <label><input type="radio" name="payment_method" value="gcash" onclick="toggleFields('gcash')" required> GCash</label><br>
-      <label><input type="radio" name="payment_method" value="bank" onclick="toggleFields('bank')"> Bank Transfer</label><br>
-      <label><input type="radio" name="payment_method" value="walkin" onclick="toggleFields('walkin')"> Walk-in</label>
-    </div>
+            <!-- Transaction Details -->
+            <div class="details-container">
+                <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
+                <span><strong>Price:</strong><?php echo htmlspecialchars($price); ?></span>
+            </div>
 
-    <!-- GCash Section -->
-    <div id="gcash-section" class="payment-section" style="display: none;">
-      <label>Scan QR Code</label><br>
-      <img src="gcash.jpg" alt="GCash QR" style="width: 200px;">
-      <input type="text" name="gcash_reference" placeholder="GCash Reference Number" maxlength="13" pattern="\d{13}">
-    </div>
+            <form method="POST" action="save_payment.php" id="paymentForm">
+                <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
 
-    <!-- Bank Transfer Section -->
-    <div id="bank-section" class="payment-section" style="display: none;">
-      <label>Bank Transfer Details</label>
-      <textarea name="bank_details" placeholder="Enter your bank transfer confirmation details..." rows="4"></textarea>
-    </div>
+                <!-- GCash Payment Fields -->
+                <div id="gcash-fields">
+                    <div class="form-group">
+                        <label for="gcash_qr">Scan QR Code</label>
+                        <div>
+                            <img src="gcash.jpg" alt="GCash QR Code" style="width: 200px; height: auto;">
+                        </div>
+                    </div>
 
-    <!-- Walk-in Section -->
-    <div id="walkin-section" class="payment-section" style="display: none;">
-      <p><strong>Note:</strong> Please bring the exact amount to our office upon your appointment date.</p>
-    </div>
+                    <div class="form-group">
+                        <label for="reference_no">Reference Number</label>
+                        <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number"
+                            maxlength="13" pattern="\d{13}" required onkeypress="return event.charCode>=48 && event.charCode<=57">
+                        <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="amt_payment">Amount to Pay</label>
+                        <input type="text" name="amt_payment" id="amt_payment" required
+                            onkeypress="return event.charCode>=48 && event.charCode<=57"
+                            placeholder="Enter amount ex 1000, 100, 10, 1">
+                    </div>
+                </div>
 
-    <input type="number" name="amount" required placeholder="Enter amount">
-    <button type="submit" class="btn btn-primary">Submit Payment</button>
-  </form>
+                <button type="submit" class="btn-primary">Submit Payment</button>
+            </form>
+        </div>
+    </table>
 </div>
-
 
     </div>
 
@@ -442,10 +431,6 @@ function showLogoutModal() {
     }
 });
 
-function toggleFields(method) {
-  document.querySelectorAll('.payment-section').forEach(div => div.style.display = 'none');
-  document.getElementById(`${method}-section`).style.display = 'block';
-}
 
 
     </script>
