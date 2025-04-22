@@ -19,14 +19,15 @@ if ($amount < 1000) { // PHP 10.00 minimum
 // Replace with your own TEST SECRET KEY from PayMongo
 $secretKey = "sk_test_MtY68qsiaBZpDr9XBgqjPf5L";
 
-// Build PayMongo request payload
+$booking_id = $input["booking_id"] ?? null;
+
 $payload = [
     "data" => [
         "attributes" => [
             "amount" => $amount,
             "redirect" => [
-                "success" => "https://exzphotography/client/payment_success.php",
-                "failed" => "https://exzphotography/client_failed.php"
+                "success" => "https://exzphotography/client/payment_success.php?booking_id=$booking_id",
+                "failed" => "https://exzphotography/client/payment_failed.php"
             ],
             "billing" => [
                 "name" => $name,
