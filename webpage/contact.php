@@ -130,13 +130,13 @@
     <a href="">
       <i class="fa fa-phone" aria-hidden="true"></i>
       <span>
-        Call : +63 912345678
+        Call : +63 9916500574
       </span>
     </a>
     <a href="">
       <i class="fa fa-envelope" aria-hidden="true"></i>
       <span>
-        Email : rysha.andaya@cbsua.edu.ph
+        Email : exzphotographystudio@gmail.com
       </span>
     </a>
     <div>
