@@ -406,8 +406,8 @@ hr {
             <input type="search" name="search" class="input-text header-searchbar" 
                 placeholder="Type Client Name" 
                 value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>" />
-            <button type="submit" class="login-btn btn-primary btn">Search</button>
-            <a href="feedback.php" class="login-btn btn-secondary btn">Reset</a>
+            <button type="submit" class="login-btn btn-primary btn" style="background-color: #224D98;">Search</button>
+            <a href="feedback.php" class="login-btn btn-secondary btn" style="background-color: #E5515B;">Reset</a>
         </div>
     </form>
 </div>

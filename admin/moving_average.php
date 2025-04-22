@@ -435,7 +435,7 @@ canvas { max-width: 100%; height: 400px; }
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Sales Forecast vs Actual',
+                        text: 'Actual vs Sales Forecast',
                         font: {
                             size: 20
                         }
