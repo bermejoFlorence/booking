@@ -500,8 +500,8 @@ hr {
                 <input type="search" name="search" class="input-text header-searchbar" 
                     placeholder="Type Client Name or Event" 
                     value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>" />
-                <button type="submit" class="login-btn btn-primary btn">Search</button>
-                <a href="bookings.php" class="login-btn btn-secondary btn">Reset</a>
+                <button type="submit" class="login-btn btn-primary btn" style="background-color: #224D98;">Search</button>
+                <a href="bookings.php" class="login-btn btn-secondary btn" style="background-color: #E5515B;">Reset</a>
             </div>
         </form>
     </div>
@@ -595,8 +595,8 @@ if ($result->num_rows > 0) {
         if ($row['stat'] == 'approved' || $row['stat'] == 'processing' || $row['stat'] == 'completed'){
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center; white-space: nowrap;'>
                     <div style='display: inline-flex; gap: 5px;'>
-                    <button style='background-color: rgb(77, 224, 126); color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>
-                    <button style='background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                    <button style='background-color: #2EAF7D; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>
+                    <button style='background-color: #224D98; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
                         onclick=\"printBooking(
                             '{$row['booking_id']}', 
                             '{$row['receipt_no']}', 
@@ -621,7 +621,7 @@ if ($result->num_rows > 0) {
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
                     <button style='background-color: rgb(98, 54, 246); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
                         onclick=\"openModal('accept', {$row['booking_id']});\">Accept</button>
-                    <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                    <button style='background-color: #E5515B; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
                         onclick=\"openModal('reject', {$row['booking_id']});\">Reject</button>
                 </td>";
         }
@@ -757,7 +757,7 @@ if ($result->num_rows > 0) {
     // Set modal content
     if (action === 'accept') {
         modalMessage.textContent = 'Are you sure you want to accept this booking?';
-        updatedConfirmBtn.style.backgroundColor = '#007bff';
+        updatedConfirmBtn.style.backgroundColor = '#2EAF7D';
         updatedConfirmBtn.onclick = function () {
             updateBookingStatus(bookingId, 'approved');
             closeConfirmationModal();
