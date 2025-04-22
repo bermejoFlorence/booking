@@ -500,8 +500,8 @@ hr {
                 <input type="search" name="search" class="input-text header-searchbar" 
                     placeholder="Type Client Name or Event" 
                     value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>" />
-                <button type="submit" class="login-btn btn-primary btn">Search</button>
-                <a href="bookings.php" class="login-btn btn-secondary btn">Reset</a>
+                <button type="submit" class="login-btn btn-primary btn" style="background-color: #224D98;">Search</button>
+                <a href="bookings.php" class="login-btn btn-secondary btn" style="background-color: #E5515B;">Reset</a>
             </div>
         </form>
     </div>
@@ -621,7 +621,7 @@ if ($result->num_rows > 0) {
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
                     <button style='background-color: rgb(98, 54, 246); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
                         onclick=\"openModal('accept', {$row['booking_id']});\">Accept</button>
-                    <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                    <button style='background-color: #E5515B; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
                         onclick=\"openModal('reject', {$row['booking_id']});\">Reject</button>
                 </td>";
         }
