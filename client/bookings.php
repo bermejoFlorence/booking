@@ -702,10 +702,13 @@ if ($bookingData && $bookingData->num_rows > 0) {
         } elseif ($row['stat'] === 'pending') {
             echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
         } elseif ($row['stat'] === 'approved') {
-            echo "<button class='checkout-btn' style='padding: 5px 10px; border: none; background-color: #46B1C9; color: white; border-radius: 3px; cursor: pointer; margin-right: 5px;' onclick=\"showConfirmationModal('checkout', '" . htmlspecialchars($row['booking_id']) . "')\">Checkout</button>";
-            echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
+            echo "<div style='display: flex; gap: 5px; justify-content: center;'>";
+echo "<button class='checkout-btn' style='padding: 5px 10px; border: none; background-color: #46B1C9; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('checkout', '" . htmlspecialchars($row['booking_id']) . "')\">Checkout</button>";
+echo "<button class='cancel-btn' style='padding: 5px 10px; border: none; background-color: red; color: white; border-radius: 3px; cursor: pointer;' onclick=\"showConfirmationModal('cancel', '" . htmlspecialchars($row['booking_id']) . "')\">Cancel</button>";
+echo "</div>";
+
         } elseif ($row['stat'] === 'processing') {
-            echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer;' 
+            echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #46B1C9; color: #fff; border-radius: 3px; cursor: pointer;' 
                 onclick=\"viewDetails(
                     '" . htmlspecialchars($row['booking_id']) . "', 
                     '" . htmlspecialchars($row['package']) . "',
