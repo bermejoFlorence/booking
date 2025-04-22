@@ -303,7 +303,7 @@ $totalPages = ceil($totalRows / $limit);
 }
 
 .fc-button {
-    background-color:#46B1C9 !important; /* Blue background */
+    background-color:#224D98 !important; /* Blue background */
     color: white !important; /* White text */
     border: none !important;
     border-radius: 5px !important;
@@ -315,12 +315,12 @@ $totalPages = ceil($totalRows / $limit);
 }
 
 .fc-prev-button, .fc-next-button {
-    background-color:#46B1C9 !important; /* Dark gray background */
+    background-color:#2EAF7D !important; /* Dark gray background */
     color: white !important; /* White text */
 }
 
 .fc-prev-button:hover, .fc-next-button:hover {
-    background-color:#46B1C9 !important; /* Darker gray on hover */
+    background-color:#2EAF7D !important; /* Darker gray on hover */
 }
 .search-container {
     display: flex;
@@ -693,7 +693,7 @@ canvas {
                     <td>$num</td>
                     <td>$date</td>
                     <td>₱" . number_format($amount, 2) . "</td>
-                    <td><a href='bookings.php' style='color: white; background-color: #4da0e0; padding: 5px 10px; border-radius: 5px; text-decoration: none;'>View Details</a></td>
+                    <td><a href='bookings.php' style='color: white; background-color: #2EAF7D; padding: 5px 10px; border-radius: 5px; text-decoration: none;'>View Details</a></td>
                 </tr>";
                 $num++;
             }
