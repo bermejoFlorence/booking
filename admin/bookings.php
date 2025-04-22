@@ -653,9 +653,12 @@ if ($result->num_rows > 0) {
 
             <!-- Payment Information -->
             <div class="section" style="margin-bottom: 10px;">
-                <h3>💰 Payment Information</h3>
+            <h3>💰 Payment Information</h3>
                 <div class="info-row"><span>Receipt No.:</span><span id="modal-receipt-num"></span></div>
-                <div class="info-row"><span>Amount Paid:</span><span id="modal-amt-payment"></span></div>
+                <div class="info-row">
+                    <span id="modal-label-amt">Awaiting Payment Confirmation:</span>
+                    <span id="modal-amt-payment"></span>
+                </div>
                 <div class="info-row"><span>Payment Status:</span><span id="modal-payment-status"></span></div>
                 <div class="info-row"><span>Reference Number:</span><span id="modal-reference-no"></span></div>
                 <div class="info-row" id="balance-row" style="display: none;">
@@ -860,9 +863,11 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
         .then(history => {
             historyBody.innerHTML = '';
             let totalPaid = 0;
-            let latestAmt = 0;
-            let latestDate = null;
+            let latestConfirmedAmt = 0;
+            let latestConfirmedDate = null;
 
+            let pendingAmt = 0;
+            let pendingDate = null;
             console.log("Fetched history:", history);
 
             const hasProcessingPayment = history.some(p => p.payment_status.toLowerCase() === "processing payment");
@@ -870,14 +875,27 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
 
             // Calculate total and get latest payment
             history.forEach(p => {
-                const amt = parseFloat(p.amt_payment || 0);
-                totalPaid += amt;
+    const amt = parseFloat(p.amt_payment || 0);
+    const status = p.payment_status.toLowerCase();
+    const created = new Date(p.date_created);
 
-                if (!latestDate || new Date(p.date_created) > new Date(latestDate)) {
-                    latestAmt = amt;
-                    latestDate = p.date_created;
-                }
-            });
+    totalPaid += amt;
+
+    if (["partial payment", "full payment"].includes(status)) {
+        if (!latestConfirmedDate || created > new Date(latestConfirmedDate)) {
+            latestConfirmedAmt = amt;
+            latestConfirmedDate = p.date_created;
+        }
+    }
+
+    if (status === "processing payment") {
+        if (!pendingDate || created > new Date(pendingDate)) {
+            pendingAmt = amt;
+            pendingDate = p.date_created;
+        }
+    }
+});
+
 
             // Filter confirmed only for display
             const displayHistory = history.filter(p => {
@@ -910,10 +928,24 @@ function printBooking(bookingId, receiptNo, amtPayment, paymentStatus, reference
             }
 
             // Display calculated values
-            document.getElementById("modal-amt-payment").innerText = "₱" + latestAmt.toLocaleString(undefined, { minimumFractionDigits: 2 });
-            const balance = priceClean - totalPaid;
-            balanceElem.textContent = "₱" + balance.toLocaleString(undefined, { minimumFractionDigits: 2 });
-            console.log("Balance Computed:", balance);
+            const amtLabel = document.getElementById("modal-label-amt");
+
+if (pendingAmt > 0) {
+    // Show pending payment as priority
+    amtLabel.innerText = "🕒 Awaiting Payment Confirmation:";
+    document.getElementById("modal-amt-payment").innerText = "₱" + pendingAmt.toLocaleString(undefined, { minimumFractionDigits: 2 });
+
+    // Adjust balance to exclude pending
+    const adjustedBalance = priceClean - (totalPaid - pendingAmt);
+    balanceElem.textContent = "₱" + adjustedBalance.toLocaleString(undefined, { minimumFractionDigits: 2 });
+} else {
+    amtLabel.innerText = "✅ Latest Confirmed Payment:";
+    document.getElementById("modal-amt-payment").innerText = "₱" + latestConfirmedAmt.toLocaleString(undefined, { minimumFractionDigits: 2 });
+
+    const balance = priceClean - totalPaid;
+    balanceElem.textContent = "₱" + balance.toLocaleString(undefined, { minimumFractionDigits: 2 });
+}
+
 
             // Show dropdown if there is a processing payment
             if (hasProcessingPayment) {
