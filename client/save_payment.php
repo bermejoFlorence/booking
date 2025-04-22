@@ -72,12 +72,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $insertQuery->close();
 
         // 3. Update booking status to 'processing'
-        $updateBooking = $database->prepare("UPDATE booking SET stat = 'processing' WHERE booking_id = ?");
-        $updateBooking->bind_param("i", $booking_id);
-        if (!$updateBooking->execute()) {
-            throw new Exception("Error updating booking status: " . $updateBooking->error);
-        }
-        $updateBooking->close();
+        // 3. Update booking status to 'processing' and update booking date_created
+$updateBooking = $database->prepare("
+UPDATE booking 
+SET stat = 'processing', date_created = ? 
+WHERE booking_id = ?
+");
+$updateBooking->bind_param("si", $current_datetime, $booking_id);
+if (!$updateBooking->execute()) {
+throw new Exception("Error updating booking status and date_created: " . $updateBooking->error);
+}
+$updateBooking->close();
 
         // 4. Commit and alert success
         $database->commit();
