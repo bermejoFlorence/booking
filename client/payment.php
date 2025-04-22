@@ -464,16 +464,24 @@ function generateGCash() {
     .then(res => res.json())
     .then(data => {
     if (data.error) {
-        console.error("PayMongo Error:", data.response); // log raw response
+        console.error("PayMongo Error:", data.response);
         Swal.fire("GCash Error", data.error, "error");
         return;
     }
 
-    const url = data.data.attributes.redirect.checkout_url;
-    document.getElementById("gcash-output").innerHTML = `
-        <a href="${url}" target="_blank" class="btn-primary">Pay via GCash Now</a>
-    `;
+    // Check if redirect URL exists
+    const url = data?.data?.attributes?.redirect?.checkout_url;
+    
+    if (url) {
+        document.getElementById("gcash-output").innerHTML = `
+            <a href="${url}" target="_blank" class="btn-primary">Pay via GCash Now</a>
+        `;
+    } else {
+        console.error("Missing checkout_url:", data);
+        Swal.fire("GCash Error", "Unable to get GCash link. Please try again.", "error");
+    }
 })
+
 
     .catch(err => {
         console.error(err);
