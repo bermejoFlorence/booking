@@ -73,7 +73,12 @@ SELECT
     p.receipt_no,
     p.amt_payment,
     p.payment_status,
-    p.reference_no
+    p.reference_no,
+
+    -- NEW FIELDS
+    (SELECT COUNT(*) FROM payment WHERE booking_id = b.booking_id) AS total_payments,
+    (SELECT SUM(amt_payment) FROM payment WHERE booking_id = b.booking_id) AS total_paid
+
 FROM 
     booking b
 LEFT JOIN 
@@ -560,7 +565,7 @@ hr {
             </thead>
 
             <tbody>
-            <?php
+<?php
 if ($result->num_rows > 0) {
     $counter = $offset + 1; // Start the numbering from the correct offset
     while ($row = $result->fetch_assoc()) {
@@ -571,7 +576,7 @@ if ($result->num_rows > 0) {
         echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['event']}</td>";
         echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₱{$row['price']}</td>";
 
-        // Display payment info
+        // ✅ Custom logic for payment fields based on stat
         if ($row['stat'] === 'pending') {
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Pending Approval</td>";
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Pending Approval</td>";
@@ -583,30 +588,14 @@ if ($result->num_rows > 0) {
         } else {
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['payment_status']}</td>";
             echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$row['reference_no']}</td>";
-            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₱" . number_format($row['amt_payment'], 2) . "</td>";
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₱{$row['amt_payment']}.00</td>";
         }
 
-        // Action buttons logic
-        echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center; white-space: nowrap;'>";
-
-        $booking_id = $row['booking_id'];
-        $stat = trim($row['stat']);
-        $payment_status = trim($row['payment_status']);
-
-        if ($stat === 'pending') {
-            echo "
-                <button style='background-color: rgb(98, 54, 246); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
-                    onclick=\"openModal('accept', {$booking_id});\">Accept</button>
-                <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
-                    onclick=\"openModal('reject', {$booking_id});\">Reject</button>
-            ";
-        } elseif ($stat === 'rejected') {
-            echo "<button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Rejected</button>";
-        } else {
-            echo "<button style='background-color: rgb(77, 224, 126); color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>";
-
-            if ($payment_status === 'processing') {
-                echo "
+        // ✅ Booking status actions
+        if ($row['stat'] == 'approved' || $row['stat'] == 'processing' || $row['stat'] == 'completed'){
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center; white-space: nowrap;'>
+                    <div style='display: inline-flex; gap: 5px;'>
+                    <button style='background-color: rgb(77, 224, 126); color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Approved</button>
                     <button style='background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
                         onclick=\"printBooking(
                             '{$row['booking_id']}', 
@@ -622,30 +611,21 @@ if ($result->num_rows > 0) {
                         )\">
                         Payment Process
                     </button>
-                ";
-            } elseif ($payment_status === 'partial') {
-                echo "<button style='background-color: orange; color: white; border: none; padding: 5px 10px; border-radius: 4px;'>Mark as Full Payment</button>";
-            } elseif ($payment_status === 'full') {
-                echo "<span class='badge bg-success' style='padding: 5px 10px; border-radius: 5px;'>Paid in Full</span>";
-                echo "<button onclick=\"printBooking(
-                        '{$row['booking_id']}', 
-                        '{$row['receipt_no']}', 
-                        '{$row['amt_payment']}',  
-                        '{$row['payment_status']}', 
-                        '{$row['reference_no']}', 
-                        '{$row['package']}', 
-                        '{$row['price']}', 
-                        '{$row['event']}', 
-                        '{$row['date_event']}', 
-                        '{$row['address_event']}'
-                    )\" 
-                    style='margin-left: 5px; background-color: #0d6efd; color: white; border: none; padding: 5px 10px; border-radius: 5px;'>
-                    Print Receipt
-                </button>";
-            }
+                    </div>
+                </td>";
+        } elseif ($row['stat'] == 'rejected') {
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
+                    <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px;' disabled>Rejected</button>
+                </td>";
+        } else {
+            echo "<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>
+                    <button style='background-color: rgb(98, 54, 246); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                        onclick=\"openModal('accept', {$row['booking_id']});\">Accept</button>
+                    <button style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;' 
+                        onclick=\"openModal('reject', {$row['booking_id']});\">Reject</button>
+                </td>";
         }
 
-        echo "</td>";
         echo "</tr>";
         $counter++;
     }
@@ -653,7 +633,6 @@ if ($result->num_rows > 0) {
     echo "<tr><td colspan='9' style='padding: 10px; text-align: center;'>No bookings available.</td></tr>";
 }
 ?>
-
 </tbody>
 
                 <div id="confirmationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
