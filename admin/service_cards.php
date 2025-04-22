@@ -487,7 +487,7 @@ hr {
                 '<?php echo addslashes(implode('|', $detailsArray)); ?>',
                 '<?php echo htmlspecialchars($row['price']); ?>'
             )" 
-            style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+            style="background-color: #2EAF7D; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
                 Edit
             </button>
                 </td>
@@ -532,7 +532,7 @@ hr {
                 '<?php echo addslashes(implode('|', $detailsArray)); ?>',
                 '<?php echo htmlspecialchars($row['price']); ?>'
             )" 
-            style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+            style="background-color: #2EAF7D; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
                 Edit
             </button>
                 </td>
@@ -575,7 +575,7 @@ hr {
                 '<?php echo addslashes(implode('|', $detailsArray)); ?>',
                 '<?php echo htmlspecialchars($row['price']); ?>'
             )" 
-            style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+            style="background-color: #2EAF7D; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
                 Edit
             </button>
                 </td>
