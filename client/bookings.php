@@ -655,9 +655,9 @@ if ($bookingData && $bookingData->num_rows > 0) {
         $statusText = htmlspecialchars($row['stat']); // default
 
         if ($row['stat'] === 'pending') {
-            $statusClass = 'background-color: rgb(241, 137, 80); color: white;';
+            $statusClass = 'background-color: #E5515B; color: white;';
         } elseif ($row['stat'] === 'processing') {
-            $statusClass = 'background-color: #46B1C9; color: white;';
+            $statusClass = 'background-color: #2EAF7D; color: white;';
         } elseif ($row['stat'] === 'approved') {
             $statusClass = 'background-color: rgb(77, 224, 126); color: white;';
         } elseif ($row['stat'] === 'rejected') {
@@ -685,7 +685,7 @@ if ($bookingData && $bookingData->num_rows > 0) {
 
         // For Partial/Full Payment: only View Details
         if (in_array($paymentStatusLower, ['partial payment', 'full payment'])) {
-            echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #ffc107; color: #fff; border-radius: 3px; cursor: pointer;' 
+            echo "<button class='details-btn' style='padding: 5px 10px; border: none; background-color: #46B1C9; color: #fff; border-radius: 3px; cursor: pointer;' 
                 onclick=\"viewDetails(
                     '" . htmlspecialchars($row['booking_id']) . "', 
                     '" . htmlspecialchars($row['package']) . "',

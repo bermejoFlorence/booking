@@ -303,7 +303,7 @@ $totalPages = ceil($totalRows / $limit);
 }
 
 .fc-button {
-    background-color:#224D98 !important; /* Blue background */
+    background-color:rgba(21, 86, 238, 0.85) !important; /* Blue background */
     color: white !important; /* White text */
     border: none !important;
     border-radius: 5px !important;
