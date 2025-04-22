@@ -41,10 +41,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $insert->close();
 
         // ✅ Update booking to processing
-        $update = $database->prepare("UPDATE booking SET stat = 'processing' WHERE booking_id = ?");
-        if (!$update) {
-            throw new Exception("Booking update prepare failed: " . $database->error);
-        }
+        
+        $update = $database->prepare("UPDATE booking SET stat = 'processing', date_created = ? WHERE booking_id = ?");
+$update->bind_param("si", $date_created, $booking_id);
+
 
         $update->bind_param("i", $booking_id);
 
