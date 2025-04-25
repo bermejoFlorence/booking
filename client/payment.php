@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="style.css">
     <title>Payment</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AQ1Pyn7z1m2wr7cSMsa5hcXrO1s3aA2bYdgSVEmbVgmkVx6mEBwp99A5PXBR3o33_5M_XgRJTxkDT_ja&currency=PHP"></script>
+   
     
     <?php
     echo "<script>console.log('Received booking_id: " . $booking_id . "');</script>";
@@ -345,6 +347,12 @@ if (isset($_GET['booking_id'])) {
 
                 <button type="submit" class="btn-primary">Submit Payment</button>
             </form>
+
+            <hr>
+    <h3 style="text-align:center;">OR</h3>
+
+    <!-- PayPal Smart Button -->
+    <div id="paypal-button-container" style="margin-top: 20px;"></div>
         </div>
     </table>
 </div>
@@ -431,6 +439,43 @@ function showLogoutModal() {
         });
     }
 });
+
+paypal.Buttons({
+    createOrder: function (data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: {
+                    value: '<?php echo $price; ?>'
+                }
+            }]
+        });
+    },
+    onApprove: function (data, actions) {
+        return actions.order.capture().then(function (details) {
+            fetch('save_payment.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    booking_id: '<?php echo $booking_id; ?>',
+                    payment_method: 'paypal',
+                    reference_no: details.id,
+                    payer_name: details.payer.name.given_name + ' ' + details.payer.name.surname,
+                    amt_payment: details.purchase_units[0].amount.value
+                })
+            }).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Payment Successful',
+                    text: `Thank you, ${details.payer.name.given_name}! Your PayPal payment was processed.`,
+                }).then(() => {
+                    window.location.href = 'bookings.php';
+                });
+            });
+        });
+    }
+}).render('#paypal-button-container');
 
 
 
