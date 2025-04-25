@@ -445,7 +445,8 @@ paypal.Buttons({
         return actions.order.create({
             purchase_units: [{
                 amount: {
-                    value: '<?php echo $price; ?>'
+                    value: '<?php echo str_replace(",", "", $price); ?>'
+
                 }
             }]
         });
