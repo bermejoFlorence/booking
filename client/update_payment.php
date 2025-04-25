@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="style.css">\
     <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_SANDBOX_CLIENT_ID&currency=PHP"></script>
+
     <title>Payment</title>
 
     <?php
