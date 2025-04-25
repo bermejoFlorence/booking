@@ -315,13 +315,14 @@ if (isset($_GET['booking_id'])) {
             <!-- Transaction Details -->
             <div class="details-container">
                 <span><strong>Package:</strong> <?php echo htmlspecialchars($package); ?></span>
-                <span><strong>Price:</strong><?php echo htmlspecialchars($price); ?></span>
+                <span><strong>Price:</strong> <?php echo htmlspecialchars($price); ?></span>
             </div>
 
+            <!-- GCash Form -->
             <form method="POST" action="save_payment.php" id="paymentForm">
                 <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
+                <input type="hidden" name="payment_method" value="gcash">
 
-                <!-- GCash Payment Fields -->
                 <div id="gcash-fields">
                     <div class="form-group">
                         <label for="gcash_qr">Scan QR Code</label>
@@ -349,10 +350,10 @@ if (isset($_GET['booking_id'])) {
             </form>
 
             <hr>
-    <h3 style="text-align:center;">OR</h3>
+            <h3 style="text-align:center;">OR</h3>
 
-    <!-- PayPal Smart Button -->
-    <div id="paypal-button-container" style="margin-top: 20px;"></div>
+            <!-- PayPal Smart Button -->
+            <div id="paypal-button-container" style="margin-top: 20px;"></div>
         </div>
     </table>
 </div>
@@ -390,16 +391,6 @@ if (isset($_GET['booking_id'])) {
     }
 }
 
-document.getElementById("reference_no").addEventListener("input", function () {
-    var referenceNo = this.value;
-    var errorMessage = document.getElementById("error-message");
-
-    if (/^\d{13}$/.test(referenceNo)) {
-        errorMessage.style.display = "none";
-    } else {
-        errorMessage.style.display = "block";
-    }
-});
 
 function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
@@ -422,62 +413,65 @@ function showLogoutModal() {
         window.location.href = "../logout.php"; // Redirect to logout page
     }
 
+      // GCash Input Validation
+      document.getElementById("reference_no").addEventListener("input", function () {
+        var referenceNo = this.value;
+        var errorMessage = document.getElementById("error-message");
+        errorMessage.style.display = /^\d{13}$/.test(referenceNo) ? "none" : "block";
+    });
+
     document.getElementById("paymentForm").addEventListener("submit", function (e) {
-    const priceStr = "<?php echo str_replace(',', '', $price); ?>"; // raw price
-    const inputAmtStr = document.getElementById("amt_payment").value;
+        const priceStr = "<?php echo str_replace(',', '', $price); ?>";
+        const inputAmtStr = document.getElementById("amt_payment").value;
+        const cleanedPrice = parseFloat(priceStr) || 0;
+        const cleanedInput = parseFloat(inputAmtStr.replace(/,/g, '')) || 0;
 
-    const cleanedPrice = parseFloat(priceStr) || 0;
-    const cleanedInput = parseFloat(inputAmtStr.replace(/,/g, '')) || 0;
+        if (cleanedInput > cleanedPrice) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Overpayment Detected',
+                text: `You entered ₱${cleanedInput.toLocaleString()} but the required amount is only ₱${cleanedPrice.toLocaleString()}.`,
+                confirmButtonColor: '#dc3545',
+            });
+        }
+    });
 
-    if (cleanedInput > cleanedPrice) {
-        e.preventDefault(); // Block submission
-        Swal.fire({
-            icon: 'warning',
-            title: 'Overpayment Detected',
-            text: `You entered ₱${cleanedInput.toLocaleString()} but the required amount is only ₱${cleanedPrice.toLocaleString()}.`,
-            confirmButtonColor: '#dc3545',
-        });
-    }
-});
-
-paypal.Buttons({
-    createOrder: function (data, actions) {
-        return actions.order.create({
-            purchase_units: [{
-                amount: {
-                    value: '<?php echo str_replace(",", "", $price); ?>'
-
-                }
-            }]
-        });
-    },
-    onApprove: function (data, actions) {
-        return actions.order.capture().then(function (details) {
-            fetch('save_payment.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    booking_id: '<?php echo $booking_id; ?>',
-                    payment_method: 'paypal',
-                    reference_no: details.id,
-                    payer_name: details.payer.name.given_name + ' ' + details.payer.name.surname,
-                    amt_payment: details.purchase_units[0].amount.value
-                })
-            }).then(() => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Payment Successful',
-                    text: `Thank you, ${details.payer.name.given_name}! Your PayPal payment was processed.`,
+    // PayPal Smart Button
+    paypal.Buttons({
+        createOrder: function (data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: '<?php echo str_replace(",", "", $price); ?>'
+                    }
+                }]
+            });
+        },
+        onApprove: function (data, actions) {
+            return actions.order.capture().then(function (details) {
+                fetch('save_payment.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        booking_id: '<?php echo $booking_id; ?>',
+                        payment_method: 'paypal',
+                        reference_no: details.id,
+                        payer_name: details.payer.name.given_name + ' ' + details.payer.name.surname,
+                        amt_payment: details.purchase_units[0].amount.value
+                    })
                 }).then(() => {
-                    window.location.href = 'bookings.php';
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Payment Successful',
+                        text: `Thank you, ${details.payer.name.given_name}! Your PayPal payment was processed.`,
+                    }).then(() => {
+                        window.location.href = 'bookings.php';
+                    });
                 });
             });
-        });
-    }
-}).render('#paypal-button-container');
-
+        }
+    }).render('#paypal-button-container');
 
 
     </script>
