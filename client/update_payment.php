@@ -332,8 +332,8 @@ echo "<script>console.log('Package: $package | Price: $price | Total Paid: $tota
             <?php else: ?>
                 <form method="POST" action="update_save_payment.php" id="paymentForm">
                     <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
+                    <input type="hidden" name="payment_method" value="gcash">
 
-                    <!-- GCash Payment Fields -->
                     <div id="gcash-fields">
                         <div class="form-group">
                             <label for="gcash_qr">Scan QR Code</label>
@@ -363,6 +363,12 @@ echo "<script>console.log('Package: $package | Price: $price | Total Paid: $tota
 
                     <button type="submit" class="btn-primary">Submit Payment</button>
                 </form>
+
+                <hr>
+                <h3 style="text-align:center;">OR</h3>
+
+                <!-- PayPal Smart Button -->
+                <div id="paypal-button-container" style="margin-top: 20px;"></div>
             <?php endif; ?>
         </div>
     </table>
@@ -375,10 +381,25 @@ echo "<script>console.log('Package: $package | Price: $price | Total Paid: $tota
         menu.classList.toggle('open');
     }
 
+
+    document.getElementById("paymentForm")?.addEventListener("submit", function (e) {
+        const balance = parseFloat("<?php echo $balance; ?>") || 0;
+        const inputAmt = parseFloat(document.getElementById("amt_payment").value.replace(/,/g, '')) || 0;
+
+        if (inputAmt > balance) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Overpayment Detected',
+                text: `You entered ₱${inputAmt.toLocaleString()} but your remaining balance is only ₱${balance.toLocaleString()}.`,
+                confirmButtonColor: '#dc3545',
+            });
+        }
+    });
+
     document.getElementById("reference_no").addEventListener("input", function () {
         const referenceNo = this.value;
         const errorMessage = document.getElementById("error-message");
-
         errorMessage.style.display = /^\d{13}$/.test(referenceNo) ? "none" : "block";
     });
 
@@ -396,6 +417,58 @@ echo "<script>console.log('Package: $package | Price: $price | Total Paid: $tota
             });
         }
     });
+
+    paypal.Buttons({
+        createOrder: function (data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: '<?php echo str_replace(",", "", number_format($balance, 2)); ?>'
+                    }
+                }]
+            });
+        },
+        onApprove: function (data, actions) {
+            return actions.order.capture().then(function (details) {
+                fetch('update_save_payment.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        booking_id: '<?php echo $booking_id; ?>',
+                        payment_method: 'paypal',
+                        reference_no: details.id,
+                        payer_name: details.payer.name.given_name + ' ' + details.payer.name.surname,
+                        amt_payment: details.purchase_units[0].amount.value
+                    })
+                }).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Payment Successful',
+                        text: `Thank you, ${details.payer.name.given_name}! Your PayPal payment was processed.`,
+                    }).then(() => {
+                        window.location.href = 'bookings.php';
+                    });
+                });
+            });
+        }
+    }).render('#paypal-button-container');
+
+    function showLogoutModal() {
+        let modal = document.getElementById("logoutModal");
+        let modalContent = document.getElementById("logoutModalContent");
+        modal.style.display = "flex";
+        setTimeout(() => { modalContent.style.transform = "scale(1)"; }, 50);
+    }
+
+    function closeLogoutModal() {
+        let modalContent = document.getElementById("logoutModalContent");
+        modalContent.style.transform = "scale(0)";
+        setTimeout(() => { document.getElementById("logoutModal").style.display = "none"; }, 300);
+    }
+
+    function logoutUser() {
+        window.location.href = "../logout.php";
+    }
 
     function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
@@ -417,6 +490,8 @@ echo "<script>console.log('Package: $package | Price: $price | Total Paid: $tota
     function logoutUser() {
         window.location.href = "../logout.php";
     }
+
+
 </script>
 
 </body>

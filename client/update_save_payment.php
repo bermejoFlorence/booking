@@ -6,8 +6,12 @@ ini_set('display_errors', 1);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $booking_id = $_POST['booking_id'] ?? null;
-    $amt_payment = $_POST['amt_payment'] ?? 0;
+    $amt_payment_raw = $_POST['amt_payment'] ?? 0;
     $reference_no = $_POST['reference_no'] ?? null;
+    $payment_method = $_POST['payment_method'] ?? 'gcash'; // ✅ Default to gcash
+
+    // ✅ Handle PayPal format (with commas or string)
+    $amt_payment = floatval(str_replace(',', '', $amt_payment_raw));
 
     if (empty($booking_id) || empty($reference_no) || $amt_payment <= 0) {
         echo "<script>
@@ -23,17 +27,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $database->begin_transaction();
 
     try {
-        // ✅ Insert payment with manual date_created
+        // ✅ Insert payment with payment_method included
         $insert = $database->prepare("
-            INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status, date_created)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status, date_created, payment_method)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
 
         if (!$insert) {
             throw new Exception("Prepare failed: " . $database->error);
         }
 
-        $insert->bind_param("idsss", $booking_id, $amt_payment, $reference_no, $payment_status, $date_created);
+        $insert->bind_param("idssss", $booking_id, $amt_payment, $reference_no, $payment_status, $date_created, $payment_method);
 
         if (!$insert->execute()) {
             throw new Exception("Insert failed: " . $insert->error);
@@ -41,12 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $insert->close();
 
         // ✅ Update booking to processing
-        
         $update = $database->prepare("UPDATE booking SET stat = 'processing', date_created = ? WHERE booking_id = ?");
-$update->bind_param("si", $date_created, $booking_id);
-
-
-        $update->bind_param("i", $booking_id);
+        $update->bind_param("si", $date_created, $booking_id);
 
         if (!$update->execute()) {
             throw new Exception("Booking update failed: " . $update->error);

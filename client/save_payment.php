@@ -10,12 +10,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $booking_id = $_POST['booking_id'] ?? null;
     $amt_payment_raw = $_POST['amt_payment'] ?? null;
     $reference_no = $_POST['reference_no'] ?? null;
+    $payment_method = $_POST['payment_method'] ?? 'gcash'; // ✅ Default to GCash
 
     // Strip commas and convert to float
     $amt_payment = floatval(str_replace(',', '', $amt_payment_raw));
     $current_datetime = date('Y-m-d H:i:s');
 
-    // Validate required fields
     if (empty($booking_id) || empty($amt_payment) || empty($reference_no)) {
         echo "<script>
                 alert('Error: All fields are required.');
@@ -27,7 +27,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $database->begin_transaction();
 
     try {
-        // 1. Check latest approved payment for current balance
         $balanceQuery = $database->prepare("
             SELECT b.price - IFNULL(p.amt_payment, 0) as current_balance
             FROM booking b
@@ -59,32 +58,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit();
         }
 
-        // 2. Insert payment row with 'processing payment'
+        // ✅ Modified INSERT to include payment_method
         $payment_status = "processing payment";
         $insertQuery = $database->prepare("
-            INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status, date_created)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO payment (booking_id, amt_payment, reference_no, payment_status, date_created, payment_method)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
-        $insertQuery->bind_param("idsss", $booking_id, $amt_payment, $reference_no, $payment_status, $current_datetime);
+        $insertQuery->bind_param("idssss", $booking_id, $amt_payment, $reference_no, $payment_status, $current_datetime, $payment_method);
         if (!$insertQuery->execute()) {
             throw new Exception("Error inserting payment: " . $insertQuery->error);
         }
         $insertQuery->close();
 
-        // 3. Update booking status to 'processing'
-        // 3. Update booking status to 'processing' and update booking date_created
-$updateBooking = $database->prepare("
-UPDATE booking 
-SET stat = 'processing', date_created = ? 
-WHERE booking_id = ?
-");
-$updateBooking->bind_param("si", $current_datetime, $booking_id);
-if (!$updateBooking->execute()) {
-throw new Exception("Error updating booking status and date_created: " . $updateBooking->error);
-}
-$updateBooking->close();
+        $updateBooking = $database->prepare("
+            UPDATE booking 
+            SET stat = 'processing', date_created = ? 
+            WHERE booking_id = ?
+        ");
+        $updateBooking->bind_param("si", $current_datetime, $booking_id);
+        if (!$updateBooking->execute()) {
+            throw new Exception("Error updating booking status and date_created: " . $updateBooking->error);
+        }
+        $updateBooking->close();
 
-        // 4. Commit and alert success
         $database->commit();
         echo "
         <!DOCTYPE html>
