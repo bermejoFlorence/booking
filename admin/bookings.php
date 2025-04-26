@@ -495,23 +495,17 @@ hr {
         
     <div class="header-section">
         <p class="heading-main12" style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px;">BOOKING DETAILS</p>
-        <form action="" method="post" class="header-search" style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
-    
-    <!-- Search bar and buttons -->
-    <div class="search-container" style="display: flex; gap: 10px; align-items: center;">
+        <form action="" method="post" class="header-search" style="margin-top: 20px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center;">
+
+        <!-- Search Field -->
         <input type="search" name="search" class="input-text header-searchbar" 
             placeholder="Type Client Name or Event" 
             value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>"
-            style="padding: 8px; width: 300px;" />
+            style="padding: 10px; min-width: 250px; flex: 1; border-radius: 6px; border: 1px solid #ccc;" />
 
-        <button type="submit" class="login-btn btn-primary btn" style="background-color: #224D98; padding: 8px 16px;">Search</button>
-
-        <a href="bookings.php" class="login-btn btn-secondary btn" style="background-color: #E5515B; padding: 8px 16px; text-decoration: none; color: white; text-align: center; line-height: 34px;">Reset</a>
-    </div>
-
-    <!-- Filters -->
-    <div class="filter-container" style="display: flex; gap: 10px; align-items: center;">
-        <select name="filter_status" class="input-text" style="padding: 8px; width: 180px;">
+        <!-- Booking Status Filter -->
+        <select name="filter_status" style="padding: 10px; min-width: 180px; flex: 0; border-radius: 6px; border: 1px solid #ccc;">
             <option value="">All Booking Status</option>
             <option value="pending" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'pending') echo 'selected'; ?>>Pending</option>
             <option value="approved" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'approved') echo 'selected'; ?>>Approved</option>
@@ -519,14 +513,26 @@ hr {
             <option value="rejected" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'rejected') echo 'selected'; ?>>Rejected</option>
         </select>
 
-        <select name="filter_payment" class="input-text" style="padding: 8px; width: 180px;">
+        <!-- Payment Status Filter -->
+        <select name="filter_payment" style="padding: 10px; min-width: 180px; flex: 0; border-radius: 6px; border: 1px solid #ccc;">
             <option value="">All Payment Status</option>
             <option value="Partial Payment" <?php if(isset($_POST['filter_payment']) && $_POST['filter_payment'] == 'Partial Payment') echo 'selected'; ?>>Partial Payment</option>
             <option value="Full Payment" <?php if(isset($_POST['filter_payment']) && $_POST['filter_payment'] == 'Full Payment') echo 'selected'; ?>>Full Payment</option>
         </select>
-    </div>
 
+        <!-- Search Button -->
+        <button type="submit" style="padding: 10px 20px; background-color: #224D98; color: white; border: none; border-radius: 6px; cursor: pointer; flex: 0;">
+            Search
+        </button>
+
+        <!-- Reset Button -->
+        <a href="bookings.php" style="padding: 10px 20px; background-color: #E5515B; color: white; border: none; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+            Reset
+        </a>
+
+    </div>
 </form>
+
 
     </div>
 
