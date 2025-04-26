@@ -498,14 +498,15 @@ hr {
         <form action="" method="post" class="header-search" style="margin-top: 20px;">
     <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center;">
 
-        <!-- Search Field -->
-        <input type="search" name="search" class="input-text header-searchbar" 
-            placeholder="Type Client Name or Event" 
+        <!-- Search Input -->
+        <input type="search" 
+            name="search" 
+            placeholder="Type Client Name or Event"
             value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>"
-            style="padding: 10px; min-width: 250px; flex: 1; border-radius: 6px; border: 1px solid #ccc;" />
+            style="padding: 10px 12px; min-width: 220px; flex: 1; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;" />
 
         <!-- Booking Status Filter -->
-        <select name="filter_status" style="padding: 10px; min-width: 180px; flex: 0; border-radius: 6px; border: 1px solid #ccc;">
+        <select name="filter_status" style="padding: 10px 12px; min-width: 180px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;">
             <option value="">All Booking Status</option>
             <option value="pending" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'pending') echo 'selected'; ?>>Pending</option>
             <option value="approved" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'approved') echo 'selected'; ?>>Approved</option>
@@ -514,24 +515,27 @@ hr {
         </select>
 
         <!-- Payment Status Filter -->
-        <select name="filter_payment" style="padding: 10px; min-width: 180px; flex: 0; border-radius: 6px; border: 1px solid #ccc;">
+        <select name="filter_payment" style="padding: 10px 12px; min-width: 180px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;">
             <option value="">All Payment Status</option>
             <option value="Partial Payment" <?php if(isset($_POST['filter_payment']) && $_POST['filter_payment'] == 'Partial Payment') echo 'selected'; ?>>Partial Payment</option>
             <option value="Full Payment" <?php if(isset($_POST['filter_payment']) && $_POST['filter_payment'] == 'Full Payment') echo 'selected'; ?>>Full Payment</option>
         </select>
 
         <!-- Search Button -->
-        <button type="submit" style="padding: 10px 20px; background-color: #224D98; color: white; border: none; border-radius: 6px; cursor: pointer; flex: 0;">
+        <button type="submit" 
+            style="padding: 10px 20px; min-width: 120px; background-color: #224D98; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer;">
             Search
         </button>
 
         <!-- Reset Button -->
-        <a href="bookings.php" style="padding: 10px 20px; background-color: #E5515B; color: white; border: none; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+        <a href="bookings.php" 
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; min-width: 120px; background-color: #E5515B; color: white; text-decoration: none; border-radius: 6px; font-size: 16px;">
             Reset
         </a>
 
     </div>
 </form>
+
 
 
     </div>
