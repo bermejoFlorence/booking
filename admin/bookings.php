@@ -503,7 +503,15 @@ hr {
             name="search" 
             placeholder="Type Client Name or Event"
             value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>"
-            style="padding: 10px 12px; min-width: 220px; flex: 1; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;" />
+            style="
+        padding: 10px 14px;
+        width: 280px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        font-family: inherit;
+        box-sizing: border-box;
+    " />
 
         <!-- Booking Status Filter -->
         <select name="filter_status" style="padding: 10px 12px; min-width: 180px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;">
