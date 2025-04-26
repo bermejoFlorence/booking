@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="../css/animations.css">  
     <link rel="stylesheet" href="../css/main.css">  
     <link rel="stylesheet" href="../css/admin.css">
-    <link rel="stylesheet" href="style.css">\
+    <link rel="stylesheet" href="style.css">
     <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_SANDBOX_CLIENT_ID&currency=PHP"></script>
-
+      <script src="https://www.paypal.com/sdk/js?client-id=AQ1Pyn7z1m2wr7cSMsa5hcXrO1s3aA2bYdgSVEmbVgmkVx6mEBwp99A5PXBR3o33_5M_XgRJTxkDT_ja&currency=PHP"></script>
+   
     <title>Payment</title>
 
     <?php
