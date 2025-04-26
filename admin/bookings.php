@@ -565,6 +565,7 @@ hr {
                     c.c_fullname AS full_name, 
                     b.date_event, 
                     b.event, 
+                    b.stat,
                     b.address_event, 
                     p.payment_status, 
                     p.amt_payment
