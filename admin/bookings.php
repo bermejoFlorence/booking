@@ -495,27 +495,72 @@ hr {
         
     <div class="header-section">
         <p class="heading-main12" style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px;">BOOKING DETAILS</p>
-        <form action="" method="post" class="header-search">
-            <div class="search-container">
-                <input type="search" name="search" class="input-text header-searchbar" 
-                    placeholder="Type Client Name or Event" 
-                    value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>" />
-                <button type="submit" class="login-btn btn-primary btn" style="background-color: #224D98;">Search</button>
-                <a href="bookings.php" class="login-btn btn-secondary btn" style="background-color: #E5515B;">Reset</a>
-            </div>
-        </form>
+        <form action="" method="post" class="header-search" style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+    
+    <!-- Search bar and buttons -->
+    <div class="search-container" style="display: flex; gap: 10px; align-items: center;">
+        <input type="search" name="search" class="input-text header-searchbar" 
+            placeholder="Type Client Name or Event" 
+            value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>"
+            style="padding: 8px; width: 300px;" />
+
+        <button type="submit" class="login-btn btn-primary btn" style="background-color: #224D98; padding: 8px 16px;">Search</button>
+
+        <a href="bookings.php" class="login-btn btn-secondary btn" style="background-color: #E5515B; padding: 8px 16px; text-decoration: none; color: white; text-align: center; line-height: 34px;">Reset</a>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-container" style="display: flex; gap: 10px; align-items: center;">
+        <select name="filter_status" class="input-text" style="padding: 8px; width: 180px;">
+            <option value="">All Booking Status</option>
+            <option value="pending" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'pending') echo 'selected'; ?>>Pending</option>
+            <option value="approved" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'approved') echo 'selected'; ?>>Approved</option>
+            <option value="cancelled" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'cancelled') echo 'selected'; ?>>Cancelled</option>
+            <option value="rejected" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'rejected') echo 'selected'; ?>>Rejected</option>
+        </select>
+
+        <select name="filter_payment" class="input-text" style="padding: 8px; width: 180px;">
+            <option value="">All Payment Status</option>
+            <option value="Partial Payment" <?php if(isset($_POST['filter_payment']) && $_POST['filter_payment'] == 'Partial Payment') echo 'selected'; ?>>Partial Payment</option>
+            <option value="Full Payment" <?php if(isset($_POST['filter_payment']) && $_POST['filter_payment'] == 'Full Payment') echo 'selected'; ?>>Full Payment</option>
+        </select>
+    </div>
+
+</form>
+
     </div>
 
     <?php
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
-        $search = $database->real_escape_string($_POST['search']);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $search = isset($_POST['search']) ? $database->real_escape_string($_POST['search']) : '';
+    
+        $whereClauses = [];
+    
+        if (!empty($search)) {
+            $whereClauses[] = "(c.c_fullname LIKE '%$search%' OR b.event LIKE '%$search%')";
+        }
+    
+        if (!empty($_POST['filter_status'])) {
+            $filter_status = $database->real_escape_string($_POST['filter_status']);
+            $whereClauses[] = "b.stat = '$filter_status'";
+        }
+    
+        if (!empty($_POST['filter_payment'])) {
+            $filter_payment = $database->real_escape_string($_POST['filter_payment']);
+            $whereClauses[] = "p.payment_status = '$filter_payment'";
+        }
+    
+        $whereClauses[] = "b.stat != 'pending'"; // existing condition
+    
+        $whereSQL = implode(' AND ', $whereClauses);
+    
         $sql = "SELECT 
                     b.booking_id, 
                     c.c_fullname AS full_name, 
                     b.date_event, 
                     b.event, 
                     b.address_event, 
-                    p.payment_status AS mode_of_payment, 
+                    p.payment_status, 
                     p.amt_payment
                 FROM 
                     booking b 
@@ -524,14 +569,12 @@ hr {
                 LEFT JOIN 
                     payment p ON b.booking_id = p.booking_id 
                 WHERE 
-                    (c.c_fullname LIKE '%$search%' OR 
-                    b.event LIKE '%$search%') AND 
-                    b.stat != 'pending'
+                    $whereSQL
                 ORDER BY 
                     b.date_event DESC";
-
+    
         $result = $database->query($sql);
-
+    
         if ($result->num_rows > 0) {
             if (!empty($search)) {
                 echo "<p>Search results for '<strong>$search</strong>':</p>";
