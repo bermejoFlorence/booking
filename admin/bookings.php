@@ -501,11 +501,11 @@ hr {
 <input type="search" name="search" 
     placeholder="Type Client Name or Event" 
     value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>"
-    style="flex: 2; min-width: 250px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;" />
+    style="flex: 2 1 250px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; min-width: 250px;" />
 
 <!-- Booking Status Filter -->
 <select name="filter_status" 
-    style="flex: 1; min-width: 180px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;">
+    style="flex: 1 1 180px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; min-width: 180px;">
     <option value="">All Booking Status</option>
     <option value="pending" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'pending') echo 'selected'; ?>>Pending</option>
     <option value="approved" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'approved') echo 'selected'; ?>>Approved</option>
@@ -515,7 +515,7 @@ hr {
 
 <!-- Payment Status Filter -->
 <select name="filter_payment" 
-    style="flex: 1; min-width: 180px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;">
+    style="flex: 1 1 180px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; min-width: 180px;">
     <option value="">All Payment Status</option>
     <option value="Partial Payment" <?php if(isset($_POST['filter_payment']) && $_POST['filter_payment'] == 'Partial Payment') echo 'selected'; ?>>Partial Payment</option>
     <option value="Full Payment" <?php if(isset($_POST['filter_payment']) && $_POST['filter_payment'] == 'Full Payment') echo 'selected'; ?>>Full Payment</option>
@@ -523,13 +523,13 @@ hr {
 
 <!-- Search Button -->
 <button type="submit" 
-    style="flex: 0 0 120px; padding: 10px; background-color: #224D98; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer;">
+    style="flex: 0 0 140px; padding: 10px; background-color: #224D98; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-align: center;">
     Search
 </button>
 
 <!-- Reset Button -->
 <a href="bookings.php" 
-    style="flex: 0 0 120px; padding: 10px; background-color: #E5515B; color: white; text-align: center; border-radius: 6px; font-size: 16px; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+    style="flex: 0 0 140px; padding: 10px; background-color: #E5515B; color: white; text-align: center; border-radius: 6px; font-size: 16px; text-decoration: none; display: flex; align-items: center; justify-content: center;">
     Reset
 </a>
 
