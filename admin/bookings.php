@@ -573,7 +573,10 @@ hr {
         $whereClauses[] = "YEAR(b.date_created) = '$filter_year'";
     }
 
-    $whereClauses[] = "b.stat != 'pending'"; // keep this last
+    if (empty($_POST['filter_status'])) {
+        $whereClauses[] = "b.stat != 'pending'";
+    }
+    
 
     $whereSQL = implode(' AND ', $whereClauses);
 
