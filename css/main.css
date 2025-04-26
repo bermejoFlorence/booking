@@ -284,17 +284,23 @@ input[type=search]:focus {
   transition: 0.5s;
   padding: 8px 20px 8px 40px;
 }
-.menu-btn{
-  padding:6px;
-  color: var(--textcolor);
-  background-position: 30% 50%;
+.menu-btn {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  background-position: 10px center;
   background-repeat: no-repeat;
-  transition: 0.5s;
+  background-size: 20px 20px;
+  gap: 12px;
+  color: var(--textcolor);
+  transition: 0.3s;
 }
-.menu-text{
-  padding-left: 40%;
+
+.menu-text {
+  padding-left: 0;
   font-weight: 500;
   font-size: 16px;
+  white-space: nowrap;
 }
 .menu-active{
   color:  #b7e2ec; /* Moonstone - Primary Accent (CTA Buttons) */
