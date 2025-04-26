@@ -522,6 +522,82 @@ canvas {
     }
 }
 
+.menu-container {
+  width: 100%;
+}
+
+.menu-row {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.menu-row:hover {
+  background-color: #d9edf7;
+  cursor: pointer;
+}
+
+.menu-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.menu-btn i,
+.menu-btn img,
+.menu-btn svg {
+  margin-right: 12px;
+  font-size: 20px;
+}
+
+.menu-text {
+  font-size: 16px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Profile container adjustments */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.profile-container img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.profile-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.profile-subtitle {
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+  word-break: break-word;
+  max-width: 150px;
+}
+
+/* Logout button */
+.logout-btn {
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+
 
     </style>
 
