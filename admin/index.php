@@ -690,11 +690,16 @@ canvas {
                 $date = $row['sales_date'];
                 $amount = $row['total_amount'];
                 echo "<tr>
-                    <td>$num</td>
-                    <td>$date</td>
-                    <td>₱" . number_format($amount, 2) . "</td>
-                    <td><a href='bookings.php' style='color: white; background-color: #2EAF7D; padding: 5px 10px; border-radius: 5px; text-decoration: none;'>View Details</a></td>
-                </tr>";
+    <td>$num</td>
+    <td>$date</td>
+    <td>₱" . number_format($amount, 2) . "</td>
+    <td>
+        <a href='bookings.php?filter_year=" . date('Y', strtotime($date)) . "' 
+           style='color: white; background-color: #2EAF7D; padding: 5px 10px; border-radius: 5px; text-decoration: none;'>
+           View Details
+        </a>
+    </td>
+</tr>";
                 $num++;
             }
         } else {

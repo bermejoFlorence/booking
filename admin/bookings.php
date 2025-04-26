@@ -549,6 +549,11 @@ hr {
 
 
     <?php
+
+if (isset($_GET['filter_year']) && !empty($_GET['filter_year'])) {
+    $_POST['filter_year'] = $_GET['filter_year'];
+}
+
    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $search = isset($_POST['search']) ? $database->real_escape_string($_POST['search']) : '';
 
