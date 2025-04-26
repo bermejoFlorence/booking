@@ -493,30 +493,21 @@ hr {
         
         <div class="dash-body" style="margin-top: 15px;">
         
-    <div class="header-section">
-        <p class="heading-main12" style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px;">BOOKING DETAILS</p>
-        <form action="" method="post" class="header-search" style="margin-top: 20px;">
-    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center;">
+        <div class="header-section" style="text-align: center; margin-bottom: 20px;">
+    <p class="heading-main12" style="font-size: 28px; font-weight: bold; margin-bottom: 20px;">BOOKING DETAILS</p>
+
+    <form action="" method="post" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
 
         <!-- Search Input -->
         <input 
-    type="text" 
-    name="search" 
-    placeholder="Type Client Name or Event"
-    value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>"
-    style="
-        padding: 10px 14px;
-        width: 280px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        font-size: 16px;
-        font-family: inherit;
-        box-sizing: border-box;
-    " />
+            type="text" 
+            name="search" 
+            placeholder="Type Client Name or Event"
+            value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>"
+            style="padding: 10px 14px; width: 220px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box;" />
 
-
-        <!-- Booking Status Filter -->
-        <select name="filter_status" style="padding: 10px 12px; min-width: 180px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;">
+        <!-- Booking Status -->
+        <select name="filter_status" style="padding: 10px; width: 180px; border-radius: 6px; border: 1px solid #ccc;">
             <option value="">All Booking Status</option>
             <option value="pending" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'pending') echo 'selected'; ?>>Pending</option>
             <option value="approved" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'approved') echo 'selected'; ?>>Approved</option>
@@ -524,80 +515,92 @@ hr {
             <option value="rejected" <?php if(isset($_POST['filter_status']) && $_POST['filter_status'] == 'rejected') echo 'selected'; ?>>Rejected</option>
         </select>
 
-        <!-- Payment Status Filter -->
-        <select name="filter_payment" style="padding: 10px 12px; min-width: 180px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;">
+        <!-- Payment Status -->
+        <select name="filter_payment" style="padding: 10px; width: 180px; border-radius: 6px; border: 1px solid #ccc;">
             <option value="">All Payment Status</option>
             <option value="Partial Payment" <?php if(isset($_POST['filter_payment']) && $_POST['filter_payment'] == 'Partial Payment') echo 'selected'; ?>>Partial Payment</option>
             <option value="Full Payment" <?php if(isset($_POST['filter_payment']) && $_POST['filter_payment'] == 'Full Payment') echo 'selected'; ?>>Full Payment</option>
         </select>
 
+        <!-- Year Filter -->
+        <select name="filter_year" style="padding: 10px; width: 140px; border-radius: 6px; border: 1px solid #ccc;">
+            <option value="">All Years</option>
+            <?php
+                $currentYear = date('Y');
+                for ($y = $currentYear; $y >= $currentYear - 10; $y--) {
+                    $selected = (isset($_POST['filter_year']) && $_POST['filter_year'] == $y) ? 'selected' : '';
+                    echo "<option value='$y' $selected>$y</option>";
+                }
+            ?>
+        </select>
+
         <!-- Search Button -->
-        <button type="submit" 
-            style="padding: 10px 20px; min-width: 120px; background-color: #224D98; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer;">
+        <button type="submit" style="padding: 10px 20px; background-color: #224D98; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer;">
             Search
         </button>
 
         <!-- Reset Button -->
         <a href="bookings.php" 
-            style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; min-width: 120px; background-color: #E5515B; color: white; text-decoration: none; border-radius: 6px; font-size: 16px;">
+           style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background-color: #E5515B; color: white; text-decoration: none; border-radius: 6px; font-size: 16px;">
             Reset
         </a>
+    </form>
+</div>
 
-    </div>
-</form>
-
-
-
-    </div>
 
     <?php
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $search = isset($_POST['search']) ? $database->real_escape_string($_POST['search']) : '';
-    
-        $whereClauses = [];
-    
-        if (!empty($search)) {
-            $whereClauses[] = "(c.c_fullname LIKE '%$search%' OR b.event LIKE '%$search%')";
-        }
-    
-        if (!empty($_POST['filter_status'])) {
-            $filter_status = $database->real_escape_string($_POST['filter_status']);
-            $whereClauses[] = "b.stat = '$filter_status'";
-        }
-    
-        if (!empty($_POST['filter_payment'])) {
-            $filter_payment = $database->real_escape_string($_POST['filter_payment']);
-            $whereClauses[] = "p.payment_status = '$filter_payment'";
-        }
-    
-        $whereClauses[] = "b.stat != 'pending'"; // existing condition
-    
-        $whereSQL = implode(' AND ', $whereClauses);
-    
-        $sql = "SELECT 
-                    b.booking_id, 
-                    c.c_fullname AS full_name, 
-                    b.date_event, 
-                    b.event, 
-                    b.address_event, 
-                    b.stat, 
-                    b.price, 
-                    p.payment_status, 
-                    p.amt_payment, 
-                    p.reference_no
-                FROM 
-                    booking b 
-                LEFT JOIN 
-                    client c ON b.client_id = c.client_id 
-                LEFT JOIN 
-                    payment p ON b.booking_id = p.booking_id 
-                WHERE 
-                    $whereSQL
-                ORDER BY 
-                    b.date_event DESC";
-    
-        $result = $database->query($sql);
-    
+   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $search = isset($_POST['search']) ? $database->real_escape_string($_POST['search']) : '';
+
+    $whereClauses = [];
+
+    if (!empty($search)) {
+        $whereClauses[] = "(c.c_fullname LIKE '%$search%' OR b.event LIKE '%$search%')";
+    }
+
+    if (!empty($_POST['filter_status'])) {
+        $filter_status = $database->real_escape_string($_POST['filter_status']);
+        $whereClauses[] = "b.stat = '$filter_status'";
+    }
+
+    if (!empty($_POST['filter_payment'])) {
+        $filter_payment = $database->real_escape_string($_POST['filter_payment']);
+        $whereClauses[] = "p.payment_status = '$filter_payment'";
+    }
+
+    if (!empty($_POST['filter_year'])) {
+        $filter_year = $database->real_escape_string($_POST['filter_year']);
+        $whereClauses[] = "YEAR(b.date_created) = '$filter_year'";
+    }
+
+    $whereClauses[] = "b.stat != 'pending'"; // keep this last
+
+    $whereSQL = implode(' AND ', $whereClauses);
+
+    $sql = "SELECT 
+                b.booking_id, 
+                c.c_fullname AS full_name, 
+                b.date_event, 
+                b.event, 
+                b.address_event, 
+                b.stat, 
+                b.price, 
+                p.payment_status, 
+                p.amt_payment, 
+                p.reference_no
+            FROM 
+                booking b 
+            LEFT JOIN 
+                client c ON b.client_id = c.client_id 
+            LEFT JOIN 
+                payment p ON b.booking_id = p.booking_id 
+            WHERE 
+                $whereSQL
+            ORDER BY 
+                b.date_event DESC";
+
+    $result = $database->query($sql);
+
         if ($result->num_rows > 0) {
             if (!empty($search)) {
                 echo "<p>Search results for '<strong>$search</strong>':</p>";
