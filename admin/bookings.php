@@ -565,10 +565,12 @@ hr {
                     c.c_fullname AS full_name, 
                     b.date_event, 
                     b.event, 
-                    b.stat,
                     b.address_event, 
+                    b.stat, 
+                    b.price, 
                     p.payment_status, 
-                    p.amt_payment
+                    p.amt_payment, 
+                    p.reference_no
                 FROM 
                     booking b 
                 LEFT JOIN 
