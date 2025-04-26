@@ -323,28 +323,35 @@ if (isset($_GET['booking_id'])) {
                 <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking_id); ?>">
                 <input type="hidden" name="payment_method" value="gcash">
 
-                <div id="gcash-fields">
+                    <div id="gcash-fields">
                     <div class="form-group">
-                        <label for="gcash_qr">Scan QR Code</label>
-                        <div>
-                            <img src="gcash.jpg" alt="GCash QR Code" style="width: 200px; height: auto;">
+                            <label for="gcash_qr">Scan QR Code</label>
+                            <div>
+                                <img src="gcash.jpg" alt="GCash QR Code" style="width: 200px; height: auto;">
+                            </div>
+
+                            <!-- ✅ Download Button -->
+                            <div style="margin-top: 10px;">
+                                <a href="gcash.jpg" download="GCash_QR_Code.jpg" 
+                                    style="display: inline-block; padding: 8px 16px; background-color: #224D98; color: white; text-decoration: none; border-radius: 6px; font-size: 14px;">
+                                    Download QR Code
+                                </a>
+                            </div>
+
+                        <div class="form-group">
+                            <label for="reference_no">Reference Number</label>
+                            <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number"
+                                maxlength="13" pattern="\d{13}" required onkeypress="return event.charCode>=48 && event.charCode<=57">
+                            <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="amt_payment">Amount to Pay</label>
+                            <input type="text" name="amt_payment" id="amt_payment" required
+                                onkeypress="return event.charCode>=48 && event.charCode<=57"
+                                placeholder="Enter amount ex 1000, 100, 10, 1">
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="reference_no">Reference Number</label>
-                        <input type="text" name="reference_no" id="reference_no" placeholder="Enter GCash reference number"
-                            maxlength="13" pattern="\d{13}" required onkeypress="return event.charCode>=48 && event.charCode<=57">
-                        <small id="error-message" style="color: red; display: none;">Reference number must be exactly 13 digits.</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="amt_payment">Amount to Pay</label>
-                        <input type="text" name="amt_payment" id="amt_payment" required
-                            onkeypress="return event.charCode>=48 && event.charCode<=57"
-                            placeholder="Enter amount ex 1000, 100, 10, 1">
-                    </div>
-                </div>
 
                 <button type="submit" class="btn-primary">Submit Payment</button>
             </form>
