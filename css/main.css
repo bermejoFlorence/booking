@@ -344,24 +344,6 @@ input[type=search]:focus {
   background-color: #46B1C9;
   color: white;
 }
-.menu-icon-home::before {
-  background-image: url('../img/icons/home.svg');
-}
-.menu-icon-appoinment::before {
-  background-image: url('../img/icons/book.svg');
-}
-.menu-icon-message::before {
-  background-image: url('../img/icons/message.png');
-}
-.menu-icon-feedback::before {
-  background-image: url('../img/icons/feedback.png');
-}
-.menu-icon-sales::before {
-  background-image: url('../img/icons/sale.png');
-}
-.menu-icon-settings::before {
-  background-image: url('../img/icons/settings.svg');
-}
 
 
 .menu-btn:hover{
