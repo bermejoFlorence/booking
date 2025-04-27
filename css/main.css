@@ -353,9 +353,15 @@ input[type=search]:focus {
 }
 
 .menu-btn.menu-active {
-  background-color: #46B1C9;
-  color: white;
+  background-color: #b7e2ec; /* Same light blue background */
+  color: #212529; /* Dark text color */
+  font-weight: 600;
 }
+.menu::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* totally invisible */
+}
+
 .menu-icon-home::before {
   background-image: url('../img/icons/home.svg');
 }
