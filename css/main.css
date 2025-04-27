@@ -284,63 +284,40 @@ input[type=search]:focus {
   transition: 0.5s;
   padding: 8px 20px 8px 40px;
 }
-.menu-btn {
-  display: flex;
-  align-items: center;
-  padding: 10px 15px;
-  background-position: 10px center;
-  background-repeat: no-repeat;
-  background-size: 20px 20px;
-  gap: 12px;
-  color: var(--textcolor);
-  transition: 0.3s;
-}
-
-.menu-text {
-  padding-left: 0;
-  font-weight: 500;
-  font-size: 16px;
-  white-space: nowrap;
-}
-
 .menu {
   width: 250px;
   background-color: #b7e2ec;
   height: 100vh;
   position: fixed;
-  top: 50px; /* adjust depende sa taas ng header */
+  top: 50px;
   left: 0;
   overflow-y: auto;
   z-index: 999;
+  padding-top: 20px;
 }
 
 .menu-container {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding-top: 20px;
-}
-
-.menu-row {
-  display: flex;
-  align-items: center;
-  padding: 10px 15px;
-  width: 100%;
 }
 
 .menu-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 12px; /* proper space between icon and text */
   width: 100%;
-  padding: 10px 15px;
-  transition: 0.3s;
+  padding: 12px 20px; /* even padding */
+  transition: background-color 0.3s, color 0.3s;
   text-decoration: none;
+  font-size: 16px;
+  color: #333;
+  border-radius: 8px;
 }
 
 .menu-text {
-  font-size: 16px;
   font-weight: 500;
+  font-size: 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -349,15 +326,13 @@ input[type=search]:focus {
 .menu-btn:hover {
   background-color: #46B1C9;
   color: white;
-  border-radius: 8px;
 }
 
-
-.menu-active{
-  color:  #b7e2ec; /* Moonstone - Primary Accent (CTA Buttons) */
-  border-right: 7px solid var(--primarycolor);
-  background-color:  #b7e2ec; /* Moonstone - Primary Accent (CTA Buttons) */
+.menu-btn.menu-active {
+  background-color: #46B1C9;
+  color: white;
 }
+
 .menu-btn:hover{
   background-color: var(--btnice);
   color: var(--primarycolor);
