@@ -116,32 +116,38 @@
 }
 
 .menu-row {
-    padding: 20px 0;
+    padding: 10px 0;
     display: flex;
-    justify-content: center;
+    align-items: center;
 }
 
 .menu-btn {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    text-align: center;
-    color: #333;
+    padding: 10px 15px;
+    background-position: 10px center;
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    gap: 12px;
+    color: var(--textcolor);
     text-decoration: none;
-    gap: 5px;
+    width: 100%;
+    transition: 0.3s;
 }
+
+.menu-text {
+    padding-left: 0;
+    font-weight: 500;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
 
 .menu-btn img, .menu-btn i, .menu-btn svg {
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
 }
-
-.menu-text {
-    font-size: 14px;
-    white-space: nowrap;
-}
-
 
 .profile-container {
     display: flex;
