@@ -309,77 +309,55 @@ canvas { max-width: 100%; height: 400px; }
                 ☰
     </div>
     <div class="container">
-        <div class="menu">
-            <div class="close-btn" onclick="toggleMenu()">✖</div>
-            <table class="menu-container" border="0">
-                <tr>
-                    <td style="padding:10px" colspan="2">
-                        <table border="0" class="profile-container">
-                            <tr>
-                                <td width="30%" style="padding-left:20px">
-                                    <img src="../img/user.png" alt="User Image">
-                                </td>
-                                <td style="padding:0px;margin:0px;">
-                                    <p class="profile-title">Administrator</p>
-                                    <p class="profile-subtitle"><?php echo $user_email; ?></p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
-                                </td>
-                            </tr>  
-                        </table>
-                         <!-- Logout Confirmation Modal -->
-                         <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
-                            <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
-                                <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
-                                <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
-                                <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="menu-row">
-                    <td class="menu-btn menu-icon-home ">
-                        <a href="index.php" class="non-style-link-menu ">
-                            <div><p class="menu-text">Home</p></div>
-                        </a>
-                    </td>
-                </tr>
-                <tr class="menu-row">
-                    <td class="menu-btn menu-icon-appoinment">
-                        <a href="bookings.php" class="non-style-link-menu"><div><p class="menu-text">My Bookings</p></a></div>
-                    </td>
-                </tr>
-                
-                <tr class="menu-row">
-                    <td class="menu-btn menu-icon-message">
-                        <a href="report.php" class="non-style-link-menu"><div><p class="menu-text">Reports</p></a></div>
-                    </td>
-                </tr>
+    <div class="menu">
+    <div class="close-btn" onclick="toggleMenu()">✖</div>
 
-                <tr class="menu-row">
-                    <td class="menu-btn menu-icon-feedback">
-                        <a href="feedback.php" class="non-style-link-menu"><div><p class="menu-text">Feedback</p></a></div>
-                    </td>
-                </tr>
-
-                <tr class="menu-row">
-                    <td class="menu-btn menu-icon-sales menu-active menu-icon-sales-active">
-                        <a href="moving_average.php" class="non-style-link-menu non-style-link-menu-active"><div><p class="menu-text">Sales</p></a></div>
-                    </td>
-                </tr>
-                
-                <tr class="menu-row">
-                    <td class="menu-btn menu-icon-settings">
-                        <a href="settings.php" class="non-style-link-menu">
-                            <div><p class="menu-text">Settings</p></div>
-                        </a>
-                    </td>
-                </tr>
-            </table>
+    <div class="menu-container">
+        
+        <!-- Profile Section -->
+        <div class="profile-container">
+            <img src="../img/user.png" alt="User Image">
+            <p class="profile-title">Administrator</p>
+            <p class="profile-subtitle"><?php echo $user_email; ?></p>
+            <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
         </div>
+
+        <!-- Sidebar Links -->
+        <a href="index.php" class="menu-btn menu-icon-home">
+            <p class="menu-text">Home</p>
+        </a>
+
+        <a href="bookings.php" class="menu-btn menu-icon-appoinment">
+            <p class="menu-text">Bookings</p>
+        </a>
+
+        <a href="report.php" class="menu-btn menu-icon-message">
+            <p class="menu-text">Reports</p>
+        </a>
+
+        <a href="feedback.php" class="menu-btn menu-icon-feedback">
+            <p class="menu-text">Feedback</p>
+        </a>
+
+        <a href="moving_average.php" class="menu-btn menu-icon-sales menu-active">
+            <p class="menu-text">Sales</p>
+        </a>
+
+        <a href="settings.php" class="menu-btn menu-icon-settings">
+            <p class="menu-text">Settings</p>
+        </a>
+    </div>
+
+    <!-- Logout Modal -->
+    <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
+        <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
+            <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
+            <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
+            <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
+        </div>
+    </div>
+
+</div>
 
         <div class="dash-body" style="margin-top: 15px; padding: 20px;">
         <div class="graph-section">
