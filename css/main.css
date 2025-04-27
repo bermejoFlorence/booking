@@ -353,10 +353,17 @@ input[type=search]:focus {
 }
 
 .menu-btn.menu-active {
-  background-color: #b7e2ec; /* Same light blue background */
-  color: #212529; /* Dark text color */
+  background-color: #b7e2ec;
+  color: #212529;
   font-weight: 600;
+  transition: background-color 0.3s, color 0.3s;
 }
+/* Idagdag ito para sa hover habang active */
+.menu-btn.menu-active:hover {
+  background-color: #4da0e0; /* darker blue pag hover */
+  color: #ffffff; /* white text pag hover */
+}
+
 .menu::-webkit-scrollbar {
   width: 0px;
   background: transparent; /* totally invisible */
@@ -381,11 +388,14 @@ input[type=search]:focus {
   background-image: url('../img/icons/settings.svg');
 }
 
-
-.menu-btn:hover{
-  background-color: var(--btnice);
-  color: var(--primarycolor);
+.menu-btn:hover {
+  background-color: #4da0e0; /* same color hover sa active */
+  color: #ffffff; /* white text pag hover kahit di active */
 }
+.menu-btn, .menu-btn.menu-active {
+  transition: all 0.3s ease;
+}
+
 .non-style-link-menu:link, .non-style-link-menu:visited,  .non-style-link-menu:active{
   text-decoration: none;
   color: var(--textcolor);
