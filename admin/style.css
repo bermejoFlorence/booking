@@ -108,22 +108,6 @@
     }
 }
 
-.menu-btn {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    background-position: 10px center;
-    background-repeat: no-repeat;
-    background-size: 20px 20px;
-    gap: 12px;
-    color: var(--textcolor);
-    text-decoration: none;
-    width: 100%;
-    transition: 0.3s;
-}
-
-
-
 .menu-btn img, .menu-btn i, .menu-btn svg {
     width: 24px;
     height: 24px;
