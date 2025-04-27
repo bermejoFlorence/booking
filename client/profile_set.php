@@ -293,7 +293,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['change_password'])) {
         <!-- Profile Section -->
         <div class="profile-container">
             <img src="../img/user.png" alt="User Image">
-            <p class="profile-title"><?php echo $username; ?></p>
+            <p class="profile-title"><?php echo $fullname; ?></p>
             <p class="profile-subtitle"><?php echo $useremail; ?></p>
             <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
         </div>
