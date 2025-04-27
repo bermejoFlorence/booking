@@ -22,10 +22,91 @@
     z-index: 999; /* Mas mababa sa header */
     background-color:   #b7e2ec; /* Moonstone - Primary Accent (CTA Buttons) */
 }
-
-.menu-container {
+.menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     width: 100%;
-}
+    padding: 12px 30px 12px 50px;
+    transition: background-color 0.3s, color 0.3s;
+    text-decoration: none;
+    font-size: 16px;
+    color: #333;
+    border-radius: 12px;
+    position: relative;
+  }
+
+  .menu-btn::before {
+    content: '';
+    min-width: 24px;
+    min-height: 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    display: inline-block;
+  }
+
+  .menu-text {
+    font-weight: 500;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .menu-btn:hover {
+    background-color: #4da0e0;
+    color: #ffffff;
+  }
+  
+  .menu-btn.menu-active {
+    background-color: #4da0e0;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  
+  .menu-btn.menu-active:hover {
+    background-color: #46B1C9;
+    color: #ffffff;
+  }
+  
+  /* Hide scrollbar */
+  .menu::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+  
+  /* Profile subtitle fix */
+  .profile-subtitle {
+    font-size: 12px;
+    color: #666;
+    max-width: 150px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    text-align: center;
+    display: block;
+    margin-top: 5px;
+  }
+  
+  /* Icons */
+  .menu-icon-home::before {
+    background-image: url('../img/icons/home.svg');
+  }
+  .menu-icon-appoinment::before {
+    background-image: url('../img/icons/book.svg');
+  }
+  .menu-icon-feedback::before {
+    background-image: url('../img/icons/feedback.png');
+  }
+  .menu-icon-settings::before {
+    background-image: url('../img/icons/settings.svg');
+  }
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-bottom: 50px;
+  }
 
 .profile-container {
     display: flex;
