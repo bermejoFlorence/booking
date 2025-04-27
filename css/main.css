@@ -303,13 +303,12 @@ input[type=search]:focus {
   padding-bottom: 50px; /* Dagdag space sa ilalim */
 }
 
-
 .menu-btn {
   display: flex;
   align-items: center;
-  gap: 8px; /* Mas maliit gap ng icon at text */
+  gap: 8px; /* Proper distance between icon and text */
   width: 100%;
-  padding: 12px 40px 12px 40px; /* Pinalaki left padding */
+  padding: 12px 30px 12px 50px; /* Eto adjustment: 50px sa left */
   transition: background-color 0.3s, color 0.3s;
   text-decoration: none;
   font-size: 16px;
