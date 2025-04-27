@@ -425,6 +425,22 @@ if (isset($_POST['change_password'])) {
 }
 ?>
 
+function showLogoutModal() {
+        let modal = document.getElementById("logoutModal");
+        let modalContent = document.getElementById("logoutModalContent");
+        modal.style.display = "flex";
+        setTimeout(() => {
+            modalContent.style.transform = "scale(1)";
+        }, 50);
+    }
+
+    function closeLogoutModal() {
+        let modalContent = document.getElementById("logoutModalContent");
+        modalContent.style.transform = "scale(0)";
+        setTimeout(() => {
+            document.getElementById("logoutModal").style.display = "none";
+        }, 300);
+    }
      
     </script>
 </body>
