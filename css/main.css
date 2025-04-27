@@ -365,7 +365,7 @@ input[type=search]:focus {
 /* Idagdag ito para sa hover habang active */
 /* Hover kahit active */
 .menu-btn.menu-active:hover {
-  background-color: #0077b6; /* darker blue pag hover */
+  background-color: #4da0e0; /* darker blue pag hover */
   color: white;
 }
 .menu::-webkit-scrollbar {
