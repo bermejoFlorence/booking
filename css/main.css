@@ -344,6 +344,24 @@ input[type=search]:focus {
   background-color: #46B1C9;
   color: white;
 }
+.menu-icon-home::before {
+  background-image: url('../img/icons/home.svg');
+}
+.menu-icon-appoinment::before {
+  background-image: url('../img/icons/book.svg');
+}
+.menu-icon-message::before {
+  background-image: url('../img/icons/message.png');
+}
+.menu-icon-feedback::before {
+  background-image: url('../img/icons/feedback.png');
+}
+.menu-icon-sales::before {
+  background-image: url('../img/icons/sale.png');
+}
+.menu-icon-settings::before {
+  background-image: url('../img/icons/settings.svg');
+}
 
 
 .menu-btn:hover{
@@ -366,86 +384,7 @@ input[type=search]:focus {
   border-radius: 7px;
   color: var(--primarycolor);
 }
-.menu-icon-dashbord{
-  background-image: url('../img/icons/dashboard.svg');
-}
-.menu-icon-doctor{
-  background-image: url('../img/icons/doctors.svg');
-}
-.menu-icon-schedule{
-  background-image: url('../img/icons/schedule.svg');
-}
-.menu-icon-appoinment{
-  background-image: url('../img/icons/book.svg');
-}
-.menu-icon-patient{
-  background-image: url('../img/icons/patients.svg');
-}
-.menu-icon-settings{
-  background-image: url('../img/icons/settings.svg');
-}
 
-.menu-icon-session{
-  background-image: url('../img/icons/session.svg');
-}
-.menu-icon-home{
-  background-image: url('../img/icons/home.svg');
-}
-
-.menu-icon-sales{
-  background-image: url('../img/icons/sale.png');
-}
-
-.menu-icon-feedback{
-  background-image: url('../img/icons/feedback.png');
-}
-.menu-icon-message{
-  background-image: url('../img/icons/message.png');
-}
-.menu-icon-dashbord:hover,.menu-icon-dashbord-active{
-  color: var(--primarycolor);
-  background-image: url('../img/icons/dashboard-hover.svg');
-}
-.menu-icon-doctor:hover,.menu-icon-doctor-active{
-  color: var(--primarycolor);
-  background-image: url('../img/icons/doctors-hover.svg');
-}
-.menu-icon-schedule:hover,.menu-icon-schedule-active{
-  color: var(--primarycolor); 
-  background-image: url('../img/icons/schedule-hover.svg');
-}
-.menu-icon-appoinment:hover,.menu-icon-appoinment-active{
-  color: var(--primarycolor);
-  background-image: url('../img/icons/book-hover.svg');
-}
-.menu-icon-patient:hover,.menu-icon-patient-active{
-  color: var(--primarycolor);
-  background-image: url('../img/icons/patients-hover.svg');
-}
-.menu-icon-settings:hover,.menu-icon-settings-active{
-  color: var(--primarycolor);
-  background-image: url('../img/icons/settings-iceblue.svg');
-}
-.menu-icon-session:hover,.menu-icon-session-active{
-  color: var(--primarycolor);
-  background-image: url('../img/icons/session-iceblue.svg');
-}
-.menu-icon-home:hover,.menu-icon-home-active{
-  color: var(--primarycolor);
-  background-image: url('../img/icons/home-iceblue.svg');
-}
-.menu-icon-sales:hover,.menu-icon-sales-active{
-  color: var(--primarycolor);
-  background-image: url('../img/icons/sale_blue.png');
-}
-.menu-icon-feedback:hover,.menu-icon-feedback-active{
-  color: var(--primarycolor);
-  background-image: url('../img/icons/feedback_blue.png');
-}
-.menu-icon-message:hover,.menu-icon-message-active{
-  color: var(--primarycolor);
-  background-image: url('../img/icons/message-blue.png');
-}
 .btn-icon-back{
   background-image: url('../img/icons/back-iceblue.svg');
   background-position: 18px 50%;
