@@ -29,23 +29,33 @@
 
 .profile-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    padding: 10px;
+    text-align: center;
+    padding: 20px 10px;
 }
+
 
 .profile-container img {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
 }
-
 .profile-title, .profile-subtitle {
     margin: 0;
+    padding: 2px 0;
+    font-size: 14px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.logout-btn {
+    margin-top: 10px;
+    width: 80%;
+}
+
 
 .profile-title {
     font-size: 16px;
@@ -56,9 +66,33 @@
     font-size: 12px;
     color: #666;
 }
-
 .menu-btn {
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 30px 12px 50px;
+    text-decoration: none;
+    font-size: 16px;
+    color: #333;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
+}
+.menu-btn::before {
+    content: '';
+    min-width: 24px;
+    min-height: 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    display: inline-block;
+}
+
+/* Active and hover effects */
+.menu-btn:hover,
+.menu-btn.menu-active {
+    background-color: #4da0e0;
+    color: white;
 }
 
 .dash-body {
