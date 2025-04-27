@@ -306,16 +306,18 @@ input[type=search]:focus {
 .menu-btn {
   display: flex;
   align-items: center;
-  gap: 8px; /* Proper distance between icon and text */
+  gap: 8px;
   width: 100%;
-  padding: 12px 30px 12px 50px; /* Eto adjustment: 50px sa left */
-  transition: background-color 0.3s, color 0.3s;
+  padding: 12px 30px 12px 50px;
   text-decoration: none;
   font-size: 16px;
   color: #333;
   border-radius: 8px;
+  transition: all 0.3s ease;
   position: relative;
 }
+
+
 
 .menu-btn::before {
   content: '';
@@ -325,6 +327,10 @@ input[type=search]:focus {
   background-position: center;
   background-size: contain;
   display: inline-block;
+}
+.menu-btn:hover:not(.menu-active) {
+  background-color: #4da0e0;
+  color: #ffffff;
 }
 
 
@@ -356,12 +362,11 @@ input[type=search]:focus {
   background-color: #b7e2ec;
   color: #212529;
   font-weight: 600;
-  transition: background-color 0.3s, color 0.3s;
 }
 /* Idagdag ito para sa hover habang active */
 .menu-btn.menu-active:hover {
-  background-color: #4da0e0; /* darker blue pag hover */
-  color: #ffffff; /* white text pag hover */
+  background-color: #4da0e0;
+  color: #ffffff;
 }
 
 .menu::-webkit-scrollbar {
