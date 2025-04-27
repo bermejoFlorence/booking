@@ -309,18 +309,15 @@ input[type=search]:focus {
   gap: 8px;
   width: 100%;
   padding: 12px 30px 12px 50px;
-  font-size: 16px;
-  text-decoration: none;
-  border-radius: 8px;
-  color: var(--textcolor);
-  background-color: transparent; /* normal walang background */
   transition: background-color 0.3s, color 0.3s;
+  text-decoration: none;
+  font-size: 16px;
+  color: var(--textcolor);
+  border-radius: 8px;
   position: relative;
 }
 
-
 .menu-btn::before {
-  content: '';
   min-width: 24px;
   min-height: 24px;
   background-repeat: no-repeat;
@@ -354,23 +351,23 @@ input[type=search]:focus {
 }
 
 .menu-btn:hover {
-  background-color: var(--btnice); /* lighter blue */
+  background-color: var(--btnice); /* light blue hover */
   color: white;
 }
 
 .menu-btn.menu-active {
-  background-color: var(--primarycolor); /* light blue */
-  color: white;
+  background-color: var(--btnice); /* active bg color */
+  color: white; /* active text color */
 }
 /* Idagdag ito para sa hover habang active */
 /* Hover kahit active */
 .menu-btn.menu-active:hover {
-  background-color: #4da0e0; /* darker blue pag hover */
+  background-color: var(--primarycolor); /* darker hover sa active */
   color: white;
 }
 .menu::-webkit-scrollbar {
   width: 0px;
-  background: transparent; /* totally invisible */
+  background: transparent;
 }
 
 .menu-icon-home::before {
