@@ -441,6 +441,11 @@ function showLogoutModal() {
             document.getElementById("logoutModal").style.display = "none";
         }, 300);
     }
+
+    
+    function logoutUser() {
+        window.location.href = "../logout.php"; // Redirect to logout page
+    }
      
     </script>
 </body>
