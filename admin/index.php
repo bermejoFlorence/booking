@@ -161,13 +161,6 @@ $totalPages = ceil($totalRows / $limit);
 ?>
     <style>
 
-.profile-subtitle {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    max-width: 125px; /* Adjust to fit within the sidebar */
-}
         .dash-body {
             margin: 30px auto; /* Adds top margin and centers horizontally */
     padding: 0 20px; /* Adds inner padding */

@@ -302,6 +302,57 @@ input[type=search]:focus {
   font-size: 16px;
   white-space: nowrap;
 }
+
+.menu {
+  width: 250px;
+  background-color: #b7e2ec;
+  height: 100vh;
+  position: fixed;
+  top: 50px; /* adjust depende sa taas ng header */
+  left: 0;
+  overflow-y: auto;
+  z-index: 999;
+}
+
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-top: 20px;
+}
+
+.menu-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  width: 100%;
+}
+
+.menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 15px;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.menu-text {
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menu-btn:hover {
+  background-color: #46B1C9;
+  color: white;
+  border-radius: 8px;
+}
+
+
 .menu-active{
   color:  #b7e2ec; /* Moonstone - Primary Accent (CTA Buttons) */
   border-right: 7px solid var(--primarycolor);

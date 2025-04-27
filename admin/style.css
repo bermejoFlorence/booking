@@ -18,12 +18,7 @@
 .menu-container {
     width: 100%;
 }
-.profile-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 10px;
-}
+
 .profile-container img {
     width: 50px; /* Fixed size for 1x1 aspect ratio */
     height: 50px; /* Fixed size for 1x1 aspect ratio */
@@ -44,9 +39,7 @@
     color: #666;
 }
 
-.menu-btn {
-    padding: 10px;
-}
+
 .dash-body {
     flex: 1;
     margin-left: 15px;
@@ -115,12 +108,6 @@
     }
 }
 
-.menu-row {
-    padding: 10px 0;
-    display: flex;
-    align-items: center;
-}
-
 .menu-btn {
     display: flex;
     align-items: center;
@@ -135,12 +122,6 @@
     transition: 0.3s;
 }
 
-.menu-text {
-    padding-left: 0;
-    font-weight: 500;
-    font-size: 16px;
-    white-space: nowrap;
-}
 
 
 .menu-btn img, .menu-btn i, .menu-btn svg {
