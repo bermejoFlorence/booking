@@ -338,45 +338,47 @@ $rating_map = [
         <!-- Hamburger Icon -->
         
         <div class="menu">
-  <!-- Close Button -->
-  <div class="close-btn" onclick="toggleMenu()">✖</div>
+    <div class="close-btn" onclick="toggleMenu()">✖</div>
 
-  <div class="menu-container">
-    <!-- Profile Section -->
-    <div class="profile-container">
-      <img src="../img/user.png" alt="User Image">
-      <p class="profile-title"><?php echo $username; ?></p>
-      <p class="profile-subtitle"><?php echo $useremail; ?></p>
-      <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
+    <div class="menu-container">
+
+        <!-- Profile Section -->
+        <div class="profile-container">
+            <img src="../img/user.png" alt="User Image">
+            <p class="profile-title"><?php echo $username; ?></p>
+            <p class="profile-subtitle"><?php echo $useremail; ?></p>
+            <button onclick="showLogoutModal()" class="logout-btn btn-primary-soft btn">Log out</button>
+        </div>
+
+        <!-- Sidebar Links -->
+        <a href="index.php" class="menu-btn menu-icon-home menu-active">
+            <p class="menu-text">Home</p>
+        </a>
+
+        <a href="bookings.php" class="menu-btn menu-icon-appoinment">
+            <p class="menu-text">My Bookings</p>
+        </a>
+
+        <a href="feedback.php" class="menu-btn menu-icon-feedback">
+            <p class="menu-text">Feedback</p>
+        </a>
+
+        <a href="profile_set.php" class="menu-btn menu-icon-settings">
+            <p class="menu-text">Profile Settings</p>
+        </a>
+
     </div>
-
-    <!-- Sidebar Links -->
-    <a href="index.php" class="menu-btn menu-icon-home menu-active">
-      <p class="menu-text">Home</p>
-    </a>
-
-    <a href="bookings.php" class="menu-btn menu-icon-appoinment">
-      <p class="menu-text">My Bookings</p>
-    </a>
-
-    <a href="feedback.php" class="menu-btn menu-icon-feedback">
-      <p class="menu-text">Feedback</p>
-    </a>
-
-    <a href="profile_set.php" class="menu-btn menu-icon-settings">
-      <p class="menu-text">Profile Settings</p>
-    </a>
 
     <!-- Logout Modal -->
     <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s;">
-      <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
-        <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
-        <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
-        <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
-      </div>
+        <div id="logoutModalContent" style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 400px; transform: scale(0); transition: transform 0.3s ease-in-out;">
+            <p id="logoutModalMessage" style="font-size: 18px; margin-bottom: 20px;">Are you sure you want to log out?</p>
+            <button id="logoutConfirmBtn" onclick="logoutUser()" style="background-color:rgb(39, 134, 211); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 16px;">Confirm</button>
+            <button onclick="closeLogoutModal()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">Cancel</button>
+        </div>
     </div>
-  </div>
 </div>
+
 
         <div class="dash-body">
 
