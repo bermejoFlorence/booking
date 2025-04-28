@@ -427,60 +427,59 @@ document.addEventListener("DOMContentLoaded", function () {
             ]
         };
     }
-
     function buildMonthlyChart() {
-        const months = ["January", "February", "March", "April", "May", "June",
-                        "July", "August", "September", "October", "November", "December"];
+    const months = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"];
 
-        const labels = [];
-        const actualSalesData = [];
-        const forecastSalesData = [];
+    const labels = [];
+    const actualSalesData = [];
+    const forecastSalesData = [];
 
-        for (let y = startYear; y <= currentYear + forecastYears; y++) {
-            for (let m = 1; m <= 12; m++) {
-                labels.push(`${months[m-1]} ${y}`);
-                if (monthlySalesData[y] && monthlySalesData[y][m]) {
-                    actualSalesData.push(monthlySalesData[y][m]);
-                    forecastSalesData.push(null);
-                } else {
-                    // Moving average per month
-                    const last5 = [];
-                    for (let back = 1; back <= 5; back++) {
-                        const pastYear = y - back;
-                        if (monthlySalesData[pastYear] && monthlySalesData[pastYear][m]) {
-                            last5.push(monthlySalesData[pastYear][m]);
-                        }
+    for (let y = startYear; y <= currentYear + forecastYears; y++) {
+        for (let m = 1; m <= 12; m++) {
+            labels.push(`${months[m-1]} ${y}`);
+            if (monthlySalesData[y] && monthlySalesData[y][m]) {
+                actualSalesData.push(monthlySalesData[y][m]);
+                forecastSalesData.push(null);
+            } else {
+                // Moving average per month forecast
+                const last5 = [];
+                for (let back = 1; back <= 5; back++) {
+                    const pastYear = y - back;
+                    if (monthlySalesData[pastYear] && monthlySalesData[pastYear][m]) {
+                        last5.push(monthlySalesData[pastYear][m]);
                     }
-                    const average = last5.length ? last5.reduce((a, b) => a + b, 0) / last5.length : 0;
-                    actualSalesData.push(null);
-                    forecastSalesData.push(average);
                 }
+                const average = last5.length ? last5.reduce((a, b) => a + b, 0) / last5.length : 0;
+                actualSalesData.push(null);
+                forecastSalesData.push(average);
             }
         }
-
-        return {
-            labels,
-            datasets: [
-                {
-                    label: "Actual Sales (Monthly)",
-                    data: actualSalesData,
-                    borderColor: "blue",
-                    backgroundColor: "transparent",
-                    tension: 0.4,
-                    spanGaps: true
-                },
-                {
-                    label: "Forecasted Sales (Monthly)",
-                    data: forecastSalesData,
-                    borderColor: "red",
-                    backgroundColor: "transparent",
-                    borderDash: [5, 5],
-                    tension: 0.4,
-                    spanGaps: true
-                }
-            ]
-        };
     }
+
+    return {
+        labels,
+        datasets: [
+            {
+                label: "Actual Sales (Monthly)",
+                data: actualSalesData,
+                borderColor: "blue",
+                backgroundColor: "transparent",
+                tension: 0.4,
+                spanGaps: true
+            },
+            {
+                label: "Forecasted Sales (Monthly)",
+                data: forecastSalesData,
+                borderColor: "red",
+                backgroundColor: "transparent",
+                borderDash: [5, 5],
+                tension: 0.4,
+                spanGaps: true
+            }
+        ]
+    };
+}
 
     function renderChart(dataConfig) {
         if (chartInstance) {
