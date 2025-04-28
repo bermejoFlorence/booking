@@ -361,7 +361,7 @@ if (isset($_POST['edit_profile'])) {
     // Verify password
     if (password_verify($verify_password, $stored_password_hash)) {
         // Update user details
-        $update_query = $database->prepare("UPDATE employee SET emp_fullname = ?, emp_email = ?, emp_address = ? WHERE emp_id = ?");
+        $update_query = $database->prepare("UPDATE employee SET fullname = ?, emp_email = ?, emp_address = ? WHERE emp_id = ?");
         $update_query->bind_param("sssi", $new_full_name, $new_email, $new_address, $user_id);
         
         if ($update_query->execute()) {
