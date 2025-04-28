@@ -41,57 +41,21 @@ $query->execute();
 $result = $query->get_result();
 $user_email = ($result->num_rows > 0) ? $result->fetch_assoc()["emp_email"] : "Unknown Email";
 
-// Set timezone and date variables
+// Set timezone
 date_default_timezone_set('Asia/Manila');
 $current_year = date('Y');
-$previous_year = $current_year - 1; // Last full year of actual sales
-$forecast_year = $current_year + 3; // Predicting 3 years ahead
-$business_start_year = 2019;
 
-// Historical years to use: current - 8 up to current - 4 (5 years before the 3-year gap)
-$start_year = max($business_start_year, $current_year - 8); // Not earlier than business start
-$end_year = $current_year - 4; // End before 3-year gap
-
-// Fetch actual sales for the previous year (used for plotting)
-$query = "SELECT DATE_FORMAT(date, '%M') AS month, SUM(total_sales) AS total_sales 
-          FROM sales 
-          WHERE YEAR(date) = $previous_year 
-          GROUP BY MONTH(date) 
-          ORDER BY MONTH(date)";
+// Fetch all yearly total sales (from 2019 to current year)
+$sales_data = [];
+$query = "SELECT YEAR(date) AS year, SUM(total_sales) AS total_sales
+          FROM sales
+          WHERE YEAR(date) >= 2019
+          GROUP BY YEAR(date)
+          ORDER BY YEAR(date)";
 $result = $database->query($query);
 
-// Store actual sales in array
-$actual_sales = [];
 while ($row = $result->fetch_assoc()) {
-    $actual_sales[$row['month']] = $row['total_sales'];
-}
-
-// Define months (for consistency)
-$months = ["January", "February", "March", "April", "May", "June", 
-           "July", "August", "September", "October", "November", "December"];
-
-// Forecast calculation (Moving Average based on 5 years with 3-year gap)
-$predicted_sales = [];
-
-for ($i = 0; $i < 12; $i++) {
-    $sales_years = [];
-
-    for ($y = $start_year; $y <= $end_year; $y++) {
-        $query = "SELECT SUM(total_sales) AS total_sales 
-                  FROM sales 
-                  WHERE YEAR(date) = $y AND DATE_FORMAT(date, '%M') = '{$months[$i]}'";
-        $result = $database->query($query);
-        $data = $result->fetch_assoc();
-
-        if ($data['total_sales'] !== null) {
-            $sales_years[] = $data['total_sales'];
-        }
-    }
-
-    // Compute average for the forecast month
-    $predicted_sales[$months[$i]] = count($sales_years) > 0 
-        ? array_sum($sales_years) / count($sales_years) 
-        : 0;
+    $sales_data[(int)$row['year']] = (float)$row['total_sales'];
 }
 ?>
 
@@ -199,6 +163,12 @@ canvas { max-width: 100%; height: 400px; }
         font-size: 5px;
         padding: 10px;
     }
+    .graph-section h2 {
+        font-size: 18px;
+    }
+    canvas {
+        height: 300px;
+    }
 }
         /* Responsive Design */
         @media screen and (max-width: 768px) {
@@ -299,6 +269,12 @@ canvas { max-width: 100%; height: 400px; }
     text-align: center;
     width: 100%;
 }
+.graph-section h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
 
     </style>
 
@@ -359,88 +335,121 @@ canvas { max-width: 100%; height: 400px; }
 
 </div>
 
-        <div class="dash-body" style="margin-top: 15px; padding: 20px;">
-        <div class="graph-section">
-    <h2>Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)</h2>
-    <canvas id="salesChart"></canvas>
+<div class="dash-body" style="margin-top: 15px; padding: 20px;">
+    <div class="graph-section">
+        <h2>Annual Sales Report (2019 - <?php echo $current_year; ?> + Forecast to <?php echo $current_year + 5; ?>)</h2>
+        <canvas id="salesChart" style="margin-top: 20px;"></canvas>
+    </div>
 </div>
 
-</div>
 
     </div>
     
     <script>
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            menu.classList.toggle('open');
+function toggleMenu() {
+    const menu = document.querySelector('.menu');
+    menu.classList.toggle('open');
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const salesData = <?php echo json_encode($sales_data); ?>;
+
+    const currentYear = <?php echo $current_year; ?>;
+    const startYear = 2019;
+    const forecastYears = 5;
+
+    // Build labels: from startYear to currentYear + forecastYears
+    const labels = [];
+    for (let y = startYear; y <= currentYear + forecastYears; y++) {
+        labels.push(y);
+    }
+
+    // Split actual vs forecast
+    const actualSalesData = [];
+    const forecastSalesData = [];
+
+    // Get all actual data first
+    labels.forEach(year => {
+        if (salesData[year]) {
+            actualSalesData.push(salesData[year]);
+            forecastSalesData.push(null); // No forecast yet
+        } else {
+            // Forecast logic: simple average of last 5 available years
+            const availableYears = Object.keys(salesData).map(y => parseInt(y)).sort();
+            const last5Years = availableYears.slice(-5);
+            const last5Totals = last5Years.map(y => salesData[y]);
+            const average = last5Totals.reduce((a, b) => a + b, 0) / last5Totals.length;
+
+            actualSalesData.push(null); // No actual sales for future
+            forecastSalesData.push(average);
+
+            // Also simulate new forecasted year
+            salesData[year] = average;
         }
+    });
 
-        document.addEventListener("DOMContentLoaded", function () {
-        const months = ["January", "February", "March", "April", "May", "June",
-                        "July", "August", "September", "October", "November", "December"];
+    const ctx = document.getElementById("salesChart").getContext("2d");
 
-        const actualSales = <?php echo json_encode($actual_sales); ?>;
-        const predictedSales = <?php echo json_encode($predicted_sales); ?>;
-        const prevYear = <?php echo $previous_year; ?>;
-        const forecastYear = <?php echo $forecast_year; ?>;
-
-        const ctx = document.getElementById("salesChart").getContext("2d");
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: months,
-                datasets: [
-                    {
-                        label: `Actual Sales (${prevYear})`,
-                        data: months.map(month => actualSales[month] || 0),
-                        borderColor: "blue",
-                        backgroundColor: "transparent",
-                        tension: 0.4
-                    },
-                    {
-                        label: `Forecasted Sales (${forecastYear})`,
-                        data: months.map(month => predictedSales[month] || 0),
-                        borderColor: "red",
-                        borderDash: [5, 5],
-                        backgroundColor: "transparent",
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Actual vs Sales Forecast',
-                        font: {
-                            size: 20
-                        }
-                    },
-                    legend: {
-                        display: true,
-                        position: 'top'
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Actual Sales",
+                    data: actualSalesData,
+                    borderColor: "blue",
+                    backgroundColor: "transparent",
+                    tension: 0.4
+                },
+                {
+                    label: "Forecasted Sales",
+                    data: forecastSalesData,
+                    borderColor: "red",
+                    borderDash: [5, 5],
+                    backgroundColor: "transparent",
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Annual Sales Report with 5-Year Forecast',
+                    font: {
+                        size: 20
                     }
                 },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Months'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Sales Amount'
-                        },
-                        beginAtZero: true
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Year'
                     }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Sales Amount (PHP)'
+                    },
+                    beginAtZero: true
                 }
             }
-        });
+        }
     });
-    </script>
+});
+</script>
+
 </body>
 </html>
