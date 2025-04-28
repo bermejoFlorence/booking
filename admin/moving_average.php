@@ -431,49 +431,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const months = ["January", "February", "March", "April", "May", "June",
                     "July", "August", "September", "October", "November", "December"];
 
-    const labels = [];
-    const actualSalesData = [];
-    const forecastSalesData = [];
-
-    for (let y = startYear; y <= currentYear + forecastYears; y++) {
-        for (let m = 1; m <= 12; m++) {
-            labels.push(`${months[m-1]} ${y}`);
-            if (monthlySalesData[y] && monthlySalesData[y][m]) {
-                actualSalesData.push(monthlySalesData[y][m]);
-                forecastSalesData.push(null);
-            } else {
-                // Moving average per month forecast
-                const last5 = [];
-                for (let back = 1; back <= 5; back++) {
-                    const pastYear = y - back;
-                    if (monthlySalesData[pastYear] && monthlySalesData[pastYear][m]) {
-                        last5.push(monthlySalesData[pastYear][m]);
-                    }
-                }
-                const average = last5.length ? last5.reduce((a, b) => a + b, 0) / last5.length : 0;
-                actualSalesData.push(null);
-                forecastSalesData.push(average);
-            }
-        }
-    }
-
     return {
-        labels,
+        labels: months,
         datasets: [
             {
-                label: "Actual Sales (Monthly)",
-                data: actualSalesData,
+                label: `Actual Sales (${prevYear})`,
+                data: months.map(month => actualSalesMonthly[month] || 0),
                 borderColor: "blue",
                 backgroundColor: "transparent",
                 tension: 0.4,
                 spanGaps: true
             },
             {
-                label: "Forecasted Sales (Monthly)",
-                data: forecastSalesData,
+                label: `Forecasted Sales (${forecastYear})`,
+                data: months.map(month => predictedSalesMonthly[month] || 0),
                 borderColor: "red",
-                backgroundColor: "transparent",
                 borderDash: [5, 5],
+                backgroundColor: "transparent",
                 tension: 0.4,
                 spanGaps: true
             }
@@ -528,16 +502,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     document.getElementById("toggleViewBtn").addEventListener("click", function () {
-        if (currentView === 'yearly') {
-            currentView = 'monthly';
-            this.textContent = "Switch to Yearly View";
-            renderChart(buildMonthlyChart());
-        } else {
-            currentView = 'yearly';
-            this.textContent = "Switch to Monthly View";
-            renderChart(buildYearlyChart());
-        }
-    });
+    if (currentView === 'yearly') {
+        currentView = 'monthly';
+        this.textContent = "Switch to Yearly View";
+        renderChart(buildMonthlyChart());
+    } else {
+        currentView = 'yearly';
+        this.textContent = "Switch to Monthly View";
+        renderChart(buildYearlyChart());
+    }
+});
+
 
     // Initial chart load
     renderChart(buildYearlyChart());
