@@ -326,30 +326,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['change_password'])) {
     </div>
 
 </div>
-        <div class="dash-body">
+<div class="dash-body">
     <div class="user-details">
         <img src="../img/user.png" alt="User Profile" class="profile-img">
-        <h2><?php echo $fullname; ?></h2>
-        <p class="profile-info"><span class="info-label">Email:</span> <?php echo $email; ?></p>
-        <p class="profile-info"><span class="info-label">Contact Number:</span> <?php echo $contactnum; ?></p>
-        <p class="profile-info"><span class="info-label">Address:</span> <?php echo $address; ?></p>
-        <button class="btn" onclick="openModal()">Change Password</button>
+        <h2><?php echo htmlspecialchars($c_fullname); ?></h2>
+        <p class="profile-info"><span class="info-label">Email:</span> <?php echo htmlspecialchars($c_email); ?></p>
+        <p class="profile-info"><span class="info-label">Contact Number:</span> <?php echo htmlspecialchars($c_contactnum); ?></p>
+        <p class="profile-info"><span class="info-label">Address:</span> <?php echo htmlspecialchars($c_address); ?></p>
+        <button class="btn" onclick="openModal()">Edit Profile</button>
     </div>
 
-    <!-- Modal for Change Password -->
-    <div id="passwordModal" class="modal">
+    <!-- Modal for Edit Profile -->
+    <div id="profileModal" class="modal">
         <div class="modal-content">
-            <h3>Change Password</h3>
+            <h3>Edit Profile</h3>
             <form method="POST">
-                <input type="password" name="current_password" placeholder="Current Password" required>
-                <input type="password" name="new_password" placeholder="New Password" required>
-                <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-                <button type="submit" name="change_password">Change Password</button>
+                <input type="text" name="c_fullname" placeholder="Full Name" value="<?php echo htmlspecialchars($c_fullname); ?>" required>
+                <input type="email" name="c_email" placeholder="Email" value="<?php echo htmlspecialchars($c_email); ?>" required>
+                <input type="text" name="c_contactnum" placeholder="Contact Number" value="<?php echo htmlspecialchars($c_contactnum); ?>" required>
+                <input type="text" name="c_address" placeholder="Address" value="<?php echo htmlspecialchars($c_address); ?>" required>
+                <hr>
+                <input type="password" name="new_password" placeholder="New Password (leave blank if no change)">
+                <hr>
+                <input type="password" name="verify_password" placeholder="Enter Current Password to Confirm Changes" required>
+                <button type="submit" name="edit_profile">Save Changes</button>
                 <button type="button" class="close-btn" onclick="closeModal()">Cancel</button>
             </form>
         </div>
     </div>
 </div>
+
 
 
 
@@ -367,47 +373,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['change_password'])) {
         document.getElementById("passwordModal").style.display = "none";
     }
     <?php
-if (isset($_POST['change_password'])) {
-    $current_password = $_POST['current_password'];
-    $new_password = $_POST['new_password'];
-    $confirm_password = $_POST['confirm_password'];
+if (isset($_POST['edit_profile'])) {
+    $new_c_fullname = trim($_POST['c_fullname']);
+    $new_c_email = trim($_POST['c_email']);
+    $new_c_contactnum = trim($_POST['c_contactnum']);
+    $new_c_address = trim($_POST['c_address']);
+    $verify_password = $_POST['verify_password'];
+    $new_password = trim($_POST['new_password']);
 
-    // Check if the current password is correct
-    if (password_verify($current_password, $current_password_hash)) {
-        if ($new_password === $confirm_password) {
-            // Encrypt the new password
+    // Fetch current hashed password
+    $stmt = $database->prepare("SELECT c_password FROM client WHERE client_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->bind_result($stored_password_hash);
+    $stmt->fetch();
+    $stmt->close();
+
+    if (password_verify($verify_password, $stored_password_hash)) {
+        if (!empty($new_password)) {
             $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
-            
-            // Update password in database
-            $update_query = $database->prepare("UPDATE client SET c_password = ? WHERE client_id = ?");
-            $update_query->bind_param("si", $new_password_hash, $user_id);
-            if ($update_query->execute()) {
-                echo "<script>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: 'Password changed successfully!',
-                        confirmButtonColor: '#28a745'
-                    }).then(() => {
-                        window.location.href = 'settings.php';
-                    });
-                </script>";
-            } else {
-                echo "<script>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops!',
-                        text: 'Something went wrong. Try again.',
-                        confirmButtonColor: '#dc3545'
-                    });
-                </script>";
-            }
+            // Update all including password
+            $update_query = $database->prepare("UPDATE client SET c_fullname = ?, c_email = ?, c_contactnum = ?, c_address = ?, c_password = ? WHERE client_id = ?");
+            $update_query->bind_param("sssssi", $new_c_fullname, $new_c_email, $new_c_contactnum, $new_c_address, $new_password_hash, $user_id);
+        } else {
+            // Update without password
+            $update_query = $database->prepare("UPDATE client SET c_fullname = ?, c_email = ?, c_contactnum = ?, c_address = ? WHERE client_id = ?");
+            $update_query->bind_param("ssssi", $new_c_fullname, $new_c_email, $new_c_contactnum, $new_c_address, $user_id);
+        }
+
+        if ($update_query->execute()) {
+            echo "<script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Profile updated successfully!',
+                    confirmButtonColor: '#28a745'
+                }).then(() => {
+                    window.location.href = 'settings.php';
+                });
+            </script>";
         } else {
             echo "<script>
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error!',
-                    text: 'New passwords do not match!',
+                    title: 'Update Failed!',
+                    text: 'Something went wrong. Try again.',
                     confirmButtonColor: '#dc3545'
                 });
             </script>";
@@ -416,8 +426,8 @@ if (isset($_POST['change_password'])) {
         echo "<script>
             Swal.fire({
                 icon: 'error',
-                title: 'Error!',
-                text: 'Incorrect current password!',
+                title: 'Incorrect Password!',
+                text: 'Please verify your current password correctly.',
                 confirmButtonColor: '#dc3545'
             });
         </script>";
