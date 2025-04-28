@@ -363,20 +363,23 @@ document.addEventListener("DOMContentLoaded", function () {
         labels.push(y);
     }
 
-    const fullSalesData = [];
+    const actualSalesData = [];
+    const forecastSalesData = [];
 
     labels.forEach(year => {
         if (salesData[year]) {
-            fullSalesData.push(salesData[year]);
+            actualSalesData.push(salesData[year]);
+            forecastSalesData.push(null);
         } else {
-            // Forecast using average of last 5 years
+            // Forecast average
             const availableYears = Object.keys(salesData).map(Number).sort();
             const last5Years = availableYears.slice(-5);
             const last5Totals = last5Years.map(y => salesData[y]);
             const average = last5Totals.reduce((a, b) => a + b, 0) / last5Totals.length;
 
-            fullSalesData.push(average);
-            salesData[year] = average; // para tuloy-tuloy sa susunod na forecast
+            actualSalesData.push(null);
+            forecastSalesData.push(average);
+            salesData[year] = average;
         }
     });
 
@@ -386,15 +389,25 @@ document.addEventListener("DOMContentLoaded", function () {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: "Sales (Actual + Forecast)",
-                data: fullSalesData,
-                borderColor: "blue",
-                backgroundColor: "transparent",
-                tension: 0.4,
-                pointBackgroundColor: labels.map(year => year <= currentYear ? "blue" : "red"),
-                borderDash: labels.map(year => year <= currentYear ? 0 : 5),
-            }]
+            datasets: [
+                {
+                    label: "Actual Sales",
+                    data: actualSalesData,
+                    borderColor: "blue",
+                    backgroundColor: "transparent",
+                    tension: 0.4,
+                    spanGaps: true
+                },
+                {
+                    label: "Forecasted Sales",
+                    data: forecastSalesData,
+                    borderColor: "red",
+                    borderDash: [5, 5],
+                    backgroundColor: "transparent",
+                    tension: 0.4,
+                    spanGaps: true
+                }
+            ]
         },
         options: {
             responsive: true,
@@ -434,6 +447,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
 
 
 </body>
