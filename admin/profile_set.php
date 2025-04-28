@@ -302,13 +302,17 @@ if ($result->num_rows > 0) {
                 <input type="text" name="full_name" placeholder="Full Name" value="<?php echo htmlspecialchars($full_name); ?>" required>
                 <input type="email" name="emp_email" placeholder="Email" value="<?php echo htmlspecialchars($emp_email); ?>" required>
                 <input type="text" name="address" placeholder="Address" value="<?php echo htmlspecialchars($address); ?>" required>
-                <input type="password" name="verify_password" placeholder="Enter your Password to Confirm" required>
+                <hr>
+                <input type="password" name="new_password" placeholder="New Password (leave blank to keep current)">
+                <hr>
+                <input type="password" name="verify_password" placeholder="Enter Current Password to Save Changes" required>
                 <button type="submit" name="edit_profile">Save Changes</button>
                 <button type="button" class="close-btn" onclick="closeModal()">Cancel</button>
             </form>
         </div>
     </div>
 </div>
+
 
     <script>
              function toggleMenu() {
@@ -343,12 +347,13 @@ function closeModal() {
     }
 
     </script>
-   <?php
+ <?php
 if (isset($_POST['edit_profile'])) {
     $new_full_name = trim($_POST['full_name']);
     $new_email = trim($_POST['emp_email']);
     $new_address = trim($_POST['address']);
     $verify_password = $_POST['verify_password'];
+    $new_password = trim($_POST['new_password']);
 
     // Fetch current hashed password from database
     $stmt = $database->prepare("SELECT emp_password FROM employee WHERE emp_id = ?");
@@ -358,12 +363,21 @@ if (isset($_POST['edit_profile'])) {
     $stmt->fetch();
     $stmt->close();
 
-    // Verify password
+    // Verify current password
     if (password_verify($verify_password, $stored_password_hash)) {
-        // Update user details
-        $update_query = $database->prepare("UPDATE employee SET fullname = ?, emp_email = ?, emp_address = ? WHERE emp_id = ?");
-        $update_query->bind_param("sssi", $new_full_name, $new_email, $new_address, $user_id);
-        
+        if (!empty($new_password)) {
+            // If new password is provided, hash it
+            $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
+
+            // Update name, email, address, and password
+            $update_query = $database->prepare("UPDATE employee SET full_name = ?, emp_email = ?, address = ?, emp_password = ? WHERE emp_id = ?");
+            $update_query->bind_param("ssssi", $new_full_name, $new_email, $new_address, $new_password_hash, $user_id);
+        } else {
+            // Update only name, email, and address
+            $update_query = $database->prepare("UPDATE employee SET full_name = ?, emp_email = ?, address = ? WHERE emp_id = ?");
+            $update_query->bind_param("sssi", $new_full_name, $new_email, $new_address, $user_id);
+        }
+
         if ($update_query->execute()) {
             echo "<script>
                 Swal.fire({
@@ -380,7 +394,7 @@ if (isset($_POST['edit_profile'])) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Failed to update profile. Try again!',
+                    text: 'Failed to update profile. Please try again.',
                     confirmButtonColor: '#dc3545'
                 });
             </script>";
@@ -389,14 +403,15 @@ if (isset($_POST['edit_profile'])) {
         echo "<script>
             Swal.fire({
                 icon: 'error',
-                title: 'Error!',
-                text: 'Incorrect password. Profile not updated!',
+                title: 'Incorrect Password!',
+                text: 'Please enter the correct current password.',
                 confirmButtonColor: '#dc3545'
             });
         </script>";
     }
 }
 ?>
+
 
 </body>
 </html>
