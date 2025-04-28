@@ -338,6 +338,9 @@ canvas { max-width: 100%; height: 400px; }
 <<div class="dash-body" style="margin-top: 15px; padding: 20px;">
     <div class="graph-section">
         <h2>Annual Sales Report (2019 - <?php echo $current_year; ?> + Forecast to <?php echo $current_year + 5; ?>)</h2>
+        <div style="text-align:center; margin-bottom: 20px;">
+    <button id="toggleViewBtn" class="btn">Switch to Monthly View</button>
+</div>
         <canvas id="salesChart" style="margin-top: 20px;"></canvas>
     </div>
 </div>
@@ -353,45 +356,44 @@ function toggleMenu() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    const salesData = <?php echo json_encode($sales_data); ?>;
+    const yearlySalesData = <?php echo json_encode($sales_data); ?>;
     const currentYear = <?php echo $current_year; ?>;
     const startYear = 2019;
     const forecastYears = 5;
 
-    const labels = [];
-    for (let y = startYear; y <= currentYear + forecastYears; y++) {
-        labels.push(y);
-    }
-
-    const actualSalesData = [];
-    const forecastSalesData = [];
-
-    labels.forEach(year => {
-        if (salesData[year]) {
-            actualSalesData.push(salesData[year]);
-            forecastSalesData.push(null);
-        } else {
-            // Forecast average
-            const availableYears = Object.keys(salesData).map(Number).sort();
-            const last5Years = availableYears.slice(-5);
-            const last5Totals = last5Years.map(y => salesData[y]);
-            const average = last5Totals.reduce((a, b) => a + b, 0) / last5Totals.length;
-
-            actualSalesData.push(null);
-            forecastSalesData.push(average);
-            salesData[year] = average;
-        }
-    });
+    let currentView = 'yearly'; // default view
+    let chartInstance = null;
 
     const ctx = document.getElementById("salesChart").getContext("2d");
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
+    function buildYearlyChart() {
+        const labels = [];
+        const actualSalesData = [];
+        const forecastSalesData = [];
+        let salesData = {...yearlySalesData}; // copy para hindi maapektuhan original
+
+        for (let y = startYear; y <= currentYear + forecastYears; y++) {
+            labels.push(y);
+            if (salesData[y]) {
+                actualSalesData.push(salesData[y]);
+                forecastSalesData.push(null);
+            } else {
+                const availableYears = Object.keys(salesData).map(Number).sort();
+                const last5Years = availableYears.slice(-5);
+                const last5Totals = last5Years.map(y => salesData[y]);
+                const average = last5Totals.reduce((a, b) => a + b, 0) / last5Totals.length;
+
+                actualSalesData.push(null);
+                forecastSalesData.push(average);
+                salesData[y] = average;
+            }
+        }
+
+        return {
+            labels,
             datasets: [
                 {
-                    label: "Actual Sales",
+                    label: "Actual Sales (Yearly)",
                     data: actualSalesData,
                     borderColor: "blue",
                     backgroundColor: "transparent",
@@ -399,7 +401,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     spanGaps: true
                 },
                 {
-                    label: "Forecasted Sales",
+                    label: "Forecasted Sales (Yearly)",
                     data: forecastSalesData,
                     borderColor: "red",
                     borderDash: [5, 5],
@@ -408,45 +410,100 @@ document.addEventListener("DOMContentLoaded", function () {
                     spanGaps: true
                 }
             ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Annual Sales Report (Actual + Forecast)',
-                    font: {
-                        size: 20
-                    }
-                },
-                legend: {
-                    display: true,
-                    position: 'top'
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
-                }
-            },
-            scales: {
-                x: {
+        };
+    }
+
+    function buildMonthlyChart() {
+        const months = ["January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"];
+
+        // Monthly data simulation: generate random numbers based on average yearly
+        const labels = [];
+        const sales = [];
+        const totalSales = Object.values(yearlySalesData).reduce((a, b) => a + b, 0);
+        const averageYearly = totalSales / Object.keys(yearlySalesData).length;
+        const averageMonthly = averageYearly / 12;
+
+        for (let i = 0; i < months.length; i++) {
+            labels.push(months[i]);
+            sales.push(Math.round(averageMonthly + (Math.random() - 0.5) * averageMonthly * 0.2)); // +/- 20%
+        }
+
+        return {
+            labels,
+            datasets: [{
+                label: "Simulated Monthly Sales",
+                data: sales,
+                borderColor: "green",
+                backgroundColor: "transparent",
+                tension: 0.4,
+            }]
+        };
+    }
+
+    function renderChart(dataConfig) {
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: dataConfig,
+            options: {
+                responsive: true,
+                plugins: {
                     title: {
                         display: true,
-                        text: 'Year'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Sales Amount (PHP)'
+                        text: (currentView === 'yearly' ? 'Annual Sales Report (Actual + Forecast)' : 'Simulated Monthly Sales Report'),
+                        font: {
+                            size: 20
+                        }
                     },
-                    beginAtZero: true
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: (currentView === 'yearly' ? 'Year' : 'Month')
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Sales Amount (PHP)'
+                        },
+                        beginAtZero: true
+                    }
                 }
             }
+        });
+    }
+
+    document.getElementById("toggleViewBtn").addEventListener("click", function () {
+        if (currentView === 'yearly') {
+            currentView = 'monthly';
+            this.textContent = "Switch to Yearly View";
+            renderChart(buildMonthlyChart());
+        } else {
+            currentView = 'yearly';
+            this.textContent = "Switch to Monthly View";
+            renderChart(buildYearlyChart());
         }
     });
+
+    // Initial chart load
+    renderChart(buildYearlyChart());
 });
 </script>
+
 
 
 
