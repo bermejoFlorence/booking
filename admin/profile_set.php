@@ -284,32 +284,31 @@ if ($result->num_rows > 0) {
     </div>
 
 </div>
-        <div class="dash-body" style="margin-top: 15px">
-        <div class="user-details">
-    <img src="../img/user.png" alt="User Profile" class="profile-img">
-    <h2><?php echo $full_name; ?> <br><span class="designation">(Administrator)</span></h2>
-    <p class="profile-info"><span class="info-label">Email:</span> <?php echo $emp_email; ?></p>
-    <p class="profile-info"><span class="info-label">Address:</span> <?php echo $address; ?></p>
-    <p class="profile-info"><span class="info-label">Date of Birth:</span> <?php echo $date_of_birth; ?></p>
-    <button class="btn" onclick="openModal()">Change Password</button>
-</div>
+<div class="dash-body" style="margin-top: 15px">
+    <div class="user-details">
+        <img src="../img/user.png" alt="User Profile" class="profile-img">
+        <h2><?php echo htmlspecialchars($full_name); ?> <br><span class="designation">(Administrator)</span></h2>
+        <p class="profile-info"><span class="info-label">Email:</span> <?php echo htmlspecialchars($emp_email); ?></p>
+        <p class="profile-info"><span class="info-label">Address:</span> <?php echo htmlspecialchars($address); ?></p>
+        <p class="profile-info"><span class="info-label">Date of Birth:</span> <?php echo htmlspecialchars($date_of_birth); ?></p>
+        <button class="btn" onclick="openModal()">Edit Profile</button>
+    </div>
 
-
-<!-- Modal for Change Password -->
-<div id="passwordModal" class="modal">
-    <div class="modal-content">
-        <h3>Change Password</h3>
-        <form method="POST" action="">
-            <input type="hidden" name="current_password_hash" value="<?php echo $current_password_hash; ?>">
-            <input type="password" name="current_password" placeholder="Current Password" required>
-            <input type="password" name="new_password" placeholder="New Password" required>
-            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-            <button type="submit" name="change_password">Change Password</button>
-            <button type="button" class="close-btn" onclick="closeModal()">Cancel</button>
-        </form>
+    <!-- Modal for Edit Profile -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Profile</h3>
+            <form method="POST" action="">
+                <input type="text" name="full_name" placeholder="Full Name" value="<?php echo htmlspecialchars($full_name); ?>" required>
+                <input type="email" name="emp_email" placeholder="Email" value="<?php echo htmlspecialchars($emp_email); ?>" required>
+                <input type="text" name="address" placeholder="Address" value="<?php echo htmlspecialchars($address); ?>" required>
+                <input type="password" name="verify_password" placeholder="Enter your Password to Confirm" required>
+                <button type="submit" name="edit_profile">Save Changes</button>
+                <button type="button" class="close-btn" onclick="closeModal()">Cancel</button>
+            </form>
+        </div>
     </div>
 </div>
-    </div>
 
     <script>
              function toggleMenu() {
@@ -317,11 +316,11 @@ if ($result->num_rows > 0) {
             menu.classList.toggle('open');
         }
         function openModal() {
-        document.getElementById("passwordModal").style.display = "flex";
-    }
-    function closeModal() {
-        document.getElementById("passwordModal").style.display = "none";
-    }
+    document.getElementById("profileModal").style.display = "flex";
+}
+function closeModal() {
+    document.getElementById("profileModal").style.display = "none";
+}
     function showLogoutModal() {
         let modal = document.getElementById("logoutModal");
         let modalContent = document.getElementById("logoutModalContent");
@@ -345,47 +344,43 @@ if ($result->num_rows > 0) {
 
     </script>
    <?php
-if (isset($_POST['change_password'])) {
-    $current_password = $_POST['current_password'];
-    $new_password = $_POST['new_password'];
-    $confirm_password = $_POST['confirm_password'];
+if (isset($_POST['edit_profile'])) {
+    $new_full_name = trim($_POST['full_name']);
+    $new_email = trim($_POST['emp_email']);
+    $new_address = trim($_POST['address']);
+    $verify_password = $_POST['verify_password'];
 
-    // Check if the current password is correct
-    if (password_verify($current_password, $current_password_hash)) {
-        if ($new_password === $confirm_password) {
-            // Encrypt the new password
-            $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
-            
-            // Update password in database
-            $update_query = $database->prepare("UPDATE employee SET emp_password = ? WHERE emp_id = ?");
-            $update_query->bind_param("si", $new_password_hash, $user_id);
-            if ($update_query->execute()) {
-                echo "<script>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: 'Password changed successfully!',
-                        confirmButtonColor: '#28a745'
-                    }).then(() => {
-                        window.location.href = 'settings.php';
-                    });
-                </script>";
-            } else {
-                echo "<script>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops!',
-                        text: 'Something went wrong. Try again.',
-                        confirmButtonColor: '#dc3545'
-                    });
-                </script>";
-            }
+    // Fetch current hashed password from database
+    $stmt = $database->prepare("SELECT emp_password FROM employee WHERE emp_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->bind_result($stored_password_hash);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Verify password
+    if (password_verify($verify_password, $stored_password_hash)) {
+        // Update user details
+        $update_query = $database->prepare("UPDATE employee SET emp_fullname = ?, emp_email = ?, emp_address = ? WHERE emp_id = ?");
+        $update_query->bind_param("sssi", $new_full_name, $new_email, $new_address, $user_id);
+        
+        if ($update_query->execute()) {
+            echo "<script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Profile updated successfully!',
+                    confirmButtonColor: '#28a745'
+                }).then(() => {
+                    window.location.href = 'settings.php';
+                });
+            </script>";
         } else {
             echo "<script>
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'New passwords do not match!',
+                    text: 'Failed to update profile. Try again!',
                     confirmButtonColor: '#dc3545'
                 });
             </script>";
@@ -395,7 +390,7 @@ if (isset($_POST['change_password'])) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error!',
-                text: 'Incorrect current password!',
+                text: 'Incorrect password. Profile not updated!',
                 confirmButtonColor: '#dc3545'
             });
         </script>";
