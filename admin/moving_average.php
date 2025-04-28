@@ -520,23 +520,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to show Yearly
     window.showYearly = function() {
-        const years = [
-            ...Object.keys(actualYearlySales),
-            ...Object.keys(predictedYearlySales)
-        ].filter((value, index, self) => self.indexOf(value) === index).sort();
+    const years = [
+        ...Object.keys(actualYearlySales),
+        ...Object.keys(predictedYearlySales)
+    ].filter((value, index, self) => self.indexOf(value) === index).sort();
 
-        createChart(
-            years,
-            years.map(year => actualYearlySales[year] || 0),
-            years.map(year => predictedYearlySales[year] || 0),
-            'Years'
-        );
+    createChart(
+        years,
+        years.map(year => actualYearlySales[year] !== undefined ? actualYearlySales[year] : null),
+        years.map(year => predictedYearlySales[year] !== undefined ? predictedYearlySales[year] : null),
+        'Years'
+    );
 
-        document.getElementById('yearlyBtn').classList.add('btn-primary');
-        document.getElementById('yearlyBtn').classList.remove('btn-secondary');
-        document.getElementById('monthlyBtn').classList.add('btn-secondary');
-        document.getElementById('monthlyBtn').classList.remove('btn-primary');
-    }
+    document.getElementById('yearlyBtn').classList.add('btn-primary');
+    document.getElementById('yearlyBtn').classList.remove('btn-secondary');
+    document.getElementById('monthlyBtn').classList.add('btn-secondary');
+    document.getElementById('monthlyBtn').classList.remove('btn-primary');
+}
+
 });
 </script>
 
