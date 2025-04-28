@@ -52,7 +52,9 @@ $business_start_year = 2019;
 $start_year = max($business_start_year, $current_year - 8); // Not earlier than business start
 $end_year = $current_year - 4; // End before 3-year gap
 
-// Fetch actual sales for the previous year (used for plotting)
+// ------------------- MONTHLY DATA -------------------
+
+// Fetch actual sales for the previous year (Monthly)
 $query = "SELECT DATE_FORMAT(date, '%M') AS month, SUM(total_sales) AS total_sales 
           FROM sales 
           WHERE YEAR(date) = $previous_year 
@@ -60,7 +62,7 @@ $query = "SELECT DATE_FORMAT(date, '%M') AS month, SUM(total_sales) AS total_sal
           ORDER BY MONTH(date)";
 $result = $database->query($query);
 
-// Store actual sales in array
+// Store actual monthly sales
 $actual_sales = [];
 while ($row = $result->fetch_assoc()) {
     $actual_sales[$row['month']] = $row['total_sales'];
@@ -70,9 +72,8 @@ while ($row = $result->fetch_assoc()) {
 $months = ["January", "February", "March", "April", "May", "June", 
            "July", "August", "September", "October", "November", "December"];
 
-// Forecast calculation (Moving Average based on 5 years with 3-year gap)
+// Forecast monthly sales (Moving Average based on 5 years with 3-year gap)
 $predicted_sales = [];
-
 for ($i = 0; $i < 12; $i++) {
     $sales_years = [];
 
@@ -88,12 +89,49 @@ for ($i = 0; $i < 12; $i++) {
         }
     }
 
-    // Compute average for the forecast month
     $predicted_sales[$months[$i]] = count($sales_years) > 0 
         ? array_sum($sales_years) / count($sales_years) 
         : 0;
 }
+
+// ------------------- YEARLY DATA -------------------
+
+// Fetch actual sales per year
+$actual_yearly_sales = [];
+$query = "SELECT YEAR(date) AS year, SUM(total_sales) AS total_sales 
+          FROM sales 
+          WHERE YEAR(date) BETWEEN $start_year AND $previous_year 
+          GROUP BY YEAR(date) 
+          ORDER BY YEAR(date)";
+$result = $database->query($query);
+
+while ($row = $result->fetch_assoc()) {
+    $actual_yearly_sales[$row['year']] = $row['total_sales'];
+}
+
+// Forecast yearly sales (Moving Average based on 5 years with 3-year gap)
+$predicted_yearly_sales = [];
+for ($y = $current_year; $y <= $forecast_year; $y++) {
+    $sales_years = [];
+
+    for ($hist_year = $start_year; $hist_year <= $end_year; $hist_year++) {
+        $query = "SELECT SUM(total_sales) AS total_sales 
+                  FROM sales 
+                  WHERE YEAR(date) = $hist_year";
+        $result = $database->query($query);
+        $data = $result->fetch_assoc();
+
+        if ($data['total_sales'] !== null) {
+            $sales_years[] = $data['total_sales'];
+        }
+    }
+
+    $predicted_yearly_sales[$y] = count($sales_years) > 0 
+        ? array_sum($sales_years) / count($sales_years) 
+        : 0;
+}
 ?>
+
 
 
     <style>
@@ -359,48 +397,63 @@ canvas { max-width: 100%; height: 400px; }
 
 </div>
 
-        <div class="dash-body" style="margin-top: 15px; padding: 20px;">
-        <div class="graph-section">
-    <h2>Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)</h2>
-    <canvas id="salesChart"></canvas>
+<div class="dash-body" style="margin-top: 15px; padding: 20px;">
+    <div class="graph-section">
+        <h2>Sales Report (<?php echo $previous_year; ?> Actual & <?php echo $forecast_year; ?> Forecast)</h2>
+
+        <!-- Button Section -->
+        <div style="margin-bottom: 20px; display: flex; justify-content: center; gap: 10px;">
+            <button id="monthlyBtn" class="btn btn-primary" onclick="showMonthly()">Monthly View</button>
+            <button id="yearlyBtn" class="btn btn-secondary" onclick="showYearly()">Yearly View</button>
+        </div>
+
+        <canvas id="salesChart"></canvas>
+    </div>
 </div>
 
-</div>
 
     </div>
     
     <script>
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            menu.classList.toggle('open');
+function toggleMenu() {
+    const menu = document.querySelector('.menu');
+    menu.classList.toggle('open');
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const months = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"];
+
+    const actualSales = <?php echo json_encode($actual_sales); ?>;
+    const predictedSales = <?php echo json_encode($predicted_sales); ?>;
+    const actualYearlySales = <?php echo json_encode($actual_yearly_sales); ?>;
+    const predictedYearlySales = <?php echo json_encode($predicted_yearly_sales); ?>;
+    const prevYear = <?php echo $previous_year; ?>;
+    const forecastYear = <?php echo $forecast_year; ?>;
+    const ctx = document.getElementById("salesChart").getContext("2d");
+
+    let salesChart; // Declare globally para ma-update natin
+
+    function createChart(labels, actualData, predictedData, xTitle) {
+        if (salesChart) {
+            salesChart.destroy(); // Destroy previous chart instance
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
-        const months = ["January", "February", "March", "April", "May", "June",
-                        "July", "August", "September", "October", "November", "December"];
-
-        const actualSales = <?php echo json_encode($actual_sales); ?>;
-        const predictedSales = <?php echo json_encode($predicted_sales); ?>;
-        const prevYear = <?php echo $previous_year; ?>;
-        const forecastYear = <?php echo $forecast_year; ?>;
-
-        const ctx = document.getElementById("salesChart").getContext("2d");
-
-        new Chart(ctx, {
+        salesChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: months,
+                labels: labels,
                 datasets: [
                     {
-                        label: `Actual Sales (${prevYear})`,
-                        data: months.map(month => actualSales[month] || 0),
+                        label: `Actual Sales`,
+                        data: actualData,
                         borderColor: "blue",
                         backgroundColor: "transparent",
                         tension: 0.4
                     },
                     {
-                        label: `Forecasted Sales (${forecastYear})`,
-                        data: months.map(month => predictedSales[month] || 0),
+                        label: `Forecasted Sales`,
+                        data: predictedData,
                         borderColor: "red",
                         borderDash: [5, 5],
                         backgroundColor: "transparent",
@@ -427,7 +480,7 @@ canvas { max-width: 100%; height: 400px; }
                     x: {
                         title: {
                             display: true,
-                            text: 'Months'
+                            text: xTitle
                         }
                     },
                     y: {
@@ -440,7 +493,52 @@ canvas { max-width: 100%; height: 400px; }
                 }
             }
         });
-    });
-    </script>
+    }
+
+    // Default Load Monthly
+    createChart(
+        months,
+        months.map(month => actualSales[month] || 0),
+        months.map(month => predictedSales[month] || 0),
+        'Months'
+    );
+
+    // Function to show Monthly
+    window.showMonthly = function() {
+        createChart(
+            months,
+            months.map(month => actualSales[month] || 0),
+            months.map(month => predictedSales[month] || 0),
+            'Months'
+        );
+
+        document.getElementById('monthlyBtn').classList.add('btn-primary');
+        document.getElementById('monthlyBtn').classList.remove('btn-secondary');
+        document.getElementById('yearlyBtn').classList.add('btn-secondary');
+        document.getElementById('yearlyBtn').classList.remove('btn-primary');
+    }
+
+    // Function to show Yearly
+    window.showYearly = function() {
+        const years = [
+            ...Object.keys(actualYearlySales),
+            ...Object.keys(predictedYearlySales)
+        ].filter((value, index, self) => self.indexOf(value) === index).sort();
+
+        createChart(
+            years,
+            years.map(year => actualYearlySales[year] || 0),
+            years.map(year => predictedYearlySales[year] || 0),
+            'Years'
+        );
+
+        document.getElementById('yearlyBtn').classList.add('btn-primary');
+        document.getElementById('yearlyBtn').classList.remove('btn-secondary');
+        document.getElementById('monthlyBtn').classList.add('btn-secondary');
+        document.getElementById('monthlyBtn').classList.remove('btn-primary');
+    }
+});
+</script>
+
 </body>
 </html>
