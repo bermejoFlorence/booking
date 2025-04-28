@@ -335,12 +335,13 @@ canvas { max-width: 100%; height: 400px; }
 
 </div>
 
-<div class="dash-body" style="margin-top: 15px; padding: 20px;">
+<<div class="dash-body" style="margin-top: 15px; padding: 20px;">
     <div class="graph-section">
         <h2>Annual Sales Report (2019 - <?php echo $current_year; ?> + Forecast to <?php echo $current_year + 5; ?>)</h2>
         <canvas id="salesChart" style="margin-top: 20px;"></canvas>
     </div>
 </div>
+
 
 
     </div>
@@ -353,38 +354,29 @@ function toggleMenu() {
 
 document.addEventListener("DOMContentLoaded", function () {
     const salesData = <?php echo json_encode($sales_data); ?>;
-
     const currentYear = <?php echo $current_year; ?>;
     const startYear = 2019;
     const forecastYears = 5;
 
-    // Build labels: from startYear to currentYear + forecastYears
     const labels = [];
     for (let y = startYear; y <= currentYear + forecastYears; y++) {
         labels.push(y);
     }
 
-    // Split actual vs forecast
-      const actualSalesData = [];
-    const forecastSalesData = [];
+    const fullSalesData = [];
 
-    // Get all actual data first
     labels.forEach(year => {
         if (salesData[year]) {
-            actualSalesData.push(salesData[year]);
-            forecastSalesData.push(null); // No forecast yet
+            fullSalesData.push(salesData[year]);
         } else {
-            // Forecast logic: simple average of last 5 available years
-            const availableYears = Object.keys(salesData).map(y => parseInt(y)).sort();
+            // Forecast using average of last 5 years
+            const availableYears = Object.keys(salesData).map(Number).sort();
             const last5Years = availableYears.slice(-5);
             const last5Totals = last5Years.map(y => salesData[y]);
             const average = last5Totals.reduce((a, b) => a + b, 0) / last5Totals.length;
 
-            actualSalesData.push(null); // No actual sales for future
-            forecastSalesData.push(average);
-
-            // Also simulate new forecasted year
-            salesData[year] = average;
+            fullSalesData.push(average);
+            salesData[year] = average; // para tuloy-tuloy sa susunod na forecast
         }
     });
 
@@ -394,30 +386,22 @@ document.addEventListener("DOMContentLoaded", function () {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [
-                {
-                    label: "Actual Sales",
-                    data: actualSalesData,
-                    borderColor: "blue",
-                    backgroundColor: "transparent",
-                    tension: 0.4
-                },
-                {
-                    label: "Forecasted Sales",
-                    data: forecastSalesData,
-                    borderColor: "red",
-                    borderDash: [5, 5],
-                    backgroundColor: "transparent",
-                    tension: 0.4
-                }
-            ]
+            datasets: [{
+                label: "Sales (Actual + Forecast)",
+                data: fullSalesData,
+                borderColor: "blue",
+                backgroundColor: "transparent",
+                tension: 0.4,
+                pointBackgroundColor: labels.map(year => year <= currentYear ? "blue" : "red"),
+                borderDash: labels.map(year => year <= currentYear ? 0 : 5),
+            }]
         },
         options: {
             responsive: true,
             plugins: {
                 title: {
                     display: true,
-                    text: 'Annual Sales Report with 5-Year Forecast',
+                    text: 'Annual Sales Report (Actual + Forecast)',
                     font: {
                         size: 20
                     }
@@ -450,6 +434,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
 
 </body>
 </html>
