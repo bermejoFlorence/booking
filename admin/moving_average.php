@@ -44,12 +44,14 @@ $user_email = ($result->num_rows > 0) ? $result->fetch_assoc()["emp_email"] : "U
 // Set timezone
 date_default_timezone_set('Asia/Manila');
 $current_year = date('Y');
+$start_year = 2019;
+$forecast_years = 5;
 
-// Fetch all yearly total sales (from 2019 to current year)
+// Fetch yearly sales data
 $sales_data = [];
 $query = "SELECT YEAR(date) AS year, SUM(total_sales) AS total_sales
           FROM sales
-          WHERE YEAR(date) >= 2019
+          WHERE YEAR(date) >= $start_year
           GROUP BY YEAR(date)
           ORDER BY YEAR(date)";
 $result = $database->query($query);
@@ -57,7 +59,23 @@ $result = $database->query($query);
 while ($row = $result->fetch_assoc()) {
     $sales_data[(int)$row['year']] = (float)$row['total_sales'];
 }
+
+// Fetch monthly sales data
+$monthly_sales_data = [];
+$query = "SELECT YEAR(date) AS year, MONTH(date) AS month, SUM(total_sales) AS total_sales
+          FROM sales
+          WHERE YEAR(date) >= $start_year
+          GROUP BY YEAR(date), MONTH(date)
+          ORDER BY YEAR(date), MONTH(date)";
+$result = $database->query($query);
+
+while ($row = $result->fetch_assoc()) {
+    $year = (int)$row['year'];
+    $month = (int)$row['month'];
+    $monthly_sales_data[$year][$month] = (float)$row['total_sales'];
+}
 ?>
+
 
 
     <style>
@@ -335,18 +353,15 @@ canvas { max-width: 100%; height: 400px; }
 
 </div>
 
-<<div class="dash-body" style="margin-top: 15px; padding: 20px;">
+<div class="dash-body" style="margin-top: 15px; padding: 20px;">
     <div class="graph-section">
-        <h2>Annual Sales Report (2019 - <?php echo $current_year; ?> + Forecast to <?php echo $current_year + 5; ?>)</h2>
+        <h2>Sales Report</h2>
         <div style="text-align:center; margin-bottom: 20px;">
-    <button id="toggleViewBtn" class="btn">Switch to Monthly View</button>
-</div>
+            <button id="toggleViewBtn" class="btn">Switch to Monthly View</button>
+        </div>
         <canvas id="salesChart" style="margin-top: 20px;"></canvas>
     </div>
 </div>
-
-
-
     </div>
     
     <script>
@@ -357,20 +372,20 @@ function toggleMenu() {
 
 document.addEventListener("DOMContentLoaded", function () {
     const yearlySalesData = <?php echo json_encode($sales_data); ?>;
+    const monthlySalesData = <?php echo json_encode($monthly_sales_data); ?>;
     const currentYear = <?php echo $current_year; ?>;
-    const startYear = 2019;
-    const forecastYears = 5;
+    const startYear = <?php echo $start_year; ?>;
+    const forecastYears = <?php echo $forecast_years; ?>;
 
-    let currentView = 'yearly'; // default view
+    let currentView = 'yearly'; // default
     let chartInstance = null;
-
     const ctx = document.getElementById("salesChart").getContext("2d");
 
     function buildYearlyChart() {
         const labels = [];
         const actualSalesData = [];
         const forecastSalesData = [];
-        let salesData = {...yearlySalesData}; // copy para hindi maapektuhan original
+        let salesData = {...yearlySalesData};
 
         for (let y = startYear; y <= currentYear + forecastYears; y++) {
             labels.push(y);
@@ -404,8 +419,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     label: "Forecasted Sales (Yearly)",
                     data: forecastSalesData,
                     borderColor: "red",
-                    borderDash: [5, 5],
                     backgroundColor: "transparent",
+                    borderDash: [5, 5],
                     tension: 0.4,
                     spanGaps: true
                 }
@@ -417,27 +432,53 @@ document.addEventListener("DOMContentLoaded", function () {
         const months = ["January", "February", "March", "April", "May", "June",
                         "July", "August", "September", "October", "November", "December"];
 
-        // Monthly data simulation: generate random numbers based on average yearly
         const labels = [];
-        const sales = [];
-        const totalSales = Object.values(yearlySalesData).reduce((a, b) => a + b, 0);
-        const averageYearly = totalSales / Object.keys(yearlySalesData).length;
-        const averageMonthly = averageYearly / 12;
+        const actualSalesData = [];
+        const forecastSalesData = [];
 
-        for (let i = 0; i < months.length; i++) {
-            labels.push(months[i]);
-            sales.push(Math.round(averageMonthly + (Math.random() - 0.5) * averageMonthly * 0.2)); // +/- 20%
+        for (let y = startYear; y <= currentYear + forecastYears; y++) {
+            for (let m = 1; m <= 12; m++) {
+                labels.push(`${months[m-1]} ${y}`);
+                if (monthlySalesData[y] && monthlySalesData[y][m]) {
+                    actualSalesData.push(monthlySalesData[y][m]);
+                    forecastSalesData.push(null);
+                } else {
+                    // Moving average per month
+                    const last5 = [];
+                    for (let back = 1; back <= 5; back++) {
+                        const pastYear = y - back;
+                        if (monthlySalesData[pastYear] && monthlySalesData[pastYear][m]) {
+                            last5.push(monthlySalesData[pastYear][m]);
+                        }
+                    }
+                    const average = last5.length ? last5.reduce((a, b) => a + b, 0) / last5.length : 0;
+                    actualSalesData.push(null);
+                    forecastSalesData.push(average);
+                }
+            }
         }
 
         return {
             labels,
-            datasets: [{
-                label: "Simulated Monthly Sales",
-                data: sales,
-                borderColor: "green",
-                backgroundColor: "transparent",
-                tension: 0.4,
-            }]
+            datasets: [
+                {
+                    label: "Actual Sales (Monthly)",
+                    data: actualSalesData,
+                    borderColor: "blue",
+                    backgroundColor: "transparent",
+                    tension: 0.4,
+                    spanGaps: true
+                },
+                {
+                    label: "Forecasted Sales (Monthly)",
+                    data: forecastSalesData,
+                    borderColor: "red",
+                    backgroundColor: "transparent",
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    spanGaps: true
+                }
+            ]
         };
     }
 
@@ -454,7 +495,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 plugins: {
                     title: {
                         display: true,
-                        text: (currentView === 'yearly' ? 'Annual Sales Report (Actual + Forecast)' : 'Simulated Monthly Sales Report'),
+                        text: (currentView === 'yearly' ? 'Annual Sales Report (Actual + Forecast)' : 'Monthly Sales Report (Actual + Forecast)'),
                         font: {
                             size: 20
                         }
@@ -472,7 +513,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     x: {
                         title: {
                             display: true,
-                            text: (currentView === 'yearly' ? 'Year' : 'Month')
+                            text: (currentView === 'yearly' ? 'Year' : 'Month-Year')
                         }
                     },
                     y: {
